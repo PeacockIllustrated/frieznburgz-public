@@ -1,4 +1,6 @@
-// ** YOUR FIREBASE CONFIGURATION **
+// --- 1. Firebase Configuration ---
+// IMPORTANT: This is your unique Firebase project configuration.
+// Do not share your apiKey publicly in production applications.
 const firebaseConfig = {
   apiKey: "AIzaSyA4hS3texgNpdQbjj8QIECY4n0Nl3SWwTo",
   authDomain: "friez-burgz.firebaseapp.com",
@@ -9,22 +11,22 @@ const firebaseConfig = {
   measurementId: "G-67WXCWCC2X"
 };
 
-// Initialize Firebase
+// Initialize Firebase services
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// DOM Elements
+// --- 2. DOM Element References ---
 const authContainer = document.getElementById('authContainer');
 const loginEmail = document.getElementById('loginEmail');
 const loginPassword = document.getElementById('loginPassword');
-const loginBtn = document.getElementById('loginBtn');
-const googleLoginBtn = document.getElementById('googleLoginBtn');
-const authMessage = document.getElementById('authMessage');
-const mainAppContainer = document.getElementById('mainAppContainer');
-const logoutBtn = document.getElementById('logoutBtn'); // New logout button
+const loginBtn = document.getElementById('loginBtn'); // Email login button
+const googleLoginBtn = document.getElementById('googleLoginBtn'); // Google login button
+const authMessage = document.getElementById('authMessage'); // Authentication message display
+const mainAppContainer = document.getElementById('mainAppContainer'); // Main application container
+const logoutBtn = document.getElementById('logoutBtn'); // Logout button
 
-// Stock Category Item Lists (matching HTML IDs and expected Firestore `category` field)
+// Stock Category Item Lists (Mapped to HTML container IDs)
 const itemLists = {
     'Meat': document.getElementById('meatItemList'),
     'Cheeses': document.getElementById('cheesesItemList'),
@@ -37,42 +39,43 @@ const itemLists = {
     'Other Essentials': document.getElementById('otherItemList')
 };
 
+// Wastage Log Elements
 const wasteItemSelect = document.getElementById('wasteItemSelect');
 const wasteQtySelect = document.getElementById('wasteQtySelect');
 const logWasteBtn = document.getElementById('logWasteBtn');
 const wasteLogList = document.getElementById('wasteLogList');
 
-let allItems = []; // To store all stock items for waste dropdown
+let allItems = []; // Global array to store all loaded stock items for quick lookup
 
-// --- Authentication ---
+// --- 3. Authentication Logic ---
 
-// Email/Password Login
+// Email/Password Login Handler
 loginBtn.addEventListener('click', async () => {
     const email = loginEmail.value;
     const password = loginPassword.value;
 
     try {
         await auth.signInWithEmailAndPassword(email, password);
-        authMessage.textContent = ''; // Clear any previous error messages
+        authMessage.textContent = ''; // Clear any previous error messages on success
     } catch (error) {
         authMessage.textContent = `Login failed: ${error.message}`;
-        console.error('Login error:', error);
+        console.error('Email/Password Login error:', error);
     }
 });
 
-// Google Sign-In
+// Google Sign-In Handler
 googleLoginBtn.addEventListener('click', async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     try {
         await auth.signInWithPopup(provider);
-        authMessage.textContent = ''; // Clear any previous error messages
+        authMessage.textContent = ''; // Clear any previous error messages on success
     } catch (error) {
         authMessage.textContent = `Google Sign-in failed: ${error.message}`;
         console.error('Google Sign-in error:', error);
     }
 });
 
-// Logout
+// Logout Handler
 logoutBtn.addEventListener('click', async () => {
     try {
         await auth.signOut();
@@ -82,23 +85,31 @@ logoutBtn.addEventListener('click', async () => {
     }
 });
 
-
+// Firebase Authentication State Observer
+// This function runs whenever the user's sign-in status changes.
 auth.onAuthStateChanged(user => {
     if (user) {
-        // User is signed in, show app, hide auth
+        // User is signed in, show the main application
         authContainer.style.display = 'none';
         mainAppContainer.style.display = 'block';
-        loadStockItems();
-        loadWasteLog();
+        loadStockItems(); // Load stock data
+        loadWasteLog();   // Load waste log
     } else {
-        // User is signed out, show auth, hide app
+        // User is signed out, show the authentication screen
         authContainer.style.display = 'flex';
         mainAppContainer.style.display = 'none';
+        // Clear inputs on logout for security
+        loginEmail.value = '';
+        loginPassword.value = '';
+        authMessage.textContent = '';
     }
 });
 
-// --- Stock Management ---
+// --- 4. Stock Management Logic ---
 
+/**
+ * Fetches all stock items from Firestore and renders them into their respective categories.
+ */
 async function loadStockItems() {
     try {
         const querySnapshot = await db.collection('items').orderBy('name').get();
@@ -115,41 +126,46 @@ async function loadStockItems() {
                 const itemElement = createStockItemElement(item);
                 itemLists[item.category].appendChild(itemElement);
             } else {
+                // Log a warning if an item's category doesn't have a matching HTML container
                 console.warn(`No HTML element found for category: "${item.category}". Item "${item.name}" will not be displayed.`);
             }
         });
 
-        populateWasteItemSelect(); // Populate waste dropdown after all items are loaded
+        populateWasteItemSelect(); // Update the waste dropdown with current items
     } catch (error) {
         console.error('Error loading stock items:', error);
-        alert('Failed to load stock items. Check Firebase permissions and console for more details.');
+        alert('Failed to load stock items. Please check Firebase permissions and console for more details.');
     }
 }
 
+/**
+ * Creates the HTML element for a single stock item.
+ * @param {Object} item - The item object from Firestore.
+ * @returns {HTMLElement} The created stock item div.
+ */
 function createStockItemElement(item) {
     const div = document.createElement('div');
     div.classList.add('stock-item');
-    div.dataset.itemId = item.id;
+    div.dataset.itemId = item.id; // Store Firestore document ID for easy lookup
 
-    // Determine stock indicator color based on currentStock vs reorderPoint
+    // Determine stock indicator color and fill level
     let stockStatusClass = '';
-    let fillHeight = '0%'; // Default to 0 height if stock is 0 or less
-    // Ensure reorderPoint is a number, default to 0 if not
+    let fillHeight = '0%';
     const reorderPoint = typeof item.reorderPoint === 'number' ? item.reorderPoint : 0;
+    const currentStock = typeof item.currentStock === 'number' ? item.currentStock : 0;
 
-    if (item.currentStock <= reorderPoint / 2) {
+    if (currentStock <= reorderPoint / 2) {
         stockStatusClass = 'critical';
-    } else if (item.currentStock <= reorderPoint) {
+    } else if (currentStock <= reorderPoint) {
         stockStatusClass = 'low';
-    } else if (item.currentStock > reorderPoint) {
+    } else { // currentStock > reorderPoint
         stockStatusClass = 'good';
     }
 
-    // Calculate fill height based on a hypothetical max stock for visual representation
-    // You might want to define a 'maxStock' field for each item in Firestore for better accuracy
-    const visualMaxStock = Math.max(item.currentStock, (item.reorderQuantity || 0) * 2, reorderPoint * 3, 100); // Default to 100 if other values are too low
-    if (item.currentStock >= 0) {
-        fillHeight = `${Math.min(100, (item.currentStock / visualMaxStock) * 100)}%`;
+    // Calculate fill height based on a hypothetical max stock (for visual representation only)
+    const visualMaxStock = Math.max(currentStock, (item.reorderQuantity || 0) * 2, reorderPoint * 3, 100);
+    if (currentStock >= 0) {
+        fillHeight = `${Math.min(100, (currentStock / visualMaxStock) * 100)}%`;
     }
 
     div.innerHTML = `
@@ -159,7 +175,7 @@ function createStockItemElement(item) {
         <span class="item-name">${item.name} (${item.unit || 'units'})</span>
         <div class="stock-controls">
             <button class="control-button decrement-btn">-</button>
-            <input type="number" class="stock-input" value="${item.currentStock}" min="0">
+            <input type="number" class="stock-input" value="${currentStock}" min="0">
             <button class="control-button increment-btn">+</button>
         </div>
         <button class="add-stock-button reorder-btn" title="Message Supplier">
@@ -167,7 +183,7 @@ function createStockItemElement(item) {
         </button>
     `;
 
-    // Event Listeners for controls
+    // Add event listeners for stock controls and reorder button
     const decrementBtn = div.querySelector('.decrement-btn');
     const incrementBtn = div.querySelector('.increment-btn');
     const stockInput = div.querySelector('.stock-input');
@@ -175,77 +191,56 @@ function createStockItemElement(item) {
 
     decrementBtn.addEventListener('click', () => updateStock(item.id, -1, stockInput));
     incrementBtn.addEventListener('click', () => updateStock(item.id, 1, stockInput));
-    stockInput.addEventListener('change', () => updateStock(item.id, 0, stockInput)); // Update on manual input change
+    // Listen for 'change' event on input to update when user types a new value
+    stockInput.addEventListener('change', () => updateStock(item.id, 0, stockInput));
     reorderBtn.addEventListener('click', () => messageSupplier(item));
 
     return div;
 }
 
+/**
+ * Updates the stock level for an item in Firestore.
+ * @param {string} itemId - The ID of the item document in Firestore.
+ * @param {number} change - The amount to change stock by (+1, -1) or 0 for manual input.
+ * @param {HTMLInputElement} inputElement - The stock input field element.
+ */
 async function updateStock(itemId, change, inputElement) {
     const docRef = db.collection('items').doc(itemId);
     let newStock;
 
-    if (change === 0) { // Manual input change
+    if (change === 0) { // Manual input change (user typed a value)
         newStock = parseInt(inputElement.value, 10);
         if (isNaN(newStock) || newStock < 0) {
             alert('Please enter a valid stock quantity (non-negative number).');
-            loadStockItems(); // Reload to revert invalid input
+            loadStockItems(); // Reload UI to revert invalid input
             return;
         }
-    } else { // Increment/Decrement button
+    } else { // Increment/Decrement button click
         const currentStock = parseInt(inputElement.value, 10);
         newStock = currentStock + change;
-        if (newStock < 0) newStock = 0; // Prevent negative stock
+        if (newStock < 0) newStock = 0; // Prevent stock from going negative
     }
 
     try {
         await docRef.update({ currentStock: newStock });
-        // Instead of directly updating input, let loadStockItems refresh for consistency
-        // inputElement.value = newStock;
-        // updateStockIndicator(itemId, newStock);
-        loadStockItems(); // Re-load all items to reflect accurate stock and indicator status
+        // Instead of directly manipulating the input/indicator,
+        // we reload all items to ensure UI consistency with Firestore data.
+        loadStockItems();
         console.log(`Stock for ${itemId} updated to ${newStock}`);
     } catch (error) {
         console.error('Error updating stock:', error);
-        alert('Failed to update stock. Please try again. Check Firebase permissions.');
+        alert('Failed to update stock. Please check Firebase permissions or network connection.');
     }
 }
 
-function updateStockIndicator(itemId, newStock) {
-    const itemElement = document.querySelector(`.stock-item[data-item-id="${itemId}"]`);
-    if (!itemElement) return;
-
-    const item = allItems.find(i => i.id === itemId);
-    if (!item) return;
-
-    const circle = itemElement.querySelector('.stock-indicator-circle');
-    const fill = itemElement.querySelector('.stock-indicator-fill');
-
-    // Remove existing status classes
-    circle.classList.remove('good', 'low', 'critical');
-
-    let stockStatusClass = '';
-    const reorderPoint = typeof item.reorderPoint === 'number' ? item.reorderPoint : 0;
-    if (newStock <= reorderPoint / 2) {
-        stockStatusClass = 'critical';
-    } else if (newStock <= reorderPoint) {
-        stockStatusClass = 'low';
-    } else { // newStock > reorderPoint
-        stockStatusClass = 'good';
-    }
-    circle.classList.add(stockStatusClass);
-
-    // Recalculate fill height (same logic as createStockItemElement)
-    const visualMaxStock = Math.max(newStock, (item.reorderQuantity || 0) * 2, reorderPoint * 3, 100);
-    const fillHeight = `${Math.min(100, (newStock / visualMaxStock) * 100)}%`;
-    fill.style.height = fillHeight;
-}
-
-
+/**
+ * Generates an email to the supplier for reordering.
+ * @param {Object} item - The item to reorder.
+ */
 function messageSupplier(item) {
-    // For MVP, open mailto link with pre-filled content.
-    // In a real app, this would trigger a backend function to send an email.
-    const recipient = 'supplier@example.com'; // Replace with actual supplier email
+    // For MVP, this opens a mailto link.
+    // In a future version, this would trigger a backend function to send an actual email.
+    const recipient = 'supplier@example.com'; // Replace with your actual supplier email
     const subject = `Order Request: ${item.name} from Friez n Burgz`;
     const body = `Dear Supplier,\n\nWe would like to order ${item.reorderQuantity || 'N/A'} ${item.unit || 'units'} of ${item.name}.\n\nOur current stock is ${item.currentStock} ${item.unit || 'units'}.\n\nPlease let us know the availability and estimated delivery time.\n\nThank you,\nFriez n Burgz Management`;
 
@@ -255,10 +250,13 @@ function messageSupplier(item) {
     alert(`Drafting email to supplier for ${item.name}. Please check your email client. Remember, a human must approve this order.`);
 }
 
+// --- 5. Wastage Logging Logic ---
 
-// --- Wastage Log ---
+/**
+ * Populates the waste item dropdown with all available stock items.
+ */
 function populateWasteItemSelect() {
-    wasteItemSelect.innerHTML = '<option value="">Select Item</option>'; // Default option
+    wasteItemSelect.innerHTML = '<option value="">Select Item</option>'; // Default placeholder option
     // Sort items alphabetically for easier selection
     const sortedItems = [...allItems].sort((a, b) => a.name.localeCompare(b.name));
     sortedItems.forEach(item => {
@@ -268,8 +266,8 @@ function populateWasteItemSelect() {
         wasteItemSelect.appendChild(option);
     });
 
-    wasteQtySelect.innerHTML = '<option value="">Select Qty</option>'; // Default option
-    for (let i = 1; i <= 50; i++) { // Max 50 units for waste, adjust as needed
+    wasteQtySelect.innerHTML = '<option value="">Select Qty</option>'; // Default placeholder option
+    for (let i = 1; i <= 50; i++) { // Populate quantity options (adjust max as needed)
         const option = document.createElement('option');
         option.value = i;
         option.textContent = i;
@@ -277,6 +275,7 @@ function populateWasteItemSelect() {
     }
 }
 
+// Waste Log Button Handler
 logWasteBtn.addEventListener('click', async () => {
     const selectedItemId = wasteItemSelect.value;
     const wastedQty = parseInt(wasteQtySelect.value, 10);
@@ -288,58 +287,63 @@ logWasteBtn.addEventListener('click', async () => {
 
     const item = allItems.find(i => i.id === selectedItemId);
     if (!item) {
-        alert('Selected item not found.');
+        alert('Selected item not found in inventory.');
         return;
     }
 
+    // Prompt for reason, ensure it's not empty
     const reason = prompt(`Reason for wasting ${wastedQty} ${item.unit || 'units'} of ${item.name}?`);
     if (reason === null || reason.trim() === '') {
-        alert('Waste not logged. Reason is required.');
+        alert('Waste not logged. A reason for wastage is required.');
         return;
     }
 
     try {
-        // Log waste
+        // Add a new document to the 'wastage_log' collection
         await db.collection('wastage_log').add({
             item: item.name,
             itemId: item.id,
             quantity: wastedQty,
             unit: item.unit || 'units',
             reason: reason,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            updatedBy: auth.currentUser ? auth.currentUser.email : 'Unknown User'
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Use server timestamp for accuracy
+            updatedBy: auth.currentUser ? auth.currentUser.email : 'Unknown User' // Log who made the entry
         });
 
-        // Deduct from current stock
+        // Deduct wasted quantity from the item's current stock in Firestore
         const currentStockRef = db.collection('items').doc(item.id);
         await currentStockRef.update({
-            currentStock: firebase.firestore.FieldValue.increment(-wastedQty)
+            currentStock: firebase.firestore.FieldValue.increment(-wastedQty) // Atomically decrement stock
         });
 
         alert(`Logged ${wastedQty} of ${item.name} as wasted and updated stock.`);
+        // Reset dropdowns
         wasteItemSelect.value = '';
         wasteQtySelect.value = '';
-        loadStockItems(); // Reload to show updated stock
-        loadWasteLog(); // Reload waste log
+        loadStockItems(); // Reload stock display to reflect deduction
+        loadWasteLog();   // Reload waste log to show new entry
     } catch (error) {
         console.error('Error logging waste:', error);
         alert('Failed to log waste. Please try again. Check Firebase permissions.');
     }
 });
 
+/**
+ * Loads and displays recent waste log entries.
+ */
 async function loadWasteLog() {
     try {
         const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7); // Calculate date 7 days ago
         const sevenDaysAgoTimestamp = firebase.firestore.Timestamp.fromDate(sevenDaysAgo);
 
         const querySnapshot = await db.collection('wastage_log')
-            .where('timestamp', '>=', sevenDaysAgoTimestamp)
-            .orderBy('timestamp', 'desc')
-            .limit(5) // Show last 5 entries
+            .where('timestamp', '>=', sevenDaysAgoTimestamp) // Filter for entries within last 7 days
+            .orderBy('timestamp', 'desc') // Order by most recent first
+            .limit(5) // Display a limited number of recent entries
             .get();
 
-        wasteLogList.innerHTML = '';
+        wasteLogList.innerHTML = ''; // Clear previous log entries
         if (querySnapshot.empty) {
             const li = document.createElement('li');
             li.textContent = 'No waste logged in the last 7 days.';
@@ -347,14 +351,14 @@ async function loadWasteLog() {
         } else {
             querySnapshot.forEach(doc => {
                 const data = doc.data();
-                // Ensure timestamp exists and is a Firestore Timestamp object before converting
+                // Safely convert Firestore Timestamp to local date string
                 const timestampDate = data.timestamp instanceof firebase.firestore.Timestamp
                                     ? data.timestamp.toDate().toLocaleString()
-                                    : (data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : 'N/A'); // Fallback for older timestamps
+                                    : (data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : 'N/A');
 
                 const li = document.createElement('li');
                 li.classList.add('waste-log-item');
-                // Trim the reason for display if it's too long
+                // Truncate long reasons for cleaner display
                 const displayReason = data.reason.length > 50 ? data.reason.substring(0, 47) + '...' : data.reason;
                 li.textContent = `${data.item} | ${data.quantity} ${data.unit || 'units'} | ${timestampDate} - ${displayReason}`;
                 wasteLogList.appendChild(li);
@@ -362,12 +366,14 @@ async function loadWasteLog() {
         }
     } catch (error) {
         console.error('Error loading waste log:', error);
-        // Do not alert for this, as it might happen often due to no logs
+        // Do not alert for this specific error, as it might happen when no logs exist or on initial load.
     }
+}
 
-  // ... (your existing script.js code above) ...
 
-// --- One-Time Data Import Function ---
+// --- 6. One-Time Data Import Function (for initial population) ---
+// This function is for initial setup. RUN IT ONCE FROM BROWSER CONSOLE AFTER LOGGING IN.
+// Then you can delete or comment out this section from your script.js file.
 const allIngredientsData = [
     // MEAT
     { id: 'beef_patties', name: 'Beef Patties', category: 'Meat', unit: 'lbs', currentStock: 50, reorderPoint: 20, reorderQuantity: 100 },
@@ -382,22 +388,22 @@ const allIngredientsData = [
     { id: 'halloumi_cheese', name: 'Halloumi Cheese', category: 'Cheeses', unit: 'blocks', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
     { id: 'mozzarella_patties', name: 'Mozzarella Patties', category: 'Cheeses', unit: 'pcs', currentStock: 45, reorderPoint: 15, reorderQuantity: 75 },
 
-    // SPECIALZ INGREDIENTS (Example, these would change often)
+    // SPECIALZ INGREDIENTS (Example data for dynamic categories)
     { id: 'special_sauce_base', name: 'Special Sauce Base', category: 'Specialz Ingredients', unit: 'liters', currentStock: 10, reorderPoint: 3, reorderQuantity: 10 },
     { id: 'crispy_onions', name: 'Crispy Onions', category: 'Specialz Ingredients', unit: 'kg', currentStock: 8, reorderPoint: 2, reorderQuantity: 15 },
     { id: 'gourmet_bun', name: 'Gourmet Bun', category: 'Specialz Ingredients', unit: 'packs', currentStock: 20, reorderPoint: 5, reorderQuantity: 30 },
 
-    // FILLETZ INGREDIENTS (Example, these would change often)
+    // FILLETZ INGREDIENTS (Example data for dynamic categories)
     { id: 'honey_chilli_glaze', name: 'Honey Chilli Glaze', category: 'Filletz Ingredients', unit: 'liters', currentStock: 5, reorderPoint: 1, reorderQuantity: 5 },
     { id: 'chilli_flakes', name: 'Chilli Flakes', category: 'Filletz Ingredients', unit: 'kg', currentStock: 2, reorderPoint: 0.5, reorderQuantity: 2 },
     { id: 'spicy_chicken_marinade', name: 'Spicy Chicken Marinade', category: 'Filletz Ingredients', unit: 'liters', currentStock: 7, reorderPoint: 2, reorderQuantity: 10 },
 
-    // MILKSHAKES OF THE WEEK (Example, these would change often)
+    // MILKSHAKES OF THE WEEK (Example data for dynamic categories)
     { id: 'mango_puree', name: 'Mango Puree', category: 'Milkshakes of the Week', unit: 'liters', currentStock: 8, reorderPoint: 2, reorderQuantity: 5 },
     { id: 'oreo_cookies', name: 'Oreo Cookies', category: 'Milkshakes of the Week', unit: 'packs', currentStock: 15, reorderPoint: 5, reorderQuantity: 20 },
     { id: 'strawberry_syrup', name: 'Strawberry Syrup', category: 'Milkshakes of the Week', unit: 'liters', currentStock: 6, reorderPoint: 2, reorderQuantity: 8 },
 
-    // PRODUCE & VEGETABLES
+    // PRODUCE & VEGETABLES (General categories)
     { id: 'lettuce_shredded', name: 'Shredded Lettuce', category: 'Produce & Vegetables', unit: 'bags', currentStock: 25, reorderPoint: 10, reorderQuantity: 40 },
     { id: 'onions_diced', name: 'Diced Onions', category: 'Produce & Vegetables', unit: 'kg', currentStock: 15, reorderPoint: 5, reorderQuantity: 25 },
     { id: 'dill_pickles', name: 'Dill Pickles', category: 'Produce & Vegetables', unit: 'jars', currentStock: 10, reorderPoint: 3, reorderQuantity: 15 },
@@ -405,7 +411,7 @@ const allIngredientsData = [
     { id: 'potatoes_fries', name: 'Fries Potatoes', category: 'Produce & Vegetables', unit: 'kg', currentStock: 80, reorderPoint: 25, reorderQuantity: 100 },
     { id: 'corn_bites_frozen', name: 'Corn Bites (Frozen)', category: 'Produce & Vegetables', unit: 'bags', currentStock: 12, reorderPoint: 4, reorderQuantity: 20 },
 
-    // SAUCES & CONDIMENTS
+    // SAUCES & CONDIMENTS (General categories)
     { id: 'classic_sauce', name: 'Classic Sauce', category: 'Sauces & Condiments', unit: 'gallons', currentStock: 15, reorderPoint: 5, reorderQuantity: 20 },
     { id: 'chipotle_mayo', name: 'Chipotle Mayo', category: 'Sauces & Condiments', unit: 'bottles', currentStock: 30, reorderPoint: 10, reorderQuantity: 20 },
     { id: 'ketchup_heinz', name: 'Heinz Ketchup', category: 'Sauces & Condiments', unit: 'gallons', currentStock: 20, reorderPoint: 8, reorderQuantity: 30 },
@@ -416,12 +422,12 @@ const allIngredientsData = [
     { id: 'hot_cheese_sauce', name: 'Hot Cheese Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 9, reorderPoint: 3, reorderQuantity: 12 },
     { id: 'gravy_mix', name: 'Gravy Mix', category: 'Sauces & Condiments', unit: 'kg', currentStock: 6, reorderPoint: 2, reorderQuantity: 8 },
 
-    // BREADS & BAKED GOODS
+    // BREADS & BAKED GOODS (General categories)
     { id: 'burger_buns', name: 'Burger Buns', category: 'Breads & Baked Goods', unit: 'packs', currentStock: 40, reorderPoint: 15, reorderQuantity: 50 },
     { id: 'breakfast_buns', name: 'Breakfast Buns', category: 'Breads & Baked Goods', unit: 'packs', currentStock: 20, reorderPoint: 8, reorderQuantity: 30 },
     { id: 'biscoff_biscuits', name: 'Biscoff Biscuits', category: 'Breads & Baked Goods', unit: 'packs', currentStock: 10, reorderPoint: 3, reorderQuantity: 15 },
 
-    // OTHER ESSENTIALS
+    // OTHER ESSENTIALS (General categories)
     { id: 'frying_oil', name: 'Frying Oil', category: 'Other Essentials', unit: 'gallons', currentStock: 5, reorderPoint: 2, reorderQuantity: 10 },
     { id: 'coffee_beans', name: 'Coffee Beans', category: 'Other Essentials', unit: 'kg', currentStock: 3, reorderPoint: 1, reorderQuantity: 5 },
     { id: 'sugar_packets', name: 'Sugar Packets', category: 'Other Essentials', unit: 'boxes', currentStock: 20, reorderPoint: 8, reorderQuantity: 30 },
@@ -430,14 +436,27 @@ const allIngredientsData = [
     { id: 'disposable_gloves', name: 'Disposable Gloves', category: 'Other Essentials', unit: 'boxes', currentStock: 18, reorderPoint: 5, reorderQuantity: 25 },
 ];
 
+/**
+ * Imports all ingredient data from the `allIngredientsData` array into Firestore.
+ * This function is designed to be run ONCE manually from the browser's developer console
+ * after a successful login to populate the database.
+ *
+ * IMPORTANT: After successful import, consider removing or commenting out this function
+ * and the `allIngredientsData` array from your `script.js` to prevent accidental re-imports
+ * and to keep your client-side code cleaner.
+ */
 async function importAllIngredients() {
     if (!auth.currentUser) {
-        console.error("You must be logged in to import data.");
+        console.error("Authentication Error: You must be logged in to import data.");
         alert("Please log in before attempting to import ingredients.");
         return;
     }
 
-    const confirmImport = confirm("Are you sure you want to import all ingredients? This will add or overwrite existing items with the same ID.");
+    const confirmImport = confirm(
+        "Are you sure you want to import all ingredients?\n\n" +
+        "This will ADD new items or OVERWRITE existing items with matching IDs.\n" +
+        "ONLY RUN THIS ONCE FOR INITIAL SETUP."
+    );
     if (!confirmImport) {
         console.log("Import cancelled by user.");
         return;
@@ -448,32 +467,26 @@ async function importAllIngredients() {
 
     for (const item of allIngredientsData) {
         const docRef = db.collection('items').doc(item.id);
-        batch.set(docRef, item); // .set() will create or overwrite
+        // Use .set() to create if not exists, or overwrite if exists.
+        // Ensure all numeric fields are actual numbers in the data array above.
+        batch.set(docRef, item);
         importedCount++;
-        // Firestore batches have a limit of 500 operations.
-        // If you had more than 500 items, you'd need to commit and start a new batch.
-        // For this list, we're fine within one batch.
     }
 
     try {
         await batch.commit();
-        console.log(`Successfully imported ${importedCount} ingredients.`);
-        alert(`Successfully imported ${importedCount} ingredients! The app will now reload.`);
-        loadStockItems(); // Reload the UI after import
+        console.log(`Successfully imported ${importedCount} ingredients to Firestore.`);
+        alert(`Successfully imported ${importedCount} ingredients! The app will now reload to display them.`);
+        loadStockItems(); // Reload the UI after successful import
     } catch (error) {
         console.error("Error importing ingredients:", error);
         alert(`Failed to import ingredients: ${error.message}. Check console for details.`);
     }
 }
-
-// You can uncomment the line below if you want to automatically trigger the import
-// once, after the user logs in for the first time.
-// It's generally safer to trigger it manually via the console.
-// auth.onAuthStateChanged(user => {
-//     if (user && user.metadata.creationTime === user.metadata.lastSignInTime) {
-//         // This is a rough check for first-time login
-//         // Consider a more robust flag in Firestore for production
-//         importAllIngredients();
-//     }
-// });
-
+// To run this function:
+// 1. Deploy your code.
+// 2. Go to your live app URL.
+// 3. Log in.
+// 4. Open your browser's Developer Console (F12 or right-click -> Inspect, then 'Console' tab).
+// 5. Type `importAllIngredients();` and press Enter.
+// 6. Confirm the action in the pop-up.
