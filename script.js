@@ -364,4 +364,116 @@ async function loadWasteLog() {
         console.error('Error loading waste log:', error);
         // Do not alert for this, as it might happen often due to no logs
     }
+
+  // ... (your existing script.js code above) ...
+
+// --- One-Time Data Import Function ---
+const allIngredientsData = [
+    // MEAT
+    { id: 'beef_patties', name: 'Beef Patties', category: 'Meat', unit: 'lbs', currentStock: 50, reorderPoint: 20, reorderQuantity: 100 },
+    { id: 'chicken_filletz_plain', name: 'Plain Chicken Filletz', category: 'Meat', unit: 'pcs', currentStock: 75, reorderPoint: 30, reorderQuantity: 150 },
+    { id: 'chicken_breast', name: 'Chicken Breast', category: 'Meat', unit: 'lbs', currentStock: 40, reorderPoint: 15, reorderQuantity: 80 },
+    { id: 'bacon_strips', name: 'Bacon Strips', category: 'Meat', unit: 'packs', currentStock: 60, reorderPoint: 25, reorderQuantity: 120 },
+    { id: 'pastrami_slices', name: 'Pastrami Slices', category: 'Meat', unit: 'lbs', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
+    { id: 'pulled_turkey', name: 'Pulled Turkey', category: 'Meat', unit: 'lbs', currentStock: 25, reorderPoint: 10, reorderQuantity: 40 },
+
+    // CHEESES
+    { id: 'american_cheese_slices', name: 'American Cheese', category: 'Cheeses', unit: 'slices', currentStock: 120, reorderPoint: 50, reorderQuantity: 200 },
+    { id: 'halloumi_cheese', name: 'Halloumi Cheese', category: 'Cheeses', unit: 'blocks', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
+    { id: 'mozzarella_patties', name: 'Mozzarella Patties', category: 'Cheeses', unit: 'pcs', currentStock: 45, reorderPoint: 15, reorderQuantity: 75 },
+
+    // SPECIALZ INGREDIENTS (Example, these would change often)
+    { id: 'special_sauce_base', name: 'Special Sauce Base', category: 'Specialz Ingredients', unit: 'liters', currentStock: 10, reorderPoint: 3, reorderQuantity: 10 },
+    { id: 'crispy_onions', name: 'Crispy Onions', category: 'Specialz Ingredients', unit: 'kg', currentStock: 8, reorderPoint: 2, reorderQuantity: 15 },
+    { id: 'gourmet_bun', name: 'Gourmet Bun', category: 'Specialz Ingredients', unit: 'packs', currentStock: 20, reorderPoint: 5, reorderQuantity: 30 },
+
+    // FILLETZ INGREDIENTS (Example, these would change often)
+    { id: 'honey_chilli_glaze', name: 'Honey Chilli Glaze', category: 'Filletz Ingredients', unit: 'liters', currentStock: 5, reorderPoint: 1, reorderQuantity: 5 },
+    { id: 'chilli_flakes', name: 'Chilli Flakes', category: 'Filletz Ingredients', unit: 'kg', currentStock: 2, reorderPoint: 0.5, reorderQuantity: 2 },
+    { id: 'spicy_chicken_marinade', name: 'Spicy Chicken Marinade', category: 'Filletz Ingredients', unit: 'liters', currentStock: 7, reorderPoint: 2, reorderQuantity: 10 },
+
+    // MILKSHAKES OF THE WEEK (Example, these would change often)
+    { id: 'mango_puree', name: 'Mango Puree', category: 'Milkshakes of the Week', unit: 'liters', currentStock: 8, reorderPoint: 2, reorderQuantity: 5 },
+    { id: 'oreo_cookies', name: 'Oreo Cookies', category: 'Milkshakes of the Week', unit: 'packs', currentStock: 15, reorderPoint: 5, reorderQuantity: 20 },
+    { id: 'strawberry_syrup', name: 'Strawberry Syrup', category: 'Milkshakes of the Week', unit: 'liters', currentStock: 6, reorderPoint: 2, reorderQuantity: 8 },
+
+    // PRODUCE & VEGETABLES
+    { id: 'lettuce_shredded', name: 'Shredded Lettuce', category: 'Produce & Vegetables', unit: 'bags', currentStock: 25, reorderPoint: 10, reorderQuantity: 40 },
+    { id: 'onions_diced', name: 'Diced Onions', category: 'Produce & Vegetables', unit: 'kg', currentStock: 15, reorderPoint: 5, reorderQuantity: 25 },
+    { id: 'dill_pickles', name: 'Dill Pickles', category: 'Produce & Vegetables', unit: 'jars', currentStock: 10, reorderPoint: 3, reorderQuantity: 15 },
+    { id: 'fresh_chillies', name: 'Fresh Chillies', category: 'Produce & Vegetables', unit: 'kg', currentStock: 5, reorderPoint: 1, reorderQuantity: 5 },
+    { id: 'potatoes_fries', name: 'Fries Potatoes', category: 'Produce & Vegetables', unit: 'kg', currentStock: 80, reorderPoint: 25, reorderQuantity: 100 },
+    { id: 'corn_bites_frozen', name: 'Corn Bites (Frozen)', category: 'Produce & Vegetables', unit: 'bags', currentStock: 12, reorderPoint: 4, reorderQuantity: 20 },
+
+    // SAUCES & CONDIMENTS
+    { id: 'classic_sauce', name: 'Classic Sauce', category: 'Sauces & Condiments', unit: 'gallons', currentStock: 15, reorderPoint: 5, reorderQuantity: 20 },
+    { id: 'chipotle_mayo', name: 'Chipotle Mayo', category: 'Sauces & Condiments', unit: 'bottles', currentStock: 30, reorderPoint: 10, reorderQuantity: 20 },
+    { id: 'ketchup_heinz', name: 'Heinz Ketchup', category: 'Sauces & Condiments', unit: 'gallons', currentStock: 20, reorderPoint: 8, reorderQuantity: 30 },
+    { id: 'creamy_garlic', name: 'Creamy Garlic Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 10, reorderPoint: 3, reorderQuantity: 15 },
+    { id: 'smokey_hot_sauce', name: 'Smokey Hot Sauce', category: 'Sauces & Condiments', unit: 'bottles', currentStock: 8, reorderPoint: 2, reorderQuantity: 10 },
+    { id: 'bbq_sauce_smokey', name: 'Smokey BBQ Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 12, reorderPoint: 4, reorderQuantity: 18 },
+    { id: 'garlic_parmesan_sauce', name: 'Garlic Parmesan Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 7, reorderPoint: 2, reorderQuantity: 10 },
+    { id: 'hot_cheese_sauce', name: 'Hot Cheese Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 9, reorderPoint: 3, reorderQuantity: 12 },
+    { id: 'gravy_mix', name: 'Gravy Mix', category: 'Sauces & Condiments', unit: 'kg', currentStock: 6, reorderPoint: 2, reorderQuantity: 8 },
+
+    // BREADS & BAKED GOODS
+    { id: 'burger_buns', name: 'Burger Buns', category: 'Breads & Baked Goods', unit: 'packs', currentStock: 40, reorderPoint: 15, reorderQuantity: 50 },
+    { id: 'breakfast_buns', name: 'Breakfast Buns', category: 'Breads & Baked Goods', unit: 'packs', currentStock: 20, reorderPoint: 8, reorderQuantity: 30 },
+    { id: 'biscoff_biscuits', name: 'Biscoff Biscuits', category: 'Breads & Baked Goods', unit: 'packs', currentStock: 10, reorderPoint: 3, reorderQuantity: 15 },
+
+    // OTHER ESSENTIALS
+    { id: 'frying_oil', name: 'Frying Oil', category: 'Other Essentials', unit: 'gallons', currentStock: 5, reorderPoint: 2, reorderQuantity: 10 },
+    { id: 'coffee_beans', name: 'Coffee Beans', category: 'Other Essentials', unit: 'kg', currentStock: 3, reorderPoint: 1, reorderQuantity: 5 },
+    { id: 'sugar_packets', name: 'Sugar Packets', category: 'Other Essentials', unit: 'boxes', currentStock: 20, reorderPoint: 8, reorderQuantity: 30 },
+    { id: 'milk_dairy', name: 'Milk (Dairy)', category: 'Other Essentials', unit: 'liters', currentStock: 25, reorderPoint: 10, reorderQuantity: 40 },
+    { id: 'whipped_cream_cans', name: 'Whipped Cream Cans', category: 'Other Essentials', unit: 'cans', currentStock: 10, reorderPoint: 3, reorderQuantity: 15 },
+    { id: 'disposable_gloves', name: 'Disposable Gloves', category: 'Other Essentials', unit: 'boxes', currentStock: 18, reorderPoint: 5, reorderQuantity: 25 },
+];
+
+async function importAllIngredients() {
+    if (!auth.currentUser) {
+        console.error("You must be logged in to import data.");
+        alert("Please log in before attempting to import ingredients.");
+        return;
+    }
+
+    const confirmImport = confirm("Are you sure you want to import all ingredients? This will add or overwrite existing items with the same ID.");
+    if (!confirmImport) {
+        console.log("Import cancelled by user.");
+        return;
+    }
+
+    const batch = db.batch();
+    let importedCount = 0;
+
+    for (const item of allIngredientsData) {
+        const docRef = db.collection('items').doc(item.id);
+        batch.set(docRef, item); // .set() will create or overwrite
+        importedCount++;
+        // Firestore batches have a limit of 500 operations.
+        // If you had more than 500 items, you'd need to commit and start a new batch.
+        // For this list, we're fine within one batch.
+    }
+
+    try {
+        await batch.commit();
+        console.log(`Successfully imported ${importedCount} ingredients.`);
+        alert(`Successfully imported ${importedCount} ingredients! The app will now reload.`);
+        loadStockItems(); // Reload the UI after import
+    } catch (error) {
+        console.error("Error importing ingredients:", error);
+        alert(`Failed to import ingredients: ${error.message}. Check console for details.`);
+    }
+}
+
+// You can uncomment the line below if you want to automatically trigger the import
+// once, after the user logs in for the first time.
+// It's generally safer to trigger it manually via the console.
+// auth.onAuthStateChanged(user => {
+//     if (user && user.metadata.creationTime === user.metadata.lastSignInTime) {
+//         // This is a rough check for first-time login
+//         // Consider a more robust flag in Firestore for production
+//         importAllIngredients();
+//     }
+// });
 }
