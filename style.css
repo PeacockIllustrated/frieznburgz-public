@@ -161,6 +161,7 @@ body {
     padding: 20px 0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     margin-bottom: 30px;
+    position: relative; /* For logout button positioning */
 }
 
 .app-logo {
@@ -178,6 +179,29 @@ body {
     margin: 0;
     line-height: 1.1;
     padding: 0 15px;
+}
+
+.logout-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: var(--yellow);
+    color: var(--red);
+    border: 2px solid var(--red);
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+    background-color: var(--khaki);
+    color: var(--yellow);
+    border-color: var(--khaki);
 }
 
 .content-wrapper {
