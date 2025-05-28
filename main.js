@@ -187,6 +187,120 @@ window.mainApp = {
     showDashboard: showDashboard
 };
 
+// --- One-Time Multi-Location Data Import Function ---
+// This function is for initial setup. RUN IT ONCE FROM BROWSER CONSOLE AFTER LOGGING IN.
+// Then you can delete or comment out this entire section from your script.js file.
 
+const allIngredientsDataMultiLocation = [
+    // Standard Meat Items
+    { id: 'beef_patties', name: 'Beef Patties', category: 'Meat', unit: 'lbs', currentStock: 50, reorderPoint: 20, reorderQuantity: 100 },
+    { id: 'chicken_filletz_plain', name: 'Plain Chicken Filletz', category: 'Meat', unit: 'pcs', currentStock: 75, reorderPoint: 30, reorderQuantity: 150 },
+    { id: 'chicken_breast', name: 'Chicken Breast', category: 'Meat', unit: 'lbs', currentStock: 40, reorderPoint: 15, reorderQuantity: 80 },
+    { id: 'bacon_strips', name: 'Bacon Strips', category: 'Meat', unit: 'packs', currentStock: 60, reorderPoint: 25, reorderQuantity: 120 },
+    { id: 'pastrami_slices', name: 'Pastrami Slices', category: 'Meat', unit: 'lbs', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
+    { id: 'pulled_turkey', name: 'Pulled Turkey', category: 'Meat', unit: 'lbs', currentStock: 25, reorderPoint: 10, reorderQuantity: 40 },
+
+    // Standard Cheese Items
+    { id: 'american_cheese_slices', name: 'American Cheese', category: 'Cheeses', unit: 'slices', currentStock: 120, reorderPoint: 50, reorderQuantity: 200 },
+    { id: 'halloumi_cheese', name: 'Halloumi Cheese', category: 'Cheeses', unit: 'blocks', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
+    { id: 'mozzarella_patties', name: 'Mozzarella Patties', category: 'Cheeses', unit: 'pcs', currentStock: 45, reorderPoint: 15, reorderQuantity: 75 },
+
+    // Example Specialz/Filletz/Milkshake Ingredients (these would be location-specific typically)
+    { id: 'special_sauce_base', name: 'Special Sauce Base', category: 'Specialz Ingredients', unit: 'liters', currentStock: 10, reorderPoint: 3, reorderQuantity: 10 },
+    { id: 'crispy_onions', name: 'Crispy Onions', category: 'Specialz Ingredients', unit: 'kg', currentStock: 8, reorderPoint: 2, reorderQuantity: 15 },
+    { id: 'honey_chilli_glaze', name: 'Honey Chilli Glaze', category: 'Filletz Ingredients', unit: 'liters', currentStock: 5, reorderPoint: 1, reorderQuantity: 5 },
+    { id: 'mango_puree', name: 'Mango Puree', category: 'Milkshakes of the Week', unit: 'liters', currentStock: 8, reorderPoint: 2, reorderQuantity: 5 },
+
+    // General Produce & Vegetables
+    { id: 'lettuce_shredded', name: 'Shredded Lettuce', category: 'Produce & Vegetables', unit: 'bags', currentStock: 25, reorderPoint: 10, reorderQuantity: 40 },
+    { id: 'onions_diced', name: 'Diced Onions', category: 'Produce & Vegetables', unit: 'kg', currentStock: 15, reorderPoint: 5, reorderQuantity: 25 },
+    { id: 'potatoes_fries', name: 'Fries Potatoes', category: 'Produce & Vegetables', unit: 'kg', currentStock: 80, reorderPoint: 25, reorderQuantity: 100 },
+
+    // General Sauces & Condiments
+    { id: 'classic_sauce', name: 'Classic Sauce', category: 'Sauces & Condiments', unit: 'gallons', currentStock: 15, reorderPoint: 5, reorderQuantity: 20 },
+    { id: 'ketchup_heinz', name: 'Heinz Ketchup', category: 'Sauces & Condiments', unit: 'gallons', currentStock: 20, reorderPoint: 8, reorderQuantity: 30 },
+
+    // General Breads & Baked Goods
+    { id: 'burger_buns', name: 'Burger Buns', category: 'Breads & Baked Goods', unit: 'packs', currentStock: 40, reorderPoint: 15, reorderQuantity: 50 },
+
+    // General Other Essentials
+    { id: 'frying_oil', name: 'Frying Oil', category: 'Other Essentials', unit: 'gallons', currentStock: 5, reorderPoint: 2, reorderQuantity: 10 },
+    { id: 'disposable_gloves', name: 'Disposable Gloves', category: 'Other Essentials', unit: 'boxes', currentStock: 18, reorderPoint: 5, reorderQuantity: 25 },
+];
+
+
+async function importAllIngredientsForLocations() {
+    if (!auth.currentUser) {
+        console.error("Authentication Error: You must be logged in to import data.");
+        alert("Please log in before attempting to import ingredients.");
+        return;
+    }
+
+    const confirmImport = confirm(
+        "Are you sure you want to import ALL ingredients for ALL locations?\n\n" +
+        "This will create/overwrite data in: locations/{locationId}/items\n" +
+        "ONLY RUN THIS ONCE FOR INITIAL SETUP."
+    );
+    if (!confirmImport) {
+        console.log("Multi-location import cancelled by user.");
+        return;
+    }
+
+    let totalImportedCount = 0;
+    const allLocations = ["south_shields", "forrest_hall", "byker", "whitley_bay", "newcastle_city_center"]; // Ensure these match IDs in config.js
+
+    for (const locationId of allLocations) {
+        const batch = db.batch();
+        let locationImportCount = 0;
+        console.log(`Starting import for location: ${locationId}`);
+
+        for (const item of allIngredientsDataMultiLocation) {
+            // Reference to the item document WITHIN the specific location's subcollection
+            const itemDocRef = db.collection('locations').doc(locationId).collection('items').doc(item.id);
+
+            // Create a copy of the item data to potentially randomize stock slightly per location
+            const itemDataCopy = { ...item };
+
+            // Optional: Randomize stock slightly for each location for variety (remove for exact copies)
+            itemDataCopy.currentStock = Math.max(0, item.currentStock + Math.floor(Math.random() * 20) - 10); // +/- 10 units
+            if (itemDataCopy.currentStock < itemDataCopy.reorderPoint / 2) { // Ensure some critical stock
+                itemDataCopy.currentStock = Math.max(0, itemDataCopy.reorderPoint / 2 + Math.floor(Math.random() * 5));
+            }
+
+
+            batch.set(itemDocRef, itemDataCopy); // Use .set() to create or overwrite
+            locationImportCount++;
+        }
+
+        try {
+            await batch.commit();
+            totalImportedCount += locationImportCount;
+            console.log(`Successfully imported ${locationImportCount} items for ${locationId}.`);
+        } catch (error) {
+            console.error(`Error importing for ${locationId}:`, error);
+            alert(`Failed to import items for ${locationId}: ${error.message}. Check console.`);
+            return; // Stop if one location fails
+        }
+    }
+
+    console.log(`Total successfully imported ${totalImportedCount} ingredients across all locations.`);
+    alert(`All ingredients (${totalImportedCount} total) successfully imported across all locations!`);
+
+    // After import, it's a good idea to reload stock for the currently selected location
+    // if a location is already chosen. This will happen on next login if not.
+    const currentSelectedLocation = getSelectedLocation();
+    if (currentSelectedLocation) {
+        window.mainApp.showDashboard(currentSelectedLocation); // Force dashboard refresh
+    }
+}
+
+// To run this function:
+// 1. Deploy your code.
+// 2. Go to your live app URL.
+// 3. Log in.
+// 4. Open your browser's Developer Console (F12 or right-click -> Inspect, then 'Console' tab).
+// 5. Type `importAllIngredientsForLocations();` and press Enter.
+// 6. Confirm the action in the pop-up.
+// 7. AFTER SUCCESSFUL IMPORT, REMOVE THIS SCRIPT FROM YOUR PROJECT.
 // Initialize the app when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', initializeApp);
