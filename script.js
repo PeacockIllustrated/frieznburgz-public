@@ -1,4 +1,4 @@
-// ** IMPORTANT: Replace with your Firebase config **
+// ** IMPORTANT: Your Firebase config from the user **
 const firebaseConfig = {
   apiKey: "AIzaSyA4hS3texgNpdQbjj8QIECY4n0Nl3SWwTo",
   authDomain: "friez-burgz.firebaseapp.com",
@@ -18,7 +18,8 @@ const db = firebase.firestore();
 const authContainer = document.getElementById('authContainer');
 const loginEmail = document.getElementById('loginEmail');
 const loginPassword = document.getElementById('loginPassword');
-const loginBtn = document.getElementById('loginBtn');
+const loginBtn = document.getElementById('loginBtn'); // Renamed from previous to indicate Email login
+const googleLoginBtn = document.getElementById('googleLoginBtn'); // New Google login button
 const authMessage = document.getElementById('authMessage');
 const mainAppContainer = document.getElementById('mainAppContainer');
 
@@ -36,6 +37,8 @@ const wasteLogList = document.getElementById('wasteLogList');
 let allItems = []; // To store all stock items for waste dropdown
 
 // --- Authentication ---
+
+// Email/Password Login
 loginBtn.addEventListener('click', async () => {
     const email = loginEmail.value;
     const password = loginPassword.value;
@@ -48,6 +51,19 @@ loginBtn.addEventListener('click', async () => {
         console.error('Login error:', error);
     }
 });
+
+// Google Sign-In
+googleLoginBtn.addEventListener('click', async () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try {
+        await auth.signInWithPopup(provider);
+        authMessage.textContent = ''; // Clear any previous error messages
+    } catch (error) {
+        authMessage.textContent = `Google Sign-in failed: ${error.message}`;
+        console.error('Google Sign-in error:', error);
+    }
+});
+
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -71,10 +87,10 @@ const itemLists = {
     'Filletz Ingredients': filletzItemList,
     'Milkshakes of the Week': milkshakesItemList,
     // Add more categories as needed for a complete inventory
-    'Produce & Vegetables': null, // Placeholder, populate these later
-    'Sauces & Condiments': null,
-    'Breads & Baked Goods': null,
-    'Other Essentials': null
+    // 'Produce & Vegetables': null, // Example: document.getElementById('produceItemList')
+    // 'Sauces & Condiments': null,
+    // 'Breads & Baked Goods': null,
+    // 'Other Essentials': null
 };
 
 async function loadStockItems() {
@@ -316,7 +332,11 @@ async function loadWasteLog() {
         } else {
             querySnapshot.forEach(doc => {
                 const data = doc.data();
-                const timestampDate = data.timestamp ? data.timestamp.toDate().toLocaleString() : 'N/A';
+                // Ensure timestamp exists and is a Firestore Timestamp object before converting
+                const timestampDate = data.timestamp instanceof firebase.firestore.Timestamp
+                                    ? data.timestamp.toDate().toLocaleString()
+                                    : (data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : 'N/A'); // Fallback for older timestamps
+
                 const li = document.createElement('li');
                 li.classList.add('waste-log-item');
                 li.textContent = `${data.item} | ${data.quantity} ${data.unit} | ${timestampDate} - ${data.reason}`;
