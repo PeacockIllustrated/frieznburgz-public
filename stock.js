@@ -7,21 +7,8 @@ import { getSelectedLocation } from './config.js';
 import { createStockItemHtml } from './stock-template.js'; // Template for individual stock items
 
 // --- DOM Elements ---
-const stockManagementPage = document.getElementById('stockManagementPage'); // The section wrapper
-const stockManagementContent = document.getElementById('stockManagementContent'); // Where dynamic content goes
-
-// Define the categories and their corresponding HTML list containers
-const stockCategoryContainers = {
-    'Meat': null, // These will be dynamically created within renderStockManagementPage
-    'Cheeses': null,
-    'Specialz Ingredients': null,
-    'Filletz Ingredients': null,
-    'Milkshakes of the Week': null,
-    'Produce & Vegetables': null,
-    'Sauces & Condiments': null,
-    'Breads & Baked Goods': null,
-    'Other Essentials': null
-};
+// The main content area for the stock management page
+const stockManagementContent = document.getElementById('stockManagementContent');
 
 let currentItemsData = []; // Store current loaded items for the selected location
 
@@ -39,6 +26,7 @@ export async function renderStockManagementPage() {
     const locationDisplayName = selectedLocationId.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
     // Clear previous content and set up base HTML structure for this page
+    // Important: We rebuild the category cards each time to ensure fresh event listeners.
     stockManagementContent.innerHTML = `
         <h3 class="subsection-title">Inventory for ${locationDisplayName}</h3>
         <div id="stockItemsGrid" class="stock-items-grid">
@@ -46,7 +34,7 @@ export async function renderStockManagementPage() {
         </div>
     `;
 
-    const stockItemsGrid = document.getElementById('stockItemsGrid');
+    const stockItemsGrid = document.getElementById('stockItemsGrid'); // Get the grid container after it's been added to the DOM
 
     try {
         // Fetch items from the specific location's subcollection
@@ -80,29 +68,29 @@ export async function renderStockManagementPage() {
                     <h3 class="category-title">${categoryName}</h3>
                     <i class="fas fa-edit edit-icon" title="Edit category items (future)"></i>
                 </div>
-                <div class="item-list" id="${categoryName.replace(/\s+/g, '')}ItemList">
+                <div class="item-list">
                     <!-- Items will be appended here -->
                 </div>
             `;
-            stockItemsGrid.appendChild(categoryCardDiv);
+            stockItemsGrid.appendChild(categoryCardDiv); // Append card to grid
 
-            const itemListContainer = categoryCardDiv.querySelector('.item-list');
-            stockCategoryContainers[categoryName] = itemListContainer; // Store reference for later use if needed
+            const itemListContainer = categoryCardDiv.querySelector('.item-list'); // Get reference to the list container inside the new card
 
             categoryItems.forEach(item => {
                 const itemDiv = document.createElement('div');
-                itemDiv.classList.add('stock-item');
-                itemDiv.dataset.itemId = item.id;
-                itemDiv.innerHTML = createStockItemHtml(item); // Use template to populate
+                itemDiv.classList.add('stock-item'); // Add class for styling and event delegation
+                itemDiv.dataset.itemId = item.id; // Store ID
+                itemDiv.innerHTML = createStockItemHtml(item); // Populate with HTML from template
 
                 itemListContainer.appendChild(itemDiv);
 
-                // Attach event listeners to the newly created elements
+                // Attach event listeners after element is in DOM
                 const decrementBtn = itemDiv.querySelector('.decrement-btn');
                 const incrementBtn = itemDiv.querySelector('.increment-btn');
                 const stockInput = itemDiv.querySelector('.stock-input');
                 const reorderBtn = itemDiv.querySelector('.reorder-btn');
 
+                // Add event listeners only if the elements exist
                 if (decrementBtn) decrementBtn.addEventListener('click', () => updateStock(item.id, -1, stockInput));
                 if (incrementBtn) incrementBtn.addEventListener('click', () => updateStock(item.id, 1, stockInput));
                 if (stockInput) stockInput.addEventListener('change', () => updateStock(item.id, 0, stockInput));
@@ -114,7 +102,7 @@ export async function renderStockManagementPage() {
 
     } catch (error) {
         console.error('Error rendering stock management page or loading items:', error);
-        stockManagementContent.innerHTML = `<h3 class="subsection-title">Inventory for ${locationDisplayName}</h3><p style="color:red;">Error loading stock items: ${error.message}. Please check console.</p>`;
+        stockManagementContent.innerHTML = `<h3 class="subsection-title">Inventory for ${locationDisplayName}</h3><p style="color:red;">Error loading stock items: ${error.message}. Please check console and Firebase permissions.</p>`;
     }
 }
 
@@ -139,7 +127,8 @@ async function updateStock(itemId, change, inputElement) {
         newStockValue = parseInt(inputElement.value, 10);
         if (isNaN(newStockValue) || newStockValue < 0) {
             alert('Please enter a valid stock quantity (non-negative number).');
-            renderStockManagementPage(); // Re-render to revert invalid input
+            // Re-render to revert invalid input to last known good state
+            await renderStockManagementPage();
             return;
         }
     } else { // Increment/Decrement button click
@@ -150,12 +139,13 @@ async function updateStock(itemId, change, inputElement) {
 
     try {
         await itemDocRef.update({ currentStock: newStockValue });
-        // Re-render the entire stock page to reflect the update and correct stock indicators
+        // After successful update, re-render the stock page to reflect changes
+        // This ensures visual indicators and numbers are fully consistent.
         await renderStockManagementPage();
         console.log(`Stock for ${itemId} at ${selectedLocationId} updated to ${newStockValue}`);
     } catch (error) {
         console.error('Error updating stock:', error);
-        alert('Failed to update stock. Please check Firebase permissions or network.');
+        alert('Failed to update stock. Please check Firebase permissions or network connection.');
     }
 }
 
