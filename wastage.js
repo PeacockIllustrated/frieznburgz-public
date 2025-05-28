@@ -8,7 +8,7 @@ import { getCurrentStockItems, renderStockManagementPage } from './stock.js'; //
 import { createWasteLogItemHtml } from './wastage-template.js'; // Template for individual waste log items
 
 // --- DOM Elements ---
-const wastageLogContent = document.getElementById('wastageLogContent'); // Where dynamic content goes
+const wastageLogContent = document.getElementById('wastageLogContent'); // Main content area for wastage page
 
 
 /**
@@ -50,14 +50,17 @@ export async function renderWastageLogPage() {
     `;
 
     // Get references to the newly created DOM elements within this page
+    // IMPORTANT: Get these elements *after* innerHTML has been set.
     const currentWasteItemSelect = document.getElementById('wasteItemSelect');
     const currentWasteQtySelect = document.getElementById('wasteQtySelect');
     const currentLogWasteBtn = document.getElementById('logWasteBtn');
     const currentWasteLogList = document.getElementById('wasteLogList');
 
-
-    populateWasteDropdowns(currentWasteItemSelect, currentWasteQtySelect);
+    // Attach event listeners to newly created elements
     currentLogWasteBtn.addEventListener('click', () => handleLogWaste(currentWasteItemSelect, currentWasteQtySelect, currentWasteLogList));
+
+    // Populate dropdowns and load log entries
+    populateWasteDropdowns(currentWasteItemSelect, currentWasteQtySelect);
     await loadWasteLog(currentWasteLogList); // Load initial log entries
 
     console.log(`Wastage log page rendered for ${selectedLocationId}.`);
@@ -71,15 +74,20 @@ export async function renderWastageLogPage() {
 function populateWasteDropdowns(itemSelect, qtySelect) {
     const items = getCurrentStockItems(); // Get current items from stock.js
 
-    itemSelect.innerHTML = '<option value="" disabled selected>Select Item</option>';
-    // Sort items alphabetically for easier selection
-    const sortedItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
-    sortedItems.forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.id;
-        option.textContent = item.name;
-        itemSelect.appendChild(option);
-    });
+    if (items.length === 0) {
+        itemSelect.innerHTML = '<option value="" disabled selected>No items found</option>';
+    } else {
+        itemSelect.innerHTML = '<option value="" disabled selected>Select Item</option>';
+        // Sort items alphabetically for easier selection
+        const sortedItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
+        sortedItems.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = item.name;
+            itemSelect.appendChild(option);
+        });
+    }
+
 
     qtySelect.innerHTML = '<option value="" disabled selected>Select Qty</option>';
     for (let i = 1; i <= 50; i++) { // Max 50 units for waste, adjust as needed
