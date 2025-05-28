@@ -7,8 +7,7 @@ import { getSelectedLocation } from './config.js';
 import { createStockItemHtml } from './stock-template.js'; // Template for individual stock items
 
 // --- DOM Elements ---
-// The main content area for the stock management page
-const stockManagementContent = document.getElementById('stockManagementContent');
+const stockManagementContent = document.getElementById('stockManagementContent'); // Main content area for stock page
 
 let currentItemsData = []; // Store current loaded items for the selected location
 
@@ -26,7 +25,6 @@ export async function renderStockManagementPage() {
     const locationDisplayName = selectedLocationId.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
     // Clear previous content and set up base HTML structure for this page
-    // Important: We rebuild the category cards each time to ensure fresh event listeners.
     stockManagementContent.innerHTML = `
         <h3 class="subsection-title">Inventory for ${locationDisplayName}</h3>
         <div id="stockItemsGrid" class="stock-items-grid">
@@ -34,7 +32,8 @@ export async function renderStockManagementPage() {
         </div>
     `;
 
-    const stockItemsGrid = document.getElementById('stockItemsGrid'); // Get the grid container after it's been added to the DOM
+    // IMPORTANT: Get the grid container *after* it's been injected into the DOM
+    const stockItemsGrid = document.getElementById('stockItemsGrid');
 
     try {
         // Fetch items from the specific location's subcollection
@@ -60,9 +59,10 @@ export async function renderStockManagementPage() {
         for (const categoryName of Object.keys(categorizedItems).sort()) { // Sort categories alphabetically
             const categoryItems = categorizedItems[categoryName];
 
-            // Create the category card HTML
+            // Create the category card HTML structure
             const categoryCardDiv = document.createElement('div');
             categoryCardDiv.classList.add('category-card');
+            // Using template literals to inject the HTML directly
             categoryCardDiv.innerHTML = `
                 <div class="category-header">
                     <h3 class="category-title">${categoryName}</h3>
@@ -72,25 +72,26 @@ export async function renderStockManagementPage() {
                     <!-- Items will be appended here -->
                 </div>
             `;
-            stockItemsGrid.appendChild(categoryCardDiv); // Append card to grid
+            stockItemsGrid.appendChild(categoryCardDiv); // Append card to the grid
 
-            const itemListContainer = categoryCardDiv.querySelector('.item-list'); // Get reference to the list container inside the new card
+            // IMPORTANT: Get reference to the item list container *inside* the newly created categoryCardDiv
+            const itemListContainer = categoryCardDiv.querySelector('.item-list');
 
             categoryItems.forEach(item => {
                 const itemDiv = document.createElement('div');
-                itemDiv.classList.add('stock-item'); // Add class for styling and event delegation
-                itemDiv.dataset.itemId = item.id; // Store ID
+                itemDiv.classList.add('stock-item');
+                itemDiv.dataset.itemId = item.id; // Store ID for updates
                 itemDiv.innerHTML = createStockItemHtml(item); // Populate with HTML from template
 
                 itemListContainer.appendChild(itemDiv);
 
-                // Attach event listeners after element is in DOM
+                // Attach event listeners to the newly created elements
                 const decrementBtn = itemDiv.querySelector('.decrement-btn');
                 const incrementBtn = itemDiv.querySelector('.increment-btn');
                 const stockInput = itemDiv.querySelector('.stock-input');
                 const reorderBtn = itemDiv.querySelector('.reorder-btn');
 
-                // Add event listeners only if the elements exist
+                // Ensure elements exist before adding listeners (defensive coding)
                 if (decrementBtn) decrementBtn.addEventListener('click', () => updateStock(item.id, -1, stockInput));
                 if (incrementBtn) incrementBtn.addEventListener('click', () => updateStock(item.id, 1, stockInput));
                 if (stockInput) stockInput.addEventListener('change', () => updateStock(item.id, 0, stockInput));
@@ -145,7 +146,7 @@ async function updateStock(itemId, change, inputElement) {
         console.log(`Stock for ${itemId} at ${selectedLocationId} updated to ${newStockValue}`);
     } catch (error) {
         console.error('Error updating stock:', error);
-        alert('Failed to update stock. Please check Firebase permissions or network connection.');
+        alert('Failed to update stock. Please check Firebase permissions or network.');
     }
 }
 
