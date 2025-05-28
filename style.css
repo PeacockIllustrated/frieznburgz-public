@@ -1,0 +1,479 @@
+/* Color Variables */
+:root {
+    --red: #e71e26;
+    --yellow: white;
+    --dim-grey: #2f2f2f;
+    --khaki: #fbae29;
+    --salmon: #ff9686;
+    --dark-slate-grey: #050505;
+}
+
+/* Global Styles */
+body {
+    margin: 0;
+    font-family: 'Futura', Arial, sans-serif;
+    background-color: var(--dark-slate-grey);
+    color: var(--red);
+    line-height: 1.5;
+}
+
+/* Authentication Container */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--dark-slate-grey);
+}
+
+.auth-card {
+    background-color: var(--yellow);
+    border: 5px solid var(--khaki);
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    max-width: 400px;
+    width: 90%;
+}
+
+.auth-logo {
+    max-width: 180px;
+    margin-bottom: 25px;
+}
+
+.auth-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 30px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 25px;
+}
+
+.auth-input {
+    width: calc(100% - 20px);
+    padding: 12px 10px;
+    margin-bottom: 15px;
+    border: 2px solid var(--red);
+    border-radius: 8px;
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 16px;
+    color: var(--dim-grey);
+    background-color: var(--yellow);
+    box-sizing: border-box;
+}
+
+.auth-input::placeholder {
+    color: var(--salmon);
+}
+
+.auth-button {
+    background-color: var(--red);
+    color: var(--yellow);
+    border: 2px solid var(--yellow);
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.auth-button:hover {
+    background-color: var(--yellow);
+    color: var(--red);
+    border-color: var(--red);
+}
+
+.auth-message {
+    color: var(--red);
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+/* Main App Container */
+.main-app-container {
+    background-color: var(--yellow);
+    padding-bottom: 50px; /* Space for footer */
+    min-height: 100vh;
+}
+
+.app-header {
+    background-color: var(--red);
+    border-bottom: 5px solid var(--yellow);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+.app-logo {
+    max-width: 180px;
+    margin-bottom: 10px;
+}
+
+.app-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 45px;
+    color: var(--yellow);
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0;
+    line-height: 1.1;
+    padding: 0 15px;
+}
+
+.content-wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px; /* Space between sections */
+}
+
+.stock-section, .wastage-section {
+    flex: 1;
+    min-width: 300px; /* Allow wrapping on small screens */
+    max-width: 100%;
+}
+
+.section-heading {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 40px;
+    color: var(--red);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 30px;
+    padding-top: 20px;
+}
+
+/* Category Card Styling */
+.category-card, .wastage-card {
+    background-color: var(--yellow);
+    border: 5px solid var(--khaki);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    margin-bottom: 30px;
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--salmon);
+}
+
+.category-title, .wastage-log-heading {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 30px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.edit-icon, .trash-icon {
+    color: var(--red);
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.edit-icon:hover, .trash-icon:hover {
+    color: var(--khaki);
+}
+
+/* Item List Styling */
+.item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.stock-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--salmon);
+}
+
+.stock-item:last-child {
+    border-bottom: none;
+}
+
+.stock-indicator-circle {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--red);
+    border-radius: 50%;
+    background-color: var(--yellow); /* Default */
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.stock-indicator-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--salmon); /* Low stock */
+    transition: height 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+/* Stock status colors */
+.stock-indicator-circle.good .stock-indicator-fill { background-color: #4CAF50; /* Green */ }
+.stock-indicator-circle.low .stock-indicator-fill { background-color: var(--khaki); /* Orange */ }
+.stock-indicator-circle.critical .stock-indicator-fill { background-color: var(--red); /* Red */ }
+
+
+.item-name {
+    flex-grow: 1;
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 18px;
+    text-transform: uppercase;
+    color: var(--dim-grey);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stock-controls {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--khaki);
+    border-radius: 20px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.control-button {
+    background-color: var(--khaki);
+    color: var(--red);
+    border: none;
+    padding: 5px 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.control-button:hover {
+    background-color: var(--red);
+    color: var(--yellow);
+}
+
+.stock-input {
+    width: 50px;
+    text-align: center;
+    border: none;
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--red);
+    background-color: var(--yellow);
+    -moz-appearance: textfield; /* Remove default spinner for Firefox */
+}
+
+/* Remove default spinner for Chrome, Safari, Edge */
+.stock-input::-webkit-outer-spin-button,
+.stock-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.add-stock-button {
+    background-color: var(--red);
+    color: var(--yellow);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.add-stock-button:hover {
+    background-color: var(--khaki);
+    color: var(--red);
+}
+
+/* Wastage Section Styling */
+.wastage-input-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    align-items: center;
+}
+
+.select-wrapper {
+    position: relative;
+    flex-grow: 1;
+}
+
+.waste-select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--khaki);
+    border-radius: 8px;
+    background-color: var(--yellow);
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 16px;
+    color: var(--red);
+    appearance: none; /* Remove default select arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+}
+
+.waste-select option {
+    color: var(--red);
+    background-color: var(--yellow);
+}
+
+.waste-select:focus {
+    outline: none;
+    border-color: var(--red);
+}
+
+.select-arrow {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--khaki);
+    pointer-events: none; /* Make sure clicks go through to the select */
+    font-size: 18px;
+}
+
+.log-waste-button {
+    background-color: var(--red);
+    color: var(--yellow);
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.log-waste-button:hover {
+    background-color: var(--khaki);
+    color: var(--red);
+}
+
+.wastage-log-heading {
+    text-align: left;
+    margin-bottom: 15px;
+    padding-top: 10px;
+    border-top: 2px solid var(--salmon);
+}
+
+.waste-log-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.waste-log-item {
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 16px;
+    color: var(--dim-grey);
+    margin-bottom: 8px;
+    padding-left: 10px;
+    position: relative;
+}
+
+.waste-log-item::before {
+    content: '•';
+    color: var(--red);
+    position: absolute;
+    left: 0;
+}
+
+/* Media Queries for Responsiveness */
+@media screen and (max-width: 768px) {
+    .app-title {
+        font-size: 35px;
+    }
+
+    .category-title, .wastage-log-heading {
+        font-size: 25px;
+    }
+
+    .wastage-input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .select-wrapper {
+        margin-bottom: 10px;
+    }
+
+    .log-waste-button {
+        align-self: center;
+        width: 60px;
+        height: 60px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .app-title {
+        font-size: 28px;
+    }
+
+    .category-card, .wastage-card {
+        padding: 15px;
+    }
+
+    .category-title, .wastage-log-heading {
+        font-size: 22px;
+    }
+
+    .stock-item {
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .stock-indicator-circle {
+        margin-right: 10px;
+    }
+
+    .item-name {
+        flex-basis: 100%;
+        margin-bottom: 5px;
+    }
+
+    .stock-controls {
+        flex-grow: 1;
+    }
+    .add-stock-button {
+        margin-left: 10px;
+    }
+}
