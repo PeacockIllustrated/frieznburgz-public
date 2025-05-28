@@ -17,6 +17,10 @@ import { initLocationSelection, showLocationSelection, hideLocationSelection, up
 // Import general UI utility functions
 import { showPage, hideAllPages, initSidebarNav, showDashboardContainer, hideDashboardContainer } from './ui.js';
 
+// Import specific page rendering functions
+import { renderStockManagementPage } from './stock.js'; // New import
+import { renderWastageLogPage } from './wastage.js';   // New import
+
 
 // --- DOM Elements (centralized for main.js's direct use) ---
 const logoutBtn = document.getElementById('logoutBtn');
@@ -36,7 +40,7 @@ function initializeApp() {
     initLocationSelection();
 
     // Initialize sidebar navigation from ui.js
-    initSidebarNav();
+    initSidebarNav(handleNavigationClick); // Pass a callback for page content rendering
 
     // Set up general event listeners for main dashboard controls
     logoutBtn.addEventListener('click', handleLogout);
@@ -90,7 +94,9 @@ function showDashboard(locationId) {
 
     // Set the initial active page (e.g., Dashboard overview)
     showPage('dashboard'); // From ui.js
-    // TODO: In later chunks, load initial dashboard data for this specific location
+    // Automatically load dashboard content if available
+    renderPageContent('dashboard'); // Render content for the default dashboard page
+
     console.log(`Dashboard shown for location: ${getLocationDisplayName(locationId)}`);
 }
 
@@ -117,10 +123,66 @@ function handleChangeLocation() {
     console.log('User requested to change location.');
 }
 
+/**
+ * Callback function passed to ui.js for sidebar navigation.
+ * Renders the content for the selected page.
+ * @param {string} pageId - The ID of the page to render (e.g., 'stock-management').
+ */
+function handleNavigationClick(pageId) {
+    // This function will be called by ui.js when a nav item is clicked.
+    // It's responsible for calling the correct rendering function for that page.
+    renderPageContent(pageId);
+}
+
+/**
+ * Renders the content for a specific dashboard page based on its ID.
+ * @param {string} pageId - The ID of the page to render.
+ */
+async function renderPageContent(pageId) {
+    const selectedLocationId = getSelectedLocation();
+    if (!selectedLocationId) {
+        // If no location is selected, redirect to location selection
+        console.warn(`Attempted to render page "${pageId}" without a selected location. Redirecting.`);
+        hideDashboardContainer();
+        showLocationSelection();
+        return;
+    }
+
+    // Use a switch statement to call the appropriate rendering function
+    switch (pageId) {
+        case 'dashboard':
+            // Dashboard overview content will go here in a later chunk
+            console.log('Rendering Dashboard Overview...');
+            // Example: dashboardPage.innerHTML = '... dynamic content ...';
+            break;
+        case 'stock-management':
+            await renderStockManagementPage(); // Call function from stock.js
+            console.log('Rendering Stock Management page...');
+            break;
+        case 'wastage-log':
+            await renderWastageLogPage(); // Call function from wastage.js
+            console.log('Rendering Wastage Log page...');
+            break;
+        case 'orders':
+            // Render orders page (future functionality)
+            console.log('Rendering Orders page...');
+            break;
+        case 'suppliers':
+            // Render suppliers page (future functionality)
+            console.log('Rendering Suppliers page...');
+            break;
+        case 'settings':
+            // Render settings page (future functionality)
+            console.log('Rendering Settings page...');
+            break;
+        default:
+            console.warn(`No rendering function defined for page: ${pageId}`);
+            break;
+    }
+}
+
+
 // Expose showDashboard to the window object so location.js can call it
-// This creates a circular dependency in terms of direct imports,
-// but for an MVP, exposing the orchestrator function is practical.
-// In a larger system, you might use a shared event bus pattern.
 window.mainApp = {
     showDashboard: showDashboard
 };
