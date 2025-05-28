@@ -93,14 +93,16 @@
 
             <section id="stockManagementPage" class="content-page">
                 <h2 class="page-title">Stock Management</h2>
-                <p>Manage inventory levels across categories.</p>
-                <!-- Stock Management content will be dynamically loaded here by stock.js -->
+                <div id="stockManagementContent">
+                    <!-- Stock Management content will be dynamically loaded here by stock.js -->
+                </div>
             </section>
 
             <section id="wastageLogPage" class="content-page">
                 <h2 class="page-title">Wastage Log</h2>
-                <p>Review and log wasted items.</p>
-                <!-- Wastage Log content will be dynamically loaded here by wastage.js -->
+                <div id="wastageLogContent">
+                    <!-- Wastage Log content will be dynamically loaded here by wastage.js -->
+                </div>
             </section>
 
             <section id="ordersPage" class="content-page">
@@ -121,7 +123,6 @@
     </div>
 
     <!-- Main JavaScript file - acts as the orchestrator -->
-    <script src="import-data.js"></script> <!-- TEMPORARY: For one-time data import -->
     <script type="module" src="main.js"></script>
 </body>
 </html>
