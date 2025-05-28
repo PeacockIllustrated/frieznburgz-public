@@ -1,4 +1,4 @@
-// ** IMPORTANT: Your Firebase config from the user **
+// ** YOUR FIREBASE CONFIGURATION **
 const firebaseConfig = {
   apiKey: "AIzaSyA4hS3texgNpdQbjj8QIECY4n0Nl3SWwTo",
   authDomain: "friez-burgz.firebaseapp.com",
@@ -18,16 +18,24 @@ const db = firebase.firestore();
 const authContainer = document.getElementById('authContainer');
 const loginEmail = document.getElementById('loginEmail');
 const loginPassword = document.getElementById('loginPassword');
-const loginBtn = document.getElementById('loginBtn'); // Renamed from previous to indicate Email login
-const googleLoginBtn = document.getElementById('googleLoginBtn'); // New Google login button
+const loginBtn = document.getElementById('loginBtn');
+const googleLoginBtn = document.getElementById('googleLoginBtn');
 const authMessage = document.getElementById('authMessage');
 const mainAppContainer = document.getElementById('mainAppContainer');
+const logoutBtn = document.getElementById('logoutBtn'); // New logout button
 
-const meatItemList = document.getElementById('meatItemList');
-const cheesesItemList = document.getElementById('cheesesItemList');
-const specialsItemList = document.getElementById('specialsItemList');
-const filletzItemList = document.getElementById('filletzItemList');
-const milkshakesItemList = document.getElementById('milkshakesItemList');
+// Stock Category Item Lists (matching HTML IDs and expected Firestore `category` field)
+const itemLists = {
+    'Meat': document.getElementById('meatItemList'),
+    'Cheeses': document.getElementById('cheesesItemList'),
+    'Specialz Ingredients': document.getElementById('specialsItemList'),
+    'Filletz Ingredients': document.getElementById('filletzItemList'),
+    'Milkshakes of the Week': document.getElementById('milkshakesItemList'),
+    'Produce & Vegetables': document.getElementById('produceItemList'),
+    'Sauces & Condiments': document.getElementById('saucesItemList'),
+    'Breads & Baked Goods': document.getElementById('breadsItemList'),
+    'Other Essentials': document.getElementById('otherItemList')
+};
 
 const wasteItemSelect = document.getElementById('wasteItemSelect');
 const wasteQtySelect = document.getElementById('wasteQtySelect');
@@ -64,6 +72,16 @@ googleLoginBtn.addEventListener('click', async () => {
     }
 });
 
+// Logout
+logoutBtn.addEventListener('click', async () => {
+    try {
+        await auth.signOut();
+    } catch (error) {
+        console.error('Logout error:', error);
+        alert('Failed to log out. Please try again.');
+    }
+});
+
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -80,41 +98,31 @@ auth.onAuthStateChanged(user => {
 });
 
 // --- Stock Management ---
-const itemLists = {
-    'Meat': meatItemList,
-    'Cheeses': cheesesItemList,
-    'Specialz Ingredients': specialsItemList,
-    'Filletz Ingredients': filletzItemList,
-    'Milkshakes of the Week': milkshakesItemList,
-    // Add more categories as needed for a complete inventory
-    // 'Produce & Vegetables': null, // Example: document.getElementById('produceItemList')
-    // 'Sauces & Condiments': null,
-    // 'Breads & Baked Goods': null,
-    // 'Other Essentials': null
-};
 
 async function loadStockItems() {
     try {
         const querySnapshot = await db.collection('items').orderBy('name').get();
         allItems = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // Clear existing items before rendering
-        Object.values(itemLists).forEach(list => {
-            if (list) list.innerHTML = '';
+        // Clear existing items in all category lists before rendering
+        Object.values(itemLists).forEach(listElement => {
+            if (listElement) listElement.innerHTML = '';
         });
 
         // Populate items by category
         allItems.forEach(item => {
-            if (itemLists[item.category]) {
+            if (itemLists[item.category]) { // Check if the category has a corresponding HTML element
                 const itemElement = createStockItemElement(item);
                 itemLists[item.category].appendChild(itemElement);
+            } else {
+                console.warn(`No HTML element found for category: "${item.category}". Item "${item.name}" will not be displayed.`);
             }
         });
 
         populateWasteItemSelect(); // Populate waste dropdown after all items are loaded
     } catch (error) {
         console.error('Error loading stock items:', error);
-        alert('Failed to load stock items. Please try again.');
+        alert('Failed to load stock items. Check Firebase permissions and console for more details.');
     }
 }
 
@@ -126,33 +134,35 @@ function createStockItemElement(item) {
     // Determine stock indicator color based on currentStock vs reorderPoint
     let stockStatusClass = '';
     let fillHeight = '0%'; // Default to 0 height if stock is 0 or less
-    if (item.currentStock <= item.reorderPoint / 2) {
+    // Ensure reorderPoint is a number, default to 0 if not
+    const reorderPoint = typeof item.reorderPoint === 'number' ? item.reorderPoint : 0;
+
+    if (item.currentStock <= reorderPoint / 2) {
         stockStatusClass = 'critical';
-    } else if (item.currentStock <= item.reorderPoint) {
+    } else if (item.currentStock <= reorderPoint) {
         stockStatusClass = 'low';
-    } else if (item.currentStock > item.reorderPoint) {
+    } else if (item.currentStock > reorderPoint) {
         stockStatusClass = 'good';
     }
 
     // Calculate fill height based on a hypothetical max stock for visual representation
     // You might want to define a 'maxStock' field for each item in Firestore for better accuracy
-    const visualMaxStock = Math.max(item.currentStock, item.reorderQuantity * 2, item.reorderPoint * 3, 100); // Adjust as needed
-    if (item.currentStock >= 0) { // Ensure fill doesn't go below 0%
+    const visualMaxStock = Math.max(item.currentStock, (item.reorderQuantity || 0) * 2, reorderPoint * 3, 100); // Default to 100 if other values are too low
+    if (item.currentStock >= 0) {
         fillHeight = `${Math.min(100, (item.currentStock / visualMaxStock) * 100)}%`;
     }
-
 
     div.innerHTML = `
         <div class="stock-indicator-circle ${stockStatusClass}">
              <div class="stock-indicator-fill" style="height: ${fillHeight};"></div>
         </div>
-        <span class="item-name">${item.name} (${item.unit})</span>
+        <span class="item-name">${item.name} (${item.unit || 'units'})</span>
         <div class="stock-controls">
             <button class="control-button decrement-btn">-</button>
             <input type="number" class="stock-input" value="${item.currentStock}" min="0">
             <button class="control-button increment-btn">+</button>
         </div>
-        <button class="add-stock-button reorder-btn">
+        <button class="add-stock-button reorder-btn" title="Message Supplier">
             <i class="fas fa-plus"></i>
         </button>
     `;
@@ -190,12 +200,14 @@ async function updateStock(itemId, change, inputElement) {
 
     try {
         await docRef.update({ currentStock: newStock });
-        inputElement.value = newStock; // Update input immediately
-        updateStockIndicator(itemId, newStock); // Update visual indicator
+        // Instead of directly updating input, let loadStockItems refresh for consistency
+        // inputElement.value = newStock;
+        // updateStockIndicator(itemId, newStock);
+        loadStockItems(); // Re-load all items to reflect accurate stock and indicator status
         console.log(`Stock for ${itemId} updated to ${newStock}`);
     } catch (error) {
         console.error('Error updating stock:', error);
-        alert('Failed to update stock. Please try again.');
+        alert('Failed to update stock. Please try again. Check Firebase permissions.');
     }
 }
 
@@ -213,17 +225,18 @@ function updateStockIndicator(itemId, newStock) {
     circle.classList.remove('good', 'low', 'critical');
 
     let stockStatusClass = '';
-    if (newStock <= item.reorderPoint / 2) {
+    const reorderPoint = typeof item.reorderPoint === 'number' ? item.reorderPoint : 0;
+    if (newStock <= reorderPoint / 2) {
         stockStatusClass = 'critical';
-    } else if (newStock <= item.reorderPoint) {
+    } else if (newStock <= reorderPoint) {
         stockStatusClass = 'low';
-    } else if (newStock > item.reorderPoint) {
+    } else { // newStock > reorderPoint
         stockStatusClass = 'good';
     }
     circle.classList.add(stockStatusClass);
 
     // Recalculate fill height (same logic as createStockItemElement)
-    const visualMaxStock = Math.max(newStock, item.reorderQuantity * 2, item.reorderPoint * 3, 100);
+    const visualMaxStock = Math.max(newStock, (item.reorderQuantity || 0) * 2, reorderPoint * 3, 100);
     const fillHeight = `${Math.min(100, (newStock / visualMaxStock) * 100)}%`;
     fill.style.height = fillHeight;
 }
@@ -233,20 +246,22 @@ function messageSupplier(item) {
     // For MVP, open mailto link with pre-filled content.
     // In a real app, this would trigger a backend function to send an email.
     const recipient = 'supplier@example.com'; // Replace with actual supplier email
-    const subject = `Order Request: ${item.name}`;
-    const body = `Dear Supplier,\n\nWe would like to order ${item.reorderQuantity || '[QTY]'} ${item.unit} of ${item.name}.\n\nPlease let us know the availability and estimated delivery time.\n\nThank you,\nFriez n Burgz Management`;
+    const subject = `Order Request: ${item.name} from Friez n Burgz`;
+    const body = `Dear Supplier,\n\nWe would like to order ${item.reorderQuantity || 'N/A'} ${item.unit || 'units'} of ${item.name}.\n\nOur current stock is ${item.currentStock} ${item.unit || 'units'}.\n\nPlease let us know the availability and estimated delivery time.\n\nThank you,\nFriez n Burgz Management`;
 
     const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
 
-    alert(`Drafting email to supplier for ${item.name}. Please check your email client.`);
+    alert(`Drafting email to supplier for ${item.name}. Please check your email client. Remember, a human must approve this order.`);
 }
 
 
 // --- Wastage Log ---
 function populateWasteItemSelect() {
     wasteItemSelect.innerHTML = '<option value="">Select Item</option>'; // Default option
-    allItems.forEach(item => {
+    // Sort items alphabetically for easier selection
+    const sortedItems = [...allItems].sort((a, b) => a.name.localeCompare(b.name));
+    sortedItems.forEach(item => {
         const option = document.createElement('option');
         option.value = item.id;
         option.textContent = item.name;
@@ -277,7 +292,7 @@ logWasteBtn.addEventListener('click', async () => {
         return;
     }
 
-    const reason = prompt(`Reason for wasting ${wastedQty} ${item.unit} of ${item.name}?`);
+    const reason = prompt(`Reason for wasting ${wastedQty} ${item.unit || 'units'} of ${item.name}?`);
     if (reason === null || reason.trim() === '') {
         alert('Waste not logged. Reason is required.');
         return;
@@ -289,7 +304,7 @@ logWasteBtn.addEventListener('click', async () => {
             item: item.name,
             itemId: item.id,
             quantity: wastedQty,
-            unit: item.unit,
+            unit: item.unit || 'units',
             reason: reason,
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             updatedBy: auth.currentUser ? auth.currentUser.email : 'Unknown User'
@@ -308,7 +323,7 @@ logWasteBtn.addEventListener('click', async () => {
         loadWasteLog(); // Reload waste log
     } catch (error) {
         console.error('Error logging waste:', error);
-        alert('Failed to log waste. Please try again.');
+        alert('Failed to log waste. Please try again. Check Firebase permissions.');
     }
 });
 
@@ -339,7 +354,9 @@ async function loadWasteLog() {
 
                 const li = document.createElement('li');
                 li.classList.add('waste-log-item');
-                li.textContent = `${data.item} | ${data.quantity} ${data.unit} | ${timestampDate} - ${data.reason}`;
+                // Trim the reason for display if it's too long
+                const displayReason = data.reason.length > 50 ? data.reason.substring(0, 47) + '...' : data.reason;
+                li.textContent = `${data.item} | ${data.quantity} ${data.unit || 'units'} | ${timestampDate} - ${displayReason}`;
                 wasteLogList.appendChild(li);
             });
         }
