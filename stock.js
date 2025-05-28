@@ -2,22 +2,25 @@
 // Manages stock item fetching, display, and updates for the selected location.
 
 import { db } from './firebase.js';
+import { auth } from './firebase.js'; // Needed for getting current user email for waste logging
 import { getSelectedLocation } from './config.js';
-import { createStockItemHtml } from './stock-template.js';
+import { createStockItemHtml } from './stock-template.js'; // Template for individual stock items
 
 // --- DOM Elements ---
-// References to the item lists within the main dashboard content
 const stockManagementPage = document.getElementById('stockManagementPage'); // The section wrapper
+const stockManagementContent = document.getElementById('stockManagementContent'); // Where dynamic content goes
+
+// Define the categories and their corresponding HTML list containers
 const stockCategoryContainers = {
-    'Meat': document.getElementById('meatItemList'),
-    'Cheeses': document.getElementById('cheesesItemList'),
-    'Specialz Ingredients': document.getElementById('specialsItemList'),
-    'Filletz Ingredients': document.getElementById('filletzItemList'),
-    'Milkshakes of the Week': document.getElementById('milkshakesItemList'),
-    'Produce & Vegetables': document.getElementById('produceItemList'),
-    'Sauces & Condiments': document.getElementById('saucesItemList'),
-    'Breads & Baked Goods': document.getElementById('breadsItemList'),
-    'Other Essentials': document.getElementById('otherItemList')
+    'Meat': null, // These will be dynamically created within renderStockManagementPage
+    'Cheeses': null,
+    'Specialz Ingredients': null,
+    'Filletz Ingredients': null,
+    'Milkshakes of the Week': null,
+    'Produce & Vegetables': null,
+    'Sauces & Condiments': null,
+    'Breads & Baked Goods': null,
+    'Other Essentials': null
 };
 
 let currentItemsData = []; // Store current loaded items for the selected location
@@ -29,57 +32,72 @@ let currentItemsData = []; // Store current loaded items for the selected locati
 export async function renderStockManagementPage() {
     const selectedLocationId = getSelectedLocation();
     if (!selectedLocationId) {
-        stockManagementPage.innerHTML = '<h2 class="page-title">Stock Management</h2><p>Please select a location first to view stock.</p>';
+        stockManagementContent.innerHTML = '<p>Please select a location first to view stock.</p>';
         return;
     }
 
-    stockManagementPage.innerHTML = `
-        <h2 class="page-title">Stock Management</h2>
-        <p>Current inventory for ${selectedLocationId.replace(/_/g, ' ')}.</p>
-        <div id="stockItemsContainer" class="stock-items-grid">
-            <!-- Category cards will be cloned/dynamically added here -->
+    const locationDisplayName = selectedLocationId.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
+    // Clear previous content and set up base HTML structure for this page
+    stockManagementContent.innerHTML = `
+        <h3 class="subsection-title">Inventory for ${locationDisplayName}</h3>
+        <div id="stockItemsGrid" class="stock-items-grid">
+            <!-- Dynamic category cards will be inserted here -->
         </div>
     `;
 
-    const stockItemsContainer = document.getElementById('stockItemsContainer');
-
-    // Clear previous contents of dynamic item lists
-    Object.values(stockCategoryContainers).forEach(container => {
-        if (container) container.innerHTML = '';
-    });
+    const stockItemsGrid = document.getElementById('stockItemsGrid');
 
     try {
         // Fetch items from the specific location's subcollection
         const itemsRef = db.collection('locations').doc(selectedLocationId).collection('items');
-        const querySnapshot = await itemsRef.orderBy('name').get();
+        const querySnapshot = await itemsRef.orderBy('category').orderBy('name').get(); // Order by category then name
         currentItemsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         if (currentItemsData.length === 0) {
-            stockItemsContainer.innerHTML = '<p>No stock items found for this location. Please add items via settings or import script.</p>';
+            stockItemsGrid.innerHTML = '<p>No stock items found for this location. Please add items via settings or import script.</p>';
             return;
         }
 
-        // Dynamically add category cards if they are not already in HTML or re-populate them
-        // For simplicity, we'll assume the category card HTML structure is already in index.html
-        // and we just populate the item lists within them.
-        // If categories are truly dynamic, you'd generate the .category-card divs here too.
+        // Group items by category
+        const categorizedItems = currentItemsData.reduce((acc, item) => {
+            if (!acc[item.category]) {
+                acc[item.category] = [];
+            }
+            acc[item.category].push(item);
+            return acc;
+        }, {});
 
-        // Clear all item lists before populating
-        Object.values(stockCategoryContainers).forEach(list => {
-            if (list) list.innerHTML = '';
-        });
+        // Render each category card and its items
+        for (const categoryName of Object.keys(categorizedItems).sort()) { // Sort categories alphabetically
+            const categoryItems = categorizedItems[categoryName];
 
-        currentItemsData.forEach(item => {
-            const categoryListContainer = stockCategoryContainers[item.category];
-            if (categoryListContainer) {
+            // Create the category card HTML
+            const categoryCardDiv = document.createElement('div');
+            categoryCardDiv.classList.add('category-card');
+            categoryCardDiv.innerHTML = `
+                <div class="category-header">
+                    <h3 class="category-title">${categoryName}</h3>
+                    <i class="fas fa-edit edit-icon" title="Edit category items (future)"></i>
+                </div>
+                <div class="item-list" id="${categoryName.replace(/\s+/g, '')}ItemList">
+                    <!-- Items will be appended here -->
+                </div>
+            `;
+            stockItemsGrid.appendChild(categoryCardDiv);
+
+            const itemListContainer = categoryCardDiv.querySelector('.item-list');
+            stockCategoryContainers[categoryName] = itemListContainer; // Store reference for later use if needed
+
+            categoryItems.forEach(item => {
                 const itemDiv = document.createElement('div');
-                itemDiv.classList.add('stock-item'); // Add class for styling and event delegation
-                itemDiv.dataset.itemId = item.id; // Store ID
-                itemDiv.innerHTML = createStockItemHtml(item); // Populate with HTML from template
+                itemDiv.classList.add('stock-item');
+                itemDiv.dataset.itemId = item.id;
+                itemDiv.innerHTML = createStockItemHtml(item); // Use template to populate
 
-                categoryListContainer.appendChild(itemDiv);
+                itemListContainer.appendChild(itemDiv);
 
-                // Attach event listeners after element is in DOM
+                // Attach event listeners to the newly created elements
                 const decrementBtn = itemDiv.querySelector('.decrement-btn');
                 const incrementBtn = itemDiv.querySelector('.increment-btn');
                 const stockInput = itemDiv.querySelector('.stock-input');
@@ -89,17 +107,14 @@ export async function renderStockManagementPage() {
                 if (incrementBtn) incrementBtn.addEventListener('click', () => updateStock(item.id, 1, stockInput));
                 if (stockInput) stockInput.addEventListener('change', () => updateStock(item.id, 0, stockInput));
                 if (reorderBtn) reorderBtn.addEventListener('click', () => messageSupplier(item));
+            });
+        }
 
-            } else {
-                console.warn(`Category container not found for: ${item.category}. Item: ${item.name}`);
-            }
-        });
-
-        console.log(`Stock items loaded for ${selectedLocationId}.`);
+        console.log(`Stock items loaded and rendered for ${selectedLocationId}.`);
 
     } catch (error) {
         console.error('Error rendering stock management page or loading items:', error);
-        stockManagementPage.innerHTML = `<h2 class="page-title">Stock Management</h2><p style="color:red;">Error loading stock items: ${error.message}. Please check console.</p>`;
+        stockManagementContent.innerHTML = `<h3 class="subsection-title">Inventory for ${locationDisplayName}</h3><p style="color:red;">Error loading stock items: ${error.message}. Please check console.</p>`;
     }
 }
 
@@ -136,7 +151,7 @@ async function updateStock(itemId, change, inputElement) {
     try {
         await itemDocRef.update({ currentStock: newStockValue });
         // Re-render the entire stock page to reflect the update and correct stock indicators
-        renderStockManagementPage();
+        await renderStockManagementPage();
         console.log(`Stock for ${itemId} at ${selectedLocationId} updated to ${newStockValue}`);
     } catch (error) {
         console.error('Error updating stock:', error);
@@ -163,7 +178,7 @@ function messageSupplier(item) {
 }
 
 /**
- * Exposes the currentItemsData array to other modules if needed (e.g., for waste dropdown).
+ * Exposes the currentItemsData array to other modules (like wastage.js) if needed.
  * @returns {Array} An array of current stock items for the selected location.
  */
 export function getCurrentStockItems() {
