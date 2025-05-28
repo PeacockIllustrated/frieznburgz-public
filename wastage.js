@@ -2,17 +2,15 @@
 // Manages wastage logging and display for the selected location.
 
 import { db } from './firebase.js';
-import { auth } from './firebase.js'; // Needed for auth.currentUser.email
+import { auth } from './firebase.js'; // Needed for auth.currentUser.email for logging who made the entry
 import { getSelectedLocation } from './config.js';
-import { getCurrentStockItems, renderStockManagementPage } from './stock.js'; // To get item list and trigger stock re-render
-import { createWasteLogItemHtml } from './wastage-template.js';
+import { getCurrentStockItems, renderStockManagementPage } from './stock.js'; // To get item list for dropdown and trigger stock re-render
+import { createWasteLogItemHtml } from './wastage-template.js'; // Template for individual waste log items
 
 // --- DOM Elements ---
 const wastageLogPage = document.getElementById('wastageLogPage'); // The section wrapper
-const wasteItemSelect = document.getElementById('wasteItemSelect');
-const wasteQtySelect = document.getElementById('wasteQtySelect');
-const logWasteBtn = document.getElementById('logWasteBtn');
-const wasteLogList = document.getElementById('wasteLogList');
+const wastageLogContent = document.getElementById('wastageLogContent'); // Where dynamic content goes
+
 
 /**
  * Renders the Wastage Log page content.
@@ -21,15 +19,15 @@ const wasteLogList = document.getElementById('wasteLogList');
 export async function renderWastageLogPage() {
     const selectedLocationId = getSelectedLocation();
     if (!selectedLocationId) {
-        wastageLogPage.innerHTML = '<h2 class="page-title">Wastage Log</h2><p>Please select a location first to log waste.</p>';
+        wastageLogContent.innerHTML = '<p>Please select a location first to log waste.</p>';
         return;
     }
 
-    // Dynamic rendering of the main wastage card structure (if not already in index.html)
-    // For simplicity, we'll assume the basic structure is in index.html and we just populate its parts.
-    wastageLogPage.innerHTML = `
-        <h2 class="page-title">Wastage Log</h2>
-        <p>Log and review wasted items for ${selectedLocationId.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}.</p>
+    const locationDisplayName = selectedLocationId.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
+    // Set up the basic HTML structure for the wastage page
+    wastageLogContent.innerHTML = `
+        <h3 class="subsection-title">Wastage Log for ${locationDisplayName}</h3>
         <div class="wastage-card">
             <div class="wastage-input-group">
                 <div class="select-wrapper">
@@ -40,18 +38,18 @@ export async function renderWastageLogPage() {
                     <select id="wasteQtySelect" class="waste-select"></select>
                     <i class="fas fa-chevron-down select-arrow"></i>
                 </div>
-                <button id="logWasteBtn" class="log-waste-button">
+                <button id="logWasteBtn" class="log-waste-button" title="Log Waste">
                     <i class="fas fa-trash-alt trash-icon"></i>
                 </button>
             </div>
-            <h3 class="wastage-log-heading">Waste Log (Prev. 7 Days)</h3>
+            <h4 class="wastage-log-heading">Waste Log (Prev. 7 Days)</h4>
             <ul class="waste-log-list" id="wasteLogList">
                 <!-- Waste log entries will be dynamically loaded here -->
             </ul>
         </div>
     `;
 
-    // Re-get DOM elements after innerHTML replacement
+    // Get references to the newly created DOM elements within this page
     const currentWasteItemSelect = document.getElementById('wasteItemSelect');
     const currentWasteQtySelect = document.getElementById('wasteQtySelect');
     const currentLogWasteBtn = document.getElementById('logWasteBtn');
@@ -60,11 +58,10 @@ export async function renderWastageLogPage() {
 
     populateWasteDropdowns(currentWasteItemSelect, currentWasteQtySelect);
     currentLogWasteBtn.addEventListener('click', () => handleLogWaste(currentWasteItemSelect, currentWasteQtySelect, currentWasteLogList));
-    await loadWasteLog(currentWasteLogList);
+    await loadWasteLog(currentWasteLogList); // Load initial log entries
 
     console.log(`Wastage log page rendered for ${selectedLocationId}.`);
 }
-
 
 /**
  * Populates the item and quantity dropdowns for waste logging.
@@ -135,8 +132,8 @@ async function handleLogWaste(itemSelect, qtySelect, logList) {
             quantity: wastedQty,
             unit: item.unit || 'units',
             reason: reason,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            updatedBy: auth.currentUser ? auth.currentUser.email : 'Unknown User'
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Use server timestamp for accuracy
+            updatedBy: auth.currentUser ? auth.currentUser.email : 'Unknown User' // Log who made the entry
         });
 
         // Deduct from item's current stock in the specific location's subcollection
@@ -149,7 +146,7 @@ async function handleLogWaste(itemSelect, qtySelect, logList) {
         itemSelect.value = ''; // Reset dropdowns
         qtySelect.value = '';
         renderStockManagementPage(); // Trigger stock page re-render to update stock levels
-        await loadWasteLog(logList); // Reload waste log to show new entry
+        await loadWasteLog(logList);   // Reload waste log to show new entry
     } catch (error) {
         console.error('Error logging waste:', error);
         alert('Failed to log waste. Please try again. Check Firebase permissions.');
