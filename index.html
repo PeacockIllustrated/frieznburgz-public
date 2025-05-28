@@ -6,7 +6,7 @@
     <title>Friez n Burgz | Stock App</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@800;900&family=Futura:wght@400&family=Montserrat:wght@800&display=swap" rel="stylesheet">
-    <!-- Font Awesome for Icons (replace with custom SVG if preferred) -->
+    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -33,18 +33,18 @@
         <header class="app-header">
             <img src="assets/logo.png" alt="Friez n Burgz Logo" class="app-logo">
             <h1 class="app-title">Stock Adjusting and Ordering</h1>
+            <button id="logoutBtn" class="logout-button">Logout</button>
         </header>
 
         <main class="content-wrapper">
             <section class="stock-section">
+                <!-- Dynamic Stock Categories -->
                 <div class="category-card" id="meatCategory">
                     <div class="category-header">
                         <h2 class="category-title">Meat</h2>
                         <i class="fas fa-edit edit-icon"></i>
                     </div>
-                    <div class="item-list" id="meatItemList">
-                        <!-- Meat items will be dynamically loaded here -->
-                    </div>
+                    <div class="item-list" id="meatItemList"></div>
                 </div>
 
                 <div class="category-card" id="cheesesCategory">
@@ -52,20 +52,15 @@
                         <h2 class="category-title">Cheeses</h2>
                         <i class="fas fa-edit edit-icon"></i>
                     </div>
-                    <div class="item-list" id="cheesesItemList">
-                        <!-- Cheese items will be dynamically loaded here -->
-                    </div>
+                    <div class="item-list" id="cheesesItemList"></div>
                 </div>
 
-                <!-- New categories for Specials, Filletz, Milkshakes of the week -->
                 <div class="category-card" id="specialsCategory">
                     <div class="category-header">
                         <h2 class="category-title">Specialz Ingredients</h2>
                         <i class="fas fa-edit edit-icon"></i>
                     </div>
-                    <div class="item-list" id="specialsItemList">
-                        <!-- Specialz items will be dynamically loaded here -->
-                    </div>
+                    <div class="item-list" id="specialsItemList"></div>
                 </div>
 
                 <div class="category-card" id="filletzCategory">
@@ -73,9 +68,7 @@
                         <h2 class="category-title">Filletz Ingredients</h2>
                         <i class="fas fa-edit edit-icon"></i>
                     </div>
-                    <div class="item-list" id="filletzItemList">
-                        <!-- Filletz items will be dynamically loaded here -->
-                    </div>
+                    <div class="item-list" id="filletzItemList"></div>
                 </div>
 
                  <div class="category-card" id="milkshakesCategory">
@@ -83,10 +76,42 @@
                         <h2 class="category-title">Milkshakes of the Week</h2>
                         <i class="fas fa-edit edit-icon"></i>
                     </div>
-                    <div class="item-list" id="milkshakesItemList">
-                        <!-- Milkshakes of the Week items will be dynamically loaded here -->
-                    </div>
+                    <div class="item-list" id="milkshakesItemList"></div>
                 </div>
+
+                <!-- New General Categories -->
+                <div class="category-card" id="produceCategory">
+                    <div class="category-header">
+                        <h2 class="category-title">Produce & Vegetables</h2>
+                        <i class="fas fa-edit edit-icon"></i>
+                    </div>
+                    <div class="item-list" id="produceItemList"></div>
+                </div>
+
+                <div class="category-card" id="saucesCategory">
+                    <div class="category-header">
+                        <h2 class="category-title">Sauces & Condiments</h2>
+                        <i class="fas fa-edit edit-icon"></i>
+                    </div>
+                    <div class="item-list" id="saucesItemList"></div>
+                </div>
+
+                <div class="category-card" id="breadsCategory">
+                    <div class="category-header">
+                        <h2 class="category-title">Breads & Baked Goods</h2>
+                        <i class="fas fa-edit edit-icon"></i>
+                    </div>
+                    <div class="item-list" id="breadsItemList"></div>
+                </div>
+
+                <div class="category-card" id="otherCategory">
+                    <div class="category-header">
+                        <h2 class="category-title">Other Essentials</h2>
+                        <i class="fas fa-edit edit-icon"></i>
+                    </div>
+                    <div class="item-list" id="otherItemList"></div>
+                </div>
+
             </section>
 
             <section class="wastage-section">
