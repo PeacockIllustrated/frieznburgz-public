@@ -89,10 +89,59 @@ body {
     border-color: var(--red);
 }
 
+.email-login-btn {
+    margin-bottom: 20px; /* Space between email login and divider */
+}
+
+.google-login-btn {
+    background-color: #4285F4; /* Google Blue */
+    color: white;
+    border-color: #4285F4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.google-login-btn:hover {
+    background-color: #357ae8; /* Darker blue on hover */
+    color: white; /* Keep text white on hover */
+    border-color: #357ae8;
+}
+
+
 .auth-message {
     color: var(--red);
     font-size: 14px;
     margin-top: 15px;
+}
+
+.divider {
+    color: var(--dim-grey);
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
+    margin: 15px 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: var(--salmon);
+}
+
+.divider::before {
+    margin-right: 10px;
+}
+
+.divider::after {
+    margin-left: 10px;
 }
 
 /* Main App Container */
