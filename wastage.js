@@ -8,7 +8,6 @@ import { getCurrentStockItems, renderStockManagementPage } from './stock.js'; //
 import { createWasteLogItemHtml } from './wastage-template.js'; // Template for individual waste log items
 
 // --- DOM Elements ---
-const wastageLogPage = document.getElementById('wastageLogPage'); // The section wrapper
 const wastageLogContent = document.getElementById('wastageLogContent'); // Where dynamic content goes
 
 
@@ -26,6 +25,7 @@ export async function renderWastageLogPage() {
     const locationDisplayName = selectedLocationId.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
     // Set up the basic HTML structure for the wastage page
+    // Important: We rebuild the wastage-card HTML structure each time to ensure fresh event listeners.
     wastageLogContent.innerHTML = `
         <h3 class="subsection-title">Wastage Log for ${locationDisplayName}</h3>
         <div class="wastage-card">
@@ -145,7 +145,7 @@ async function handleLogWaste(itemSelect, qtySelect, logList) {
         alert(`Logged ${wastedQty} of ${item.name} as wasted for ${selectedLocationId.replace(/_/g, ' ')}.`);
         itemSelect.value = ''; // Reset dropdowns
         qtySelect.value = '';
-        renderStockManagementPage(); // Trigger stock page re-render to update stock levels
+        await renderStockManagementPage(); // Trigger stock page re-render to update stock levels
         await loadWasteLog(logList);   // Reload waste log to show new entry
     } catch (error) {
         console.error('Error logging waste:', error);
