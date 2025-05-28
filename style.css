@@ -5,7 +5,8 @@
     --dim-grey: #2f2f2f;
     --khaki: #fbae29;
     --salmon: #ff9686;
-    --dark-slate-grey: #050505;
+    --dark-slate-grey: #050505; /* Original black for deep contrast */
+    --light-grey: #f0f0f0; /* New - lighter grey for background contrast if needed */
 }
 
 /* Global Styles */
@@ -63,7 +64,7 @@ body {
     margin-bottom: 25px;
 }
 
-.auth-input, .location-select {
+.auth-input, .location-select, .stock-input, .waste-select { /* Added stock & waste inputs */
     width: calc(100% - 20px);
     padding: 12px 10px;
     margin-bottom: 15px;
@@ -159,6 +160,7 @@ body {
 .select-wrapper {
     position: relative;
     width: 100%;
+    margin-bottom: 15px; /* Added margin */
 }
 
 .location-select {
@@ -166,6 +168,11 @@ body {
     -webkit-appearance: none;
     -moz-appearance: none;
     cursor: pointer;
+}
+
+.location-select option {
+    background-color: var(--yellow);
+    color: var(--red);
 }
 
 .select-arrow {
@@ -227,6 +234,8 @@ body {
     font-size: 18px;
     color: var(--yellow);
     text-transform: uppercase;
+    text-align: center; /* Center location name */
+    flex-grow: 1; /* Allow it to take available space */
 }
 
 .header-button {
@@ -254,9 +263,9 @@ body {
 .dashboard-sidebar {
     grid-column: 1;
     grid-row: 2;
-    background-color: var(--dark-slate-grey); /* Dark grey for sidebar */
+    background-color: var(--red); /* Changed to red */
     padding: 20px 0;
-    border-right: 5px solid var(--red); /* Red border on the right */
+    border-right: 5px solid var(--yellow); /* Yellow border on the right */
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
@@ -289,23 +298,23 @@ body {
 }
 
 .nav-item:hover {
-    background-color: var(--red); /* Red background on hover */
-    color: var(--yellow);
+    background-color: var(--khaki); /* Khaki background on hover */
+    color: var(--red); /* Red text on hover */
 }
 
 .nav-item:hover i {
-    color: var(--yellow); /* Yellow icons on hover */
+    color: var(--red); /* Red icons on hover */
 }
 
 .nav-item.active {
-    background-color: var(--red); /* Active item is red */
-    color: var(--yellow);
+    background-color: var(--yellow); /* Active item is yellow */
+    color: var(--red); /* Red text for active */
     border-left: 5px solid var(--khaki); /* Highlight active with khaki border */
     padding-left: 20px; /* Adjust padding for border */
 }
 
 .nav-item.active i {
-    color: var(--yellow);
+    color: var(--red); /* Red icons for active */
 }
 
 
@@ -318,6 +327,7 @@ body {
     overflow-y: auto; /* Enable scrolling for content */
 }
 
+/* Content Pages */
 .content-page {
     display: none; /* Hidden by default, shown by JS */
 }
@@ -336,6 +346,234 @@ body {
     border-bottom: 2px solid var(--salmon);
     padding-bottom: 10px;
 }
+
+/* Stock item cards (from previous structure, but adapted for new layout) */
+.category-card, .wastage-card {
+    background-color: var(--yellow); /* Main yellow background, so card background is same */
+    border: 5px solid var(--khaki);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    margin-bottom: 30px; /* Space between cards */
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--salmon);
+}
+
+.category-title, .wastage-log-heading {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 30px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.edit-icon, .trash-icon {
+    color: var(--red);
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.edit-icon:hover, .trash-icon:hover {
+    color: var(--khaki);
+}
+
+/* Item List Styling */
+.item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.stock-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--salmon);
+}
+
+.stock-item:last-child {
+    border-bottom: none;
+}
+
+.stock-indicator-circle {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--red);
+    border-radius: 50%;
+    background-color: var(--yellow); /* Default */
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.stock-indicator-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--salmon); /* Low stock */
+    transition: height 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+/* Stock status colors */
+.stock-indicator-circle.good .stock-indicator-fill { background-color: #4CAF50; /* Green */ }
+.stock-indicator-circle.low .stock-indicator-fill { background-color: var(--khaki); /* Orange */ }
+.stock-indicator-circle.critical .stock-indicator-fill { background-color: var(--red); /* Red */ }
+
+
+.item-name {
+    flex-grow: 1;
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 18px;
+    text-transform: uppercase;
+    color: var(--dim-grey);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stock-controls {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--khaki);
+    border-radius: 20px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.control-button {
+    background-color: var(--khaki);
+    color: var(--red);
+    border: none;
+    padding: 5px 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.control-button:hover {
+    background-color: var(--red);
+    color: var(--yellow);
+}
+
+.stock-input {
+    width: 50px;
+    text-align: center;
+    border: none;
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--red);
+    background-color: var(--yellow);
+    -moz-appearance: textfield; /* Remove default spinner for Firefox */
+}
+
+/* Remove default spinner for Chrome, Safari, Edge */
+.stock-input::-webkit-outer-spin-button,
+.stock-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.add-stock-button {
+    background-color: var(--red);
+    color: var(--yellow);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.add-stock-button:hover {
+    background-color: var(--khaki);
+    color: var(--red);
+}
+
+/* Wastage Section Styling */
+.wastage-input-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    align-items: center;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+}
+
+.wastage-input-group .select-wrapper {
+    flex-grow: 1;
+    min-width: 150px; /* Ensure select boxes don't get too small */
+}
+
+.log-waste-button {
+    background-color: var(--red);
+    color: var(--yellow);
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.log-waste-button:hover {
+    background-color: var(--khaki);
+    color: var(--red);
+}
+
+.wastage-log-heading {
+    text-align: left;
+    margin-bottom: 15px;
+    padding-top: 10px;
+    border-top: 2px solid var(--salmon);
+}
+
+.waste-log-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.waste-log-item {
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 16px;
+    color: var(--dim-grey);
+    margin-bottom: 8px;
+    padding-left: 15px; /* Adjust padding for bullet */
+    position: relative;
+    word-break: break-word; /* Allow long words to break */
+}
+
+.waste-log-item::before {
+    content: '•';
+    color: var(--red);
+    position: absolute;
+    left: 0;
+    font-size: 1.2em; /* Make bullet slightly larger */
+    line-height: 1;
+}
+
 
 /* --- Responsive Adjustments --- */
 @media screen and (max-width: 768px) {
@@ -359,14 +597,16 @@ body {
     }
 
     .header-center {
-        display: none; /* Hide current location display on small screens for simplicity */
+        /* This whole section is hidden on mobile now (see main.js) */
+        /* If you want to show it, you'll need to redesign its placement */
+        display: none;
     }
 
     .dashboard-sidebar {
         grid-column: 1;
         grid-row: 2;
         border-right: none;
-        border-bottom: 5px solid var(--red); /* Move border to bottom */
+        border-bottom: 5px solid var(--yellow); /* Yellow border on the bottom */
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         flex-direction: row; /* Horizontal sidebar */
         overflow-x: auto; /* Enable horizontal scrolling for nav items */
@@ -406,6 +646,11 @@ body {
     .page-title {
         font-size: 30px;
     }
+
+    .stock-section, .wastage-section {
+        flex: auto; /* Allow them to fill available space */
+        width: 100%; /* Take full width */
+    }
 }
 
 @media screen and (max-width: 480px) {
@@ -437,5 +682,40 @@ body {
 
     .page-title {
         font-size: 24px;
+    }
+
+    .stock-item {
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+    }
+    .stock-indicator-circle {
+        margin-right: 10px;
+    }
+    .item-name {
+        flex-basis: 100%;
+        margin-bottom: 5px;
+    }
+    .stock-controls {
+        flex-grow: 1;
+    }
+    .add-stock-button {
+        margin-left: 10px;
+    }
+
+    .wastage-input-group {
+        flex-direction: column; /* Stack inputs vertically */
+        align-items: stretch; /* Stretch to fill width */
+    }
+    .wastage-input-group .select-wrapper {
+        min-width: unset; /* Remove min-width to allow proper stretching */
+    }
+    .log-waste-button {
+        align-self: center; /* Center button when inputs are stacked */
+        width: 45px; /* Smaller button */
+        height: 45px;
+    }
+    .waste-log-item {
+        font-size: 14px; /* Smaller font for log items */
     }
 }
