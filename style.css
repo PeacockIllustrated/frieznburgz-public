@@ -2,59 +2,66 @@
 :root {
     --red: #e71e26;
     --yellow: white;
-    --dim-grey: #2f2f2f;
-    --khaki: #fbae29;
-    --salmon: #ff9686;
-    --dark-slate-grey: #050505; /* Original black for deep contrast */
-    --light-grey: #f0f0f0; /* New - lighter grey for background contrast if needed */
+    --dim-grey: #2f2f2f; /* Deep grey for text/elements */
+    --khaki: #fbae29; /* Vibrant orange-yellow */
+    --salmon: #ff9686; /* Lighter red/orange tone */
+    --dark-slate-grey: #050505; /* Near black, used for body background */
 }
 
 /* Global Styles */
 body {
     margin: 0;
     font-family: 'Futura', Arial, sans-serif;
-    background-color: var(--dark-slate-grey);
-    color: var(--red);
+    background-color: var(--dark-slate-grey); /* Overall dark background */
+    color: var(--red); /* Default text color for app content */
     line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
+    -webkit-font-smoothing: antialiased; /* Smoother text rendering */
     -moz-osx-font-smoothing: grayscale;
     display: flex; /* Use flex to center auth/location containers */
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 100vh; /* Full viewport height */
 }
 
-/* Hidden by default, managed by JS */
-.auth-container, .location-selection-container, .main-dashboard-container {
-    display: none;
+/* Base containers visibility - managed by JavaScript */
+.auth-container,
+.location-selection-container,
+.main-dashboard-container {
+    display: none; /* Hidden by default */
     width: 100%;
     min-height: 100vh; /* Ensure full viewport height for dashboard */
 }
 
 /* --- Authentication & Location Selection Card Styles --- */
-.auth-container, .location-selection-container {
-    display: flex; /* Override hidden default when active */
+/* These containers are flex to center their child cards */
+.auth-container,
+.location-selection-container {
+    display: flex; /* Overrides default 'display: none' when active */
     justify-content: center;
     align-items: center;
 }
 
-.auth-card, .location-selection-card {
-    background-color: var(--yellow);
-    border: 5px solid var(--khaki);
-    border-radius: 20px;
+/* Styling for the login/location selection cards */
+.auth-card,
+.location-selection-card {
+    background-color: var(--yellow); /* White background */
+    border: 5px solid var(--khaki); /* Khaki border */
+    border-radius: 20px; /* Rounded corners */
     padding: 40px 30px;
     text-align: center;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4); /* Subtle shadow */
     max-width: 400px;
     width: 90%;
     box-sizing: border-box; /* Include padding in width calculation */
 }
 
+/* Logo in auth/location cards */
 .auth-logo {
     max-width: 180px;
     margin-bottom: 25px;
 }
 
+/* Title in auth/location cards */
 .auth-title {
     font-family: 'Fraunces', serif;
     font-weight: 900;
@@ -64,8 +71,12 @@ body {
     margin-bottom: 25px;
 }
 
-.auth-input, .location-select, .stock-input, .waste-select { /* Added stock & waste inputs */
-    width: calc(100% - 20px);
+/* Input fields (email, password, location select, stock, waste) */
+.auth-input,
+.location-select,
+.stock-input,
+.waste-select {
+    width: calc(100% - 20px); /* Full width minus padding */
     padding: 12px 10px;
     margin-bottom: 15px;
     border: 2px solid var(--red);
@@ -77,10 +88,12 @@ body {
     box-sizing: border-box;
 }
 
+/* Placeholder text color */
 .auth-input::placeholder {
     color: var(--salmon);
 }
 
+/* Styling for all authentication/action buttons */
 .auth-button {
     background-color: var(--red);
     color: var(--yellow);
@@ -94,40 +107,46 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     width: 100%;
-    display: flex; /* For icons */
+    display: flex; /* For aligning text and icon */
     align-items: center;
     justify-content: center;
     gap: 10px; /* Space between text and icon */
 }
 
+/* Hover effect for general auth buttons */
 .auth-button:hover {
     background-color: var(--yellow);
     color: var(--red);
     border-color: var(--red);
 }
 
+/* Specific margin for email login button */
 .email-login-btn {
     margin-bottom: 20px;
 }
 
+/* Google Sign-in button specific styles */
 .google-login-btn {
     background-color: #4285F4; /* Google Blue */
     color: white;
     border-color: #4285F4;
 }
 
+/* Google Sign-in button hover effect */
 .google-login-btn:hover {
-    background-color: #357ae8; /* Darker blue on hover */
+    background-color: #357ae8; /* Darker blue */
     color: white;
     border-color: #357ae8;
 }
 
+/* Authentication message (e.g., login failed) */
 .auth-message {
     color: var(--red);
     font-size: 14px;
     margin-top: 15px;
 }
 
+/* Separator 'OR' style */
 .divider {
     color: var(--dim-grey);
     font-family: 'Futura', Arial, sans-serif;
@@ -140,6 +159,7 @@ body {
     justify-content: center;
 }
 
+/* Lines around the 'OR' text */
 .divider::before,
 .divider::after {
     content: '';
@@ -160,84 +180,93 @@ body {
 .select-wrapper {
     position: relative;
     width: 100%;
-    margin-bottom: 15px; /* Added margin */
+    margin-bottom: 15px;
 }
 
+/* Remove default browser styling for select dropdown */
 .location-select {
-    appearance: none; /* Remove default select arrow */
+    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     cursor: pointer;
 }
 
+/* Option styles for location select */
 .location-select option {
     background-color: var(--yellow);
     color: var(--red);
 }
 
+/* Custom arrow for select dropdown */
 .select-arrow {
     position: absolute;
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--khaki);
-    pointer-events: none; /* Make sure clicks go through to the select */
+    pointer-events: none; /* Clicks pass through to the select element */
     font-size: 18px;
 }
 
-/* --- Main Dashboard Layout --- */
+/* --- Main Admin Dashboard Layout --- */
 .main-dashboard-container {
-    display: grid; /* Use CSS Grid for overall layout */
-    grid-template-columns: 250px 1fr; /* Sidebar width + Main content */
-    grid-template-rows: 70px 1fr; /* Header height + Main content */
+    display: grid; /* Use CSS Grid for the main layout */
+    grid-template-columns: 250px 1fr; /* Sidebar width + Main content area */
+    grid-template-rows: 70px 1fr; /* Header height + Remaining height for content */
     min-height: 100vh;
-    background-color: var(--yellow);
+    background-color: var(--yellow); /* Overall dashboard background */
 }
 
-/* Header */
+/* Header Section */
 .dashboard-header {
-    grid-column: 1 / -1; /* Spans across both columns */
-    grid-row: 1;
-    background-color: var(--red);
-    border-bottom: 5px solid var(--yellow);
+    grid-column: 1 / -1; /* Spans across all columns (sidebar + content) */
+    grid-row: 1; /* First row */
+    background-color: var(--red); /* Red header background */
+    border-bottom: 5px solid var(--yellow); /* Yellow border at bottom */
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    color: var(--yellow);
+    color: var(--yellow); /* Default text color for header */
 }
 
-.header-left, .header-right, .header-center {
+.header-left,
+.header-right,
+.header-center {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 15px; /* Spacing between elements */
 }
 
+/* Header logo */
 .header-logo {
     max-width: 100px;
     height: auto;
 }
 
+/* App name in header */
 .app-name {
     font-family: 'Fraunces', serif;
     font-weight: 900;
     font-size: 24px;
     text-transform: uppercase;
     color: var(--yellow);
-    white-space: nowrap; /* Prevent wrapping */
+    white-space: nowrap; /* Prevent text wrapping */
 }
 
+/* Current location display in header */
 .current-location-display {
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
     font-size: 18px;
     color: var(--yellow);
     text-transform: uppercase;
-    text-align: center; /* Center location name */
-    flex-grow: 1; /* Allow it to take available space */
+    text-align: center;
+    flex-grow: 1; /* Allows it to take available space in the center */
 }
 
+/* Header buttons (Change Location, Logout) */
 .header-button {
     background-color: var(--yellow);
     color: var(--red);
@@ -250,23 +279,24 @@ body {
     text-transform: uppercase;
     cursor: pointer;
     transition: all 0.2s ease;
-    white-space: nowrap; /* Prevent wrapping */
+    white-space: nowrap; /* Prevent text wrapping */
 }
 
+/* Header button hover effect */
 .header-button:hover {
     background-color: var(--khaki);
     color: var(--yellow);
     border-color: var(--khaki);
 }
 
-/* Sidebar */
+/* Sidebar Navigation */
 .dashboard-sidebar {
-    grid-column: 1;
-    grid-row: 2;
-    background-color: var(--red); /* Changed to red */
+    grid-column: 1; /* First column */
+    grid-row: 2; /* Second row */
+    background-color: var(--red); /* RED sidebar background */
     padding: 20px 0;
     border-right: 5px solid var(--yellow); /* Yellow border on the right */
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
     display: flex;
     flex-direction: column;
 }
@@ -274,9 +304,10 @@ body {
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 10px; /* Space between nav items */
 }
 
+/* Individual navigation item styling */
 .nav-item {
     display: flex;
     align-items: center;
@@ -291,28 +322,33 @@ body {
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Icons within nav items */
 .nav-item i {
     font-size: 20px;
     color: var(--khaki); /* Khaki icons */
     transition: color 0.2s ease;
 }
 
+/* Nav item hover effect */
 .nav-item:hover {
     background-color: var(--khaki); /* Khaki background on hover */
     color: var(--red); /* Red text on hover */
 }
 
+/* Nav item icon hover effect */
 .nav-item:hover i {
     color: var(--red); /* Red icons on hover */
 }
 
+/* Active navigation item styling */
 .nav-item.active {
     background-color: var(--yellow); /* Active item is yellow */
     color: var(--red); /* Red text for active */
     border-left: 5px solid var(--khaki); /* Highlight active with khaki border */
-    padding-left: 20px; /* Adjust padding for border */
+    padding-left: 20px; /* Adjust padding due to border */
 }
 
+/* Active nav item icon styling */
 .nav-item.active i {
     color: var(--red); /* Red icons for active */
 }
@@ -320,22 +356,23 @@ body {
 
 /* Main Content Area */
 .dashboard-content {
-    grid-column: 2;
-    grid-row: 2;
-    background-color: var(--yellow);
+    grid-column: 2; /* Second column */
+    grid-row: 2; /* Second row */
+    background-color: var(--yellow); /* Content area background */
     padding: 30px;
-    overflow-y: auto; /* Enable scrolling for content */
+    overflow-y: auto; /* Enable vertical scrolling for content */
 }
 
-/* Content Pages */
+/* Content Pages (sections within main content) */
 .content-page {
-    display: none; /* Hidden by default, shown by JS */
+    display: none; /* Hidden by default, JavaScript manages visibility */
 }
 
 .content-page.active-page {
     display: block; /* Active page is shown */
 }
 
+/* Titles for main content pages (Dashboard Overview, Stock Management, etc.) */
 .page-title {
     font-family: 'Fraunces', serif;
     font-weight: 900;
@@ -343,20 +380,45 @@ body {
     color: var(--red);
     text-transform: uppercase;
     margin-bottom: 20px;
-    border-bottom: 2px solid var(--salmon);
+    border-bottom: 2px solid var(--salmon); /* Separator line */
     padding-bottom: 10px;
 }
 
-/* Stock item cards (from previous structure, but adapted for new layout) */
-.category-card, .wastage-card {
-    background-color: var(--yellow); /* Main yellow background, so card background is same */
-    border: 5px solid var(--khaki);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-    margin-bottom: 30px; /* Space between cards */
+/* Titles for sub-sections within pages (e.g., Inventory for South Shields) */
+.subsection-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 30px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 1px dashed var(--salmon); /* Lighter separator */
+    padding-bottom: 10px;
 }
 
+/* --- Stock Management Specific Styles --- */
+
+/* Grid for holding category cards in Stock Management */
+.stock-items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive columns, min 280px, max 1fr */
+    gap: 20px; /* Space between category cards */
+    margin-top: 20px; /* Space from the subsection title */
+}
+
+/* Individual category cards within stock management */
+.category-card {
+    background-color: var(--yellow); /* Card background (same as main content) */
+    border: 5px solid var(--khaki); /* Khaki border */
+    border-radius: 20px; /* Rounded corners */
+    padding: 25px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+    display: flex; /* Use flex for internal layout */
+    flex-direction: column;
+}
+
+/* Header within category cards (Meat, Cheeses) */
 .category-header {
     display: flex;
     justify-content: space-between;
@@ -366,91 +428,100 @@ body {
     border-bottom: 2px solid var(--salmon);
 }
 
-.category-title, .wastage-log-heading {
+/* Title within category headers (Meat, Cheeses) */
+.category-title {
     font-family: 'Fraunces', serif;
     font-weight: 900;
-    font-size: 30px;
+    font-size: 24px; /* Slightly smaller than page-title */
     color: var(--red);
     text-transform: uppercase;
     margin: 0;
 }
 
-.edit-icon, .trash-icon {
+/* Edit icon next to category titles (future use) */
+.edit-icon {
     color: var(--red);
-    font-size: 24px;
+    font-size: 20px; /* Slightly smaller icon */
     cursor: pointer;
     transition: color 0.2s ease;
 }
 
-.edit-icon:hover, .trash-icon:hover {
+.edit-icon:hover {
     color: var(--khaki);
 }
 
-/* Item List Styling */
+/* List container for items within a category card */
 .item-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 15px; /* Space between individual stock items */
 }
 
+/* Individual stock item row (Beef Patties, Chicken Filletz) */
 .stock-item {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 10px 0;
-    border-bottom: 1px dashed var(--salmon);
+    border-bottom: 1px dashed var(--salmon); /* Dashed separator */
 }
 
+/* Remove border from the last item in a list */
 .stock-item:last-child {
     border-bottom: none;
 }
 
+/* Circular stock indicator */
 .stock-indicator-circle {
     width: 30px;
     height: 30px;
     border: 2px solid var(--red);
-    border-radius: 50%;
-    background-color: var(--yellow); /* Default */
-    flex-shrink: 0;
+    border-radius: 50%; /* Make it a circle */
+    background-color: var(--yellow); /* Default background */
+    flex-shrink: 0; /* Prevent it from shrinking */
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* Hide overflow of the fill */
 }
 
+/* The dynamic fill inside the stock indicator */
 .stock-indicator-fill {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: var(--salmon); /* Low stock */
-    transition: height 0.3s ease-in-out, background-color 0.3s ease-in-out;
+    background-color: var(--salmon); /* Default fill color */
+    transition: height 0.3s ease-in-out, background-color 0.3s ease-in-out; /* Smooth transitions */
 }
 
-/* Stock status colors */
-.stock-indicator-circle.good .stock-indicator-fill { background-color: #4CAF50; /* Green */ }
-.stock-indicator-circle.low .stock-indicator-fill { background-color: var(--khaki); /* Orange */ }
-.stock-indicator-circle.critical .stock-indicator-fill { background-color: var(--red); /* Red */ }
+/* Stock status color overrides for the fill */
+.stock-indicator-circle.good .stock-indicator-fill { background-color: #4CAF50; /* Green for good stock */ }
+.stock-indicator-circle.low .stock-indicator-fill { background-color: var(--khaki); /* Orange for low stock */ }
+.stock-indicator-circle.critical .stock-indicator-fill { background-color: var(--red); /* Red for critical stock */ }
 
 
+/* Name of the stock item (Beef Patties, etc.) */
 .item-name {
-    flex-grow: 1;
+    flex-grow: 1; /* Allows it to take available space */
     font-family: 'Futura', Arial, sans-serif;
     font-size: 18px;
     text-transform: uppercase;
     color: var(--dim-grey);
-    white-space: nowrap;
+    white-space: nowrap; /* Prevent wrapping */
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; /* Add ellipsis for long names */
 }
 
+/* Container for + / - / quantity input */
 .stock-controls {
     display: flex;
     align-items: center;
     border: 2px solid var(--khaki);
-    border-radius: 20px;
+    border-radius: 20px; /* Rounded capsule shape */
     overflow: hidden;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
+/* + / - buttons */
 .control-button {
     background-color: var(--khaki);
     color: var(--red);
@@ -463,11 +534,13 @@ body {
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* + / - button hover effect */
 .control-button:hover {
     background-color: var(--red);
     color: var(--yellow);
 }
 
+/* Stock quantity input field */
 .stock-input {
     width: 50px;
     text-align: center;
@@ -487,11 +560,12 @@ body {
     margin: 0;
 }
 
+/* Button to message supplier (+ icon) */
 .add-stock-button {
     background-color: var(--red);
     color: var(--yellow);
     border: none;
-    border-radius: 50%;
+    border-radius: 50%; /* Circular button */
     width: 40px;
     height: 40px;
     font-size: 25px;
@@ -501,17 +575,31 @@ body {
     cursor: pointer;
     transition: background-color 0.2s ease;
     flex-shrink: 0;
+    margin-left: 10px; /* Space from stock controls */
 }
 
+/* Supplier button hover effect */
 .add-stock-button:hover {
     background-color: var(--khaki);
     color: var(--red);
 }
 
-/* Wastage Section Styling */
+/* --- Wastage Log Specific Styles --- */
+
+/* Card container for wastage input and log */
+.wastage-card {
+    background-color: var(--yellow); /* Card background (same as main content) */
+    border: 5px solid var(--khaki);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    margin-bottom: 30px;
+}
+
+/* Grouping for wastage item select, quantity select, and log button */
 .wastage-input-group {
     display: flex;
-    gap: 15px;
+    gap: 15px; /* Space between elements */
     margin-bottom: 25px;
     align-items: center;
     flex-wrap: wrap; /* Allow wrapping on small screens */
@@ -522,6 +610,7 @@ body {
     min-width: 150px; /* Ensure select boxes don't get too small */
 }
 
+/* Waste log button (trash icon) */
 .log-waste-button {
     background-color: var(--red);
     color: var(--yellow);
@@ -537,11 +626,13 @@ body {
     flex-shrink: 0;
 }
 
+/* Waste log button hover effect */
 .log-waste-button:hover {
     background-color: var(--khaki);
     color: var(--red);
 }
 
+/* Heading for the waste log list */
 .wastage-log-heading {
     text-align: left;
     margin-bottom: 15px;
@@ -549,77 +640,80 @@ body {
     border-top: 2px solid var(--salmon);
 }
 
+/* List for displaying waste log entries */
 .waste-log-list {
-    list-style: none;
+    list-style: none; /* Remove default list bullets */
     padding: 0;
     margin: 0;
 }
 
+/* Individual waste log item styling */
 .waste-log-item {
     font-family: 'Futura', Arial, sans-serif;
     font-size: 16px;
     color: var(--dim-grey);
     margin-bottom: 8px;
-    padding-left: 15px; /* Adjust padding for bullet */
+    padding-left: 15px; /* Space for custom bullet */
     position: relative;
-    word-break: break-word; /* Allow long words to break */
+    word-break: break-word; /* Allow long text to wrap */
 }
 
+/* Custom bullet point for waste log items */
 .waste-log-item::before {
     content: '•';
     color: var(--red);
     position: absolute;
     left: 0;
-    font-size: 1.2em; /* Make bullet slightly larger */
-    line-height: 1;
+    font-size: 1.2em;
+    line-height: 1; /* Align bullet vertically */
 }
 
 
 /* --- Responsive Adjustments --- */
 @media screen and (max-width: 768px) {
     .main-dashboard-container {
-        grid-template-columns: 1fr; /* Stack sidebar on top */
+        grid-template-columns: 1fr; /* Stack sidebar on top for tablets */
         grid-template-rows: auto auto 1fr; /* Header, then sidebar, then content */
     }
 
     .dashboard-header {
-        flex-direction: column;
+        flex-direction: column; /* Stack header elements vertically */
         align-items: flex-start;
         padding-top: 10px;
         padding-bottom: 10px;
-        height: auto; /* Allow header to grow */
+        height: auto; /* Allow header to grow with content */
     }
 
-    .header-left, .header-right {
+    .header-left,
+    .header-right {
         width: 100%;
-        justify-content: space-between; /* Space out elements in header */
+        justify-content: space-between; /* Space out elements within these groups */
         margin-bottom: 10px;
     }
 
+    /* Hide the center location display on smaller screens to save space */
     .header-center {
-        /* This whole section is hidden on mobile now (see main.js) */
-        /* If you want to show it, you'll need to redesign its placement */
         display: none;
     }
 
     .dashboard-sidebar {
         grid-column: 1;
-        grid-row: 2;
-        border-right: none;
-        border-bottom: 5px solid var(--yellow); /* Yellow border on the bottom */
+        grid-row: 2; /* Sidebar moves to the second row */
+        border-right: none; /* Remove right border */
+        border-bottom: 5px solid var(--yellow); /* Add yellow border to bottom */
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         flex-direction: row; /* Horizontal sidebar */
-        overflow-x: auto; /* Enable horizontal scrolling for nav items */
+        overflow-x: auto; /* Enable horizontal scrolling for navigation */
         -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
-        justify-content: flex-start; /* Align items to start */
+        justify-content: flex-start;
         padding: 10px 0;
         min-height: auto; /* Allow height to collapse */
     }
 
     .sidebar-nav {
-        flex-direction: row;
-        width: max-content; /* Allow content to dictate width */
-        gap: 5px; /* Reduce gap */
+        flex-direction: row; /* Horizontal navigation items */
+        width: max-content; /* Allow content to dictate width for scrolling */
+        gap: 5px; /* Reduce space between nav items */
     }
 
     .nav-item {
@@ -627,18 +721,20 @@ body {
         padding: 10px 15px; /* Adjust padding for horizontal layout */
     }
 
+    /* Active nav item styling for horizontal sidebar */
     .nav-item.active {
         border-left: none; /* Remove left border */
-        border-bottom: 3px solid var(--khaki); /* Use bottom border for active */
+        border-bottom: 3px solid var(--khaki); /* Use bottom border for active indicator */
         padding-left: 15px; /* Restore padding */
     }
 
     .dashboard-content {
         grid-column: 1;
-        grid-row: 3;
+        grid-row: 3; /* Content moves to the third row */
         padding: 20px;
     }
 
+    /* Adjust font sizes for smaller screens */
     .app-name {
         font-size: 20px;
     }
@@ -647,26 +743,37 @@ body {
         font-size: 30px;
     }
 
-    .stock-section, .wastage-section {
+    /* Stock/Wastage sections */
+    .stock-section,
+    .wastage-section {
         flex: auto; /* Allow them to fill available space */
-        width: 100%; /* Take full width */
+        width: 100%; /* Take full width of parent */
+    }
+
+    .subsection-title {
+        font-size: 25px;
     }
 }
 
 @media screen and (max-width: 480px) {
-    .auth-card, .location-selection-card {
+    /* Smaller padding for auth/location cards */
+    .auth-card,
+    .location-selection-card {
         padding: 30px 15px;
     }
 
+    /* Smaller auth title */
     .auth-title {
         font-size: 24px;
     }
 
+    /* Smaller auth buttons */
     .auth-button {
         font-size: 16px;
         padding: 10px 20px;
     }
 
+    /* Smaller header logo and app name */
     .header-logo {
         max-width: 80px;
     }
@@ -675,47 +782,69 @@ body {
         font-size: 18px;
     }
 
+    /* Smaller header buttons */
     .header-button {
         font-size: 12px;
         padding: 6px 10px;
     }
 
+    /* Smaller page titles */
     .page-title {
         font-size: 24px;
     }
 
+    .subsection-title {
+        font-size: 20px;
+    }
+
+    /* Stock item wrapping on very small screens */
     .stock-item {
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-wrap: wrap; /* Allow items to wrap */
+        justify-content: center; /* Center content when wrapped */
         text-align: center;
     }
+
     .stock-indicator-circle {
-        margin-right: 10px;
+        margin-right: 10px; /* Space for the circle */
     }
+
+    /* Item name takes full width when wrapped */
     .item-name {
         flex-basis: 100%;
         margin-bottom: 5px;
     }
+
+    /* Stock controls take full width when wrapped */
     .stock-controls {
         flex-grow: 1;
+        width: 100%; /* Take full width */
     }
+
+    /* Margin for supplier button when wrapped */
     .add-stock-button {
         margin-left: 10px;
     }
 
+    /* Wastage input group stacking */
     .wastage-input-group {
         flex-direction: column; /* Stack inputs vertically */
         align-items: stretch; /* Stretch to fill width */
     }
+
+    /* Remove min-width to allow select boxes to stretch fully */
     .wastage-input-group .select-wrapper {
-        min-width: unset; /* Remove min-width to allow proper stretching */
+        min-width: unset;
     }
+
+    /* Center and make waste log button smaller */
     .log-waste-button {
-        align-self: center; /* Center button when inputs are stacked */
-        width: 45px; /* Smaller button */
+        align-self: center;
+        width: 45px;
         height: 45px;
     }
+
+    /* Smaller font for waste log items */
     .waste-log-item {
-        font-size: 14px; /* Smaller font for log items */
+        font-size: 14px;
     }
 }
