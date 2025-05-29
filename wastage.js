@@ -4,7 +4,7 @@
 import { db } from './firebase.js';
 import { auth } from './firebase.js'; // Needed for auth.currentUser.email for logging who made the entry
 import { getSelectedLocation } from './config.js';
-import { getCurrentStockItems, renderStockManagementPage } from './stock.js'; // To get item list for dropdown and trigger stock re-render
+import { getCurrentStockItems } from './stock.js'; // To get item list for dropdown
 import { createWasteLogItemHtml } from './wastage-template.js'; // Template for individual waste log items
 
 // We no longer get these elements at the top, but inside the render function.
@@ -32,18 +32,9 @@ export async function renderWastageLogPage() {
     wastageLogContent.innerHTML = `
         <h3 class="subsection-title">Wastage Log for ${locationDisplayName}</h3>
         <div class="wastage-card">
-            <div class="wastage-input-group">
-                <div class="select-wrapper">
-                    <select id="wasteItemSelect" class="waste-select"></select>
-                    <i class="fas fa-chevron-down select-arrow"></i>
-                </div>
-                <div class="select-wrapper">
-                    <select id="wasteQtySelect" class="waste-select"></select>
-                    <i class="fas fa-chevron-down select-arrow"></i>
-                </div>
-                <button id="logWasteBtn" class="log-waste-button" title="Log Waste">
-                    <i class="fas fa-trash-alt trash-icon"></i>
-                </button>
+            <div class="wastage-actions">
+                <p>Ready to log new waste?</p>
+                <button id="logNewWasteEntryBtn" class="auth-button quick-action-btn">Log New Waste Entry</button>
             </div>
             <h4 class="wastage-log-heading">Waste Log (Prev. 7 Days)</h4>
             <ul class="waste-log-list" id="wasteLogList">
@@ -56,126 +47,27 @@ export async function renderWastageLogPage() {
 
     // 2. IMPORTANT: Get references to the newly created DOM elements *within this page*
     // These must be retrieved *after* the innerHTML assignment.
-    const currentWasteItemSelect = document.getElementById('wasteItemSelect');
-    const currentWasteQtySelect = document.getElementById('wasteQtySelect');
-    const currentLogWasteBtn = document.getElementById('logWasteBtn');
+    const logNewWasteEntryBtn = document.getElementById('logNewWasteEntryBtn');
     const currentWasteLogList = document.getElementById('wasteLogList');
 
     // 3. Attach event listeners to newly created elements
-    if (currentLogWasteBtn) {
-        currentLogWasteBtn.addEventListener('click', () => handleLogWaste(currentWasteItemSelect, currentWasteQtySelect, currentWasteLogList));
+    if (logNewWasteEntryBtn) {
+        logNewWasteEntryBtn.addEventListener('click', () => {
+            if (window.mainApp && typeof window.mainApp.showQuickAdjustmentModal === 'function') {
+                window.mainApp.showQuickAdjustmentModal('waste');
+            } else {
+                console.error('mainApp.showQuickAdjustmentModal is not available.');
+                alert('An error occurred. Cannot open waste logging modal.');
+            }
+        });
     } else {
-        console.error('wastage.js: Log Waste button not found after rendering.');
+        console.error('wastage.js: Log New Waste Entry button not found after rendering.');
     }
 
 
-    // 4. Populate dropdowns and load log entries
-    populateWasteDropdowns(currentWasteItemSelect, currentWasteQtySelect);
+    // 4. Load log entries
     await loadWasteLog(currentWasteLogList); // Load initial log entries
     console.log(`wastage.js: Wastage log page rendered for ${selectedLocationId}.`);
-}
-
-/**
- * Populates the item and quantity dropdowns for waste logging.
- * @param {HTMLSelectElement} itemSelect - The item select element.
- * @param {HTMLSelectElement} qtySelect - The quantity select element.
- */
-function populateWasteDropdowns(itemSelect, qtySelect) {
-    // Defensive check: Ensure itemSelect and qtySelect are valid HTML elements
-    if (!itemSelect || !qtySelect) {
-        console.error('wastage.js: Waste dropdown elements are null. Cannot populate.');
-        return;
-    }
-
-    const items = getCurrentStockItems(); // Get current items from stock.js
-
-    if (items.length === 0) {
-        itemSelect.innerHTML = '<option value="" disabled selected>No items found (check Stock Management)</option>';
-        itemSelect.disabled = true; // Disable if no items
-    } else {
-        itemSelect.innerHTML = '<option value="" disabled selected>Select Item</option>';
-        itemSelect.disabled = false;
-        // Sort items alphabetically for easier selection
-        const sortedItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
-        sortedItems.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.id;
-            option.textContent = item.name;
-            itemSelect.appendChild(option);
-        });
-    }
-
-
-    qtySelect.innerHTML = '<option value="" disabled selected>Select Qty</option>';
-    for (let i = 1; i <= 50; i++) { // Max 50 units for waste, adjust as needed
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = i;
-        qtySelect.appendChild(option);
-    }
-}
-
-/**
- * Handles the logging of wasted items.
- * @param {HTMLSelectElement} itemSelect - The item select element.
- * @param {HTMLSelectElement} qtySelect - The quantity select element.
- * @param {HTMLUListElement} logList - The waste log list element.
- */
-async function handleLogWaste(itemSelect, qtySelect, logList) {
-    const selectedLocationId = getSelectedLocation();
-    if (!selectedLocationId) {
-        alert('No location selected. Cannot log waste.');
-        return;
-    }
-
-    const selectedItemId = itemSelect.value;
-    const wastedQty = parseInt(qtySelect.value, 10);
-
-    if (!selectedItemId || isNaN(wastedQty) || wastedQty <= 0) {
-        alert('Please select an item and a valid quantity for waste.');
-        return;
-    }
-
-    const items = getCurrentStockItems();
-    const item = items.find(i => i.id === selectedItemId);
-    if (!item) {
-        alert('Selected item not found in inventory.');
-        return;
-    }
-
-    const reason = prompt(`Reason for wasting ${wastedQty} ${item.unit || 'units'} of ${item.name}?`);
-    if (reason === null || reason.trim() === '') {
-        alert('Waste not logged. A reason for wastage is required.');
-        return;
-    }
-
-    try {
-        // Add waste log entry to the specific location's subcollection
-        await db.collection('locations').doc(selectedLocationId).collection('wastage_log').add({
-            item: item.name,
-            itemId: item.id,
-            quantity: wastedQty,
-            unit: item.unit || 'units',
-            reason: reason,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Use server timestamp for accuracy
-            updatedBy: auth.currentUser ? auth.currentUser.email : 'Unknown User' // Log who made the entry
-        });
-
-        // Deduct from item's current stock in the specific location's subcollection
-        const itemDocRef = db.collection('locations').doc(selectedLocationId).collection('items').doc(item.id);
-        await itemDocRef.update({
-            currentStock: firebase.firestore.FieldValue.increment(-wastedQty)
-        });
-
-        alert(`Logged ${wastedQty} of ${item.name} as wasted for ${selectedLocationId.replace(/_/g, ' ')}.`);
-        itemSelect.value = ''; // Reset dropdowns
-        qtySelect.value = '';
-        await renderStockManagementPage(); // Trigger stock page re-render to update stock levels
-        await loadWasteLog(logList);   // Reload waste log to show new entry
-    } catch (error) {
-        console.error('Error logging waste:', error);
-        alert('Failed to log waste. Please try again. Check Firebase permissions.');
-    }
 }
 
 /**
