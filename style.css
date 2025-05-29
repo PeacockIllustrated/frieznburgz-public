@@ -776,6 +776,12 @@ body {
     text-align: center;
     display: none; /* Hidden by default */
 }
+/* Info message for the modal */
+.modal-message.info-message {
+    color: var(--dim-grey);
+    font-style: italic;
+    font-size: 13px;
+}
 
 
 /* --- Stock Management Specific Styles --- */
@@ -811,7 +817,7 @@ body {
 /* Individual category cards within stock management */
 .category-card {
     background-color: var(--yellow); /* Card background (same as main content) */
-    border: 5px solid var(--khaki); /* Khaki border */
+    border: 5px solid var(--khaki);
     border-radius: 20px;
     padding: 25px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); /* Subtle shadow */
@@ -1168,20 +1174,100 @@ body {
     resize: vertical;
 }
 
-.modal-supplier-details-form .items-supplied-list {
-    list-style: disc;
-    padding-left: 20px;
-    margin: 0;
-    color: var(--dim-grey);
+/* NEW: Styles for the "Items Supplied" checkboxes in the modal */
+.modal-supplier-details-form .items-supplied-section {
+    max-height: 250px; /* Limit height for scrollable items list */
+    overflow-y: auto;
+    border: 1px dashed var(--salmon);
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #fcfcfc; /* Slightly off-white background */
+}
+
+.modal-supplier-details-form .items-supplied-section > label {
+    margin-bottom: 10px; /* Space between label and content */
+}
+
+.modal-supplier-details-form .item-category-group {
+    margin-bottom: 15px;
+}
+
+.modal-supplier-details-form .category-heading {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 18px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+    border-bottom: 1px solid var(--salmon);
+    padding-bottom: 5px;
+}
+
+.modal-supplier-details-form .item-checkboxes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid for checkboxes */
+    gap: 8px 15px; /* Row and column gap */
+}
+
+.modal-supplier-details-form .item-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-family: 'Futura', Arial, sans-serif;
+    font-size: 15px;
+    color: var(--dim-grey);
+    cursor: pointer;
+    white-space: nowrap; /* Prevent wrapping for each item name */
+}
+
+.modal-supplier-details-form .item-checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--khaki);
+    border-radius: 4px;
+    background-color: var(--yellow);
+    appearance: none; /* Hide default checkbox */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    top: -1px; /* Adjust vertical alignment */
+}
+
+/* Custom checkbox checked state */
+.modal-supplier-details-form .item-checkbox-label input[type="checkbox"]:checked {
+    background-color: var(--red);
+    border-color: var(--red);
+}
+
+/* Checkmark for custom checkbox */
+.modal-supplier-details-form .item-checkbox-label input[type="checkbox"]:checked::before {
+    content: '\2713'; /* Unicode checkmark character */
+    display: block;
+    color: var(--yellow);
     font-size: 14px;
+    text-align: center;
+    line-height: 1.2; /* Center vertically */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .modal-supplier-details-form .small-text {
     font-size: 12px;
     color: var(--salmon);
-    margin-top: -10px;
-    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.modal-supplier-details-form .no-items-listed {
+    text-align: center;
+    font-style: italic;
+    color: var(--dim-grey);
+    margin-top: 10px;
 }
 
 
@@ -1375,99 +1461,6 @@ body {
     .supplier-name {
         font-size: 20px;
     }
-}
-
-@media screen and (max-width: 480px) {
-    /* Smaller padding for auth/location cards */
-    .auth-card,
-    .location-selection-card {
-        padding: 30px 15px;
-    }
-
-    /* Smaller auth title */
-    .auth-title {
-        font-size: 24px;
-    }
-
-    /* Smaller auth buttons */
-    .auth-button {
-        font-size: 16px;
-        padding: 10px 20px;
-    }
-
-    /* Smaller header logo and app name */
-    .header-logo {
-        max-width: 80px;
-    }
-
-    .app-name {
-        font-size: 18px;
-    }
-
-    /* Smaller header buttons */
-    .header-button {
-        font-size: 12px;
-        padding: 6px 10px;
-    }
-
-    /* Smaller page titles */
-    .page-title {
-        font-size: 24px;
-    }
-
-    .subsection-title {
-        font-size: 20px;
-    }
-
-    /* Stock item (when stacked vertically) */
-    .stock-item {
-        flex-direction: column; /* Stack name above controls */
-        align-items: center; /* Center horizontally */
-    }
-
-    .item-name {
-        width: 100%; /* Ensure name takes full width for centering */
-        text-align: center;
-        margin-bottom: 10px; /* Space between name and the controls group */
-    }
-
-    .stock-controls-group {
-        width: 100%; /* Take full width on small screens */
-        justify-content: center; /* Center the entire group */
-        gap: 10px; /* Adjust gap for small screens */
-    }
-
-    /* Dashboard specific adjustments for very small screens */
-    .summary-circle {
-        width: 50px; /* Even smaller circles on very small mobile */
-        height: 50px;
-        font-size: 20px;
-    }
-
-    .summary-title {
-        font-size: 14px;
-    }
-
-    .quick-action-btn {
-        width: 95%; /* Wider buttons on very small mobile */
-        font-size: 14px;
-    }
-    .quick-action-btn.small-btn {
-        width: 80%;
-    }
-
-    /* Smaller font for waste log items */
-    .waste-log-item {
-        font-size: 14px;
-    }
-
-    /* Supplier card adjustments for very small screens */
-    .supplier-card {
-        padding: 15px;
-    }
-    .supplier-name {
-        font-size: 18px;
-    }
     .supplier-contact,
     .supplier-email,
     .supplier-phone {
@@ -1485,5 +1478,16 @@ body {
     .modal-supplier-details-form .modal-input {
         font-size: 14px;
         padding: 10px;
+    }
+
+    /* Adjust checkbox grid for smaller screens */
+    .modal-supplier-details-form .item-checkboxes-grid {
+        grid-template-columns: 1fr; /* Stack checkboxes vertically on smaller screens */
+    }
+    .modal-supplier-details-form .category-heading {
+        font-size: 16px;
+    }
+    .modal-supplier-details-form .item-checkbox-label {
+        font-size: 14px;
     }
 }
