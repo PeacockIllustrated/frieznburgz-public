@@ -1,14 +1,46 @@
 // --- suppliers-template.js ---
 // Provides HTML templating for supplier page components.
 
+import { itemCategoryIcons } from './config.js'; // NEW: Import icon mappings
+
 /**
  * Generates the HTML for a single supplier card/list item.
  * @param {Object} supplier - The supplier object.
+ * @param {Array<Object>} allUniqueItems - A list of all unique items across all locations.
  * @returns {string} The HTML string for a supplier card.
  */
-export function createSupplierCardHtml(supplier) {
+export function createSupplierCardHtml(supplier, allUniqueItems) {
+    const supplierCategories = new Set(); // Use a Set to store unique categories for this supplier
+
+    // Determine unique categories based on itemsSupplied names
+    if (supplier.itemsSupplied && Array.isArray(supplier.itemsSupplied)) {
+        supplier.itemsSupplied.forEach(itemName => {
+            const item = allUniqueItems.find(i => i.name === itemName);
+            if (item && item.category) {
+                supplierCategories.add(item.category);
+            }
+        });
+    }
+
+    // Generate icon HTML for each unique category
+    let iconsHtml = '';
+    const sortedCategories = Array.from(supplierCategories).sort(); // Sort categories alphabetically for consistent display
+    sortedCategories.forEach(category => {
+        const iconInfo = itemCategoryIcons[category] || itemCategoryIcons['Uncategorized'];
+        if (iconInfo) {
+            iconsHtml += `
+                <div class="supplier-icon ${iconInfo.colorClass}" title="${category}">
+                    <i class="${iconInfo.icon}"></i>
+                </div>
+            `;
+        }
+    });
+
     return `
         <div class="supplier-card" data-supplier-id="${supplier.id}">
+            <div class="supplier-icons-container">
+                ${iconsHtml}
+            </div>
             <h3 class="supplier-name">${supplier.name}</h3>
             <p class="supplier-contact">Contact: ${supplier.contactPerson}</p>
             <p class="supplier-email"><i class="fas fa-envelope"></i> ${supplier.email}</p>
