@@ -4,13 +4,12 @@
 import { db } from './firebase.js'; // Firebase Firestore instance
 import { getSelectedLocation } from './config.js'; // To ensure a location is selected (though suppliers might be global)
 import { createSupplierCardHtml, createSupplierDetailsModalBodyHtml } from './suppliers-template.js'; // Template for supplier cards and modal body
+import { getAllUniqueStockItems } from './stock.js'; // NEW: To get a global list of items
 
 // --- Universal Modal Elements ---
 // (Assume these are managed by dashboard.js and exposed via window.mainApp)
 // No direct DOM element retrieval here, instead use window.mainApp.openModal/closeModal
 // and modalMessage for feedback.
-
-// Removed mock data, now using Firebase
 
 /**
  * Renders the Suppliers Management page.
@@ -100,10 +99,15 @@ async function loadSuppliers(container) {
  * Opens the universal modal for adding or viewing/editing a supplier.
  * @param {Object|null} supplierData - The supplier object if editing, or null for adding a new one.
  */
-function openSupplierModal(supplierData = null) {
+async function openSupplierModal(supplierData = null) {
     const isNew = !supplierData || !supplierData.id; // Corrected check for new supplier
     const title = isNew ? 'Add New Supplier' : `Details: ${supplierData.name}`;
-    const bodyHtml = createSupplierDetailsModalBodyHtml(supplierData);
+
+    // NEW: Fetch all available items
+    const allAvailableItems = await getAllUniqueStockItems();
+    console.log('suppliers.js: All available items for modal:', allAvailableItems); // Log items for debugging
+
+    const bodyHtml = createSupplierDetailsModalBodyHtml(supplierData, allAvailableItems);
     let footerHtml = '';
 
     if (isNew) {
@@ -156,6 +160,11 @@ async function handleSaveOrEditSupplier(originalSupplierData) {
     const address = document.getElementById('supplierAddress').value.trim();
     const notes = document.getElementById('supplierNotes').value.trim();
 
+    // NEW: Get selected items from checkboxes
+    const selectedItemsCheckboxes = document.querySelectorAll('.modal-supplier-details-form input[name="itemsSupplied"]:checked');
+    const itemsSupplied = Array.from(selectedItemsCheckboxes).map(cb => cb.value);
+
+
     if (!name || !contactPerson || !email || !phone) {
         modalMessage.textContent = 'Please fill in all required fields (Name, Contact Person, Email, Phone).';
         modalMessage.style.display = 'block';
@@ -169,8 +178,7 @@ async function handleSaveOrEditSupplier(originalSupplierData) {
         phone,
         address,
         notes,
-        // When adding, itemsSupplied is an empty array; when updating, retain existing itemsSupplied
-        itemsSupplied: originalSupplierData ? originalSupplierData.itemsSupplied || [] : []
+        itemsSupplied // NEW: Use the array from checked checkboxes
     };
 
     modalMessage.textContent = 'Processing...';
@@ -237,7 +245,7 @@ async function handleDeleteSupplier(supplierId, supplierName) {
 }
 
 
-// Re-expose closeModal from mainApp/dashboard.js for use within this module
+// Expose closeModal from mainApp/dashboard.js for use within this module
 // This is a workaround since modal functions are centralized in dashboard.js
 function closeModal() {
     if (window.mainApp && typeof window.mainApp.closeModal === 'function') {
