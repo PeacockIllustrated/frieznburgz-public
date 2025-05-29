@@ -22,6 +22,22 @@ export const locations = [
     { id: 'newcastle_city_center', name: 'Newcastle City Center' } // Future location example
 ];
 
+// NEW: Mappings for item categories to Font Awesome icons and specific colors
+export const itemCategoryIcons = {
+    'Meat': { icon: 'fas fa-drumstick-bite', colorClass: 'icon-meat' },
+    'Cheeses': { icon: 'fas fa-cheese', colorClass: 'icon-cheese' },
+    'Produce & Vegetables': { icon: 'fas fa-carrot', colorClass: 'icon-veggies' },
+    'Breads & Baked Goods': { icon: 'fas fa-bread-slice', colorClass: 'icon-bread' },
+    'Sauces & Condiments': { icon: 'fas fa-bottle-droplet', colorClass: 'icon-sauces' },
+    'Specialz Ingredients': { icon: 'fas fa-star', colorClass: 'icon-specialz' },
+    'Filletz Ingredients': { icon: 'fas fa-hotdog', colorClass: 'icon-filletz' }, // Example for specific
+    'Milkshakes of the Week': { icon: 'fas fa-mug-hot', colorClass: 'icon-milkshake' },
+    'Other Essentials': { icon: 'fas fa-box-open', colorClass: 'icon-essentials' },
+    'Fruits': { icon: 'fas fa-apple-alt', colorClass: 'icon-fruit' }, // Example for Fruits
+    'Desserts': { icon: 'fas fa-ice-cream', colorClass: 'icon-desserts' }, // Example for Desserts
+    'Uncategorized': { icon: 'fas fa-box', colorClass: 'icon-uncategorized' }
+};
+
 // Key for storing the selected location in localStorage
 const LOCATION_STORAGE_KEY = 'fnb_selected_location_id';
 
