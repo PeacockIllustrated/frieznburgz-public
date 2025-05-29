@@ -375,7 +375,7 @@ body {
     grid-column: 2; /* Second column */
     grid-row: 2; /* Second row */
     background-color: var(--yellow); /* Content area background */
-    padding: 30px;
+    padding: 50px; /* INCREASED PADDING */
     overflow-y: auto; /* Enable vertical scrolling for content */
 }
 
@@ -463,41 +463,41 @@ body {
     display: flex;
     justify-content: center; /* Center Good and Low horizontally */
     align-items: center;
-    gap: 20px; /* Space between Good and Low circles */
-    width: 100%; /* Take full width for centering */
-    flex-wrap: wrap; /* Allow wrapping on very small screens */
+    gap: 20px;
+    width: 100%;
+    flex-wrap: wrap;
 }
 
 .summary-bottom-row {
     display: flex;
-    justify-content: center; /* Center Critical horizontally */
+    justify-content: center;
     align-items: center;
     width: 100%;
 }
 
 
-.summary-card { /* Individual summary cards within the overview */
+.summary-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 5px;
-    min-width: 100px; /* Ensure cards don't shrink too much */
+    min-width: 100px;
 }
 
 .summary-circle {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    border: 4px solid; /* Border color will be set by status class */
+    border: 4px solid;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Fraunces', serif; /* Fraunces for numbers in circles */
+    font-family: 'Fraunces', serif;
     font-weight: 900;
     font-size: 30px;
-    color: var(--yellow); /* Text color in circle (e.g., '0', '25') */
-    text-rendering: optimizeLegibility; /* Added for "supersoft" appearance */
+    color: var(--yellow);
+    text-rendering: optimizeLegibility;
 }
 
 /* Status-specific background/border colors for summary circles */
@@ -506,7 +506,7 @@ body {
 .summary-circle.critical { border-color: var(--red); background-color: var(--red); }
 
 .summary-title {
-    font-family: 'Montserrat', sans-serif; /* Montserrat for summary titles */
+    font-family: 'Montserrat', sans-serif;
     font-weight: 800;
     font-size: 16px;
     color: var(--dim-grey);
@@ -515,10 +515,10 @@ body {
 }
 
 .critical-stock-card .item-list {
-    width: 100%; /* Ensure critical stock list takes full width of its card */
-    max-height: 250px; /* Limit height for scrollable critical alerts */
+    width: 100%;
+    max-height: 250px;
     overflow-y: auto;
-    padding-right: 5px; /* Prevent scrollbar from overlapping content */
+    padding-right: 5px;
 }
 
 .critical-item-entry {
@@ -535,66 +535,78 @@ body {
 }
 
 .critical-indicator-circle {
-    width: 35px; /* Slightly larger than stock item circles */
+    width: 35px;
     height: 35px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Fraunces', serif; /* Fraunces for numbers in critical item circles */
+    font-family: 'Fraunces', serif;
     font-weight: 800;
     font-size: 16px;
-    color: var(--yellow); /* Text color inside circle */
+    color: var(--yellow);
     flex-shrink: 0;
-    text-rendering: optimizeLegibility; /* Added for "supersoft" appearance */
+    text-rendering: optimizeLegibility;
 }
 
 .critical-indicator-circle.low { background-color: var(--khaki); border: 2px solid var(--khaki); }
 .critical-indicator-circle.critical { background-color: var(--red); border: 2px solid var(--red); }
 
+/* NEW styles for stacking critical item details */
+.critical-item-details {
+    display: flex;
+    flex-direction: column; /* Stack vertically */
+    flex-grow: 1; /* Allow to take available space */
+    align-items: flex-start; /* Align text to the left within its container */
+    overflow: hidden; /* Hide overflow of text */
+}
+
 .critical-item-name {
-    font-family: 'Futura', Arial, sans-serif; /* Futura for item names */
-    flex-grow: 1;
+    font-family: 'Futura', Arial, sans-serif;
     font-size: 16px;
     font-weight: 800;
     color: var(--dim-grey);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    width: 100%; /* Ensure it fills its container for ellipsis */
+    margin-bottom: 2px; /* Small space between name and reorder info */
 }
 
 .critical-reorder-info {
-    font-family: 'Futura', Arial, sans-serif; /* Futura for reorder info */
+    font-family: 'Futura', Arial, sans-serif;
     font-size: 14px;
     color: var(--salmon);
     white-space: nowrap;
-    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%; /* Ensure it fills its container for ellipsis */
 }
 
 /* Recent Wastage Card specific styles */
 .recent-wastage-card .waste-log-list {
-    list-style: none; /* Already defined but good to confirm */
+    list-style: none;
     padding: 0;
     margin: 0;
     width: 100%;
-    max-height: 180px; /* Limit height for scrollable waste log */
+    max-height: 180px;
     overflow-y: auto;
     padding-right: 5px;
 }
 
 .recent-wastage-card .dashboard-waste-item {
-    font-family: 'Futura', Arial, sans-serif; /* Futura for waste item text */
-    font-size: 14px; /* Smaller font for compact view */
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 14px;
     margin-bottom: 5px;
     padding-left: 10px;
 }
 .recent-wastage-card .dashboard-waste-item::before {
-    font-size: 1em; /* Smaller bullet */
+    font-size: 1em;
     left: 0;
 }
 .recent-wastage-card .waste-timestamp {
-    font-family: 'Futura', Arial, sans-serif; /* Futura for timestamp */
-    color: var(--dim-grey); /* Make timestamp stand out slightly less */
+    font-family: 'Futura', Arial, sans-serif;
+    color: var(--dim-grey);
     font-size: 0.9em;
 }
 
@@ -607,21 +619,21 @@ body {
 .quick-actions-content {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Space between buttons */
+    gap: 10px;
     width: 100%;
     align-items: center;
     margin-top: 10px;
 }
 
 .quick-action-btn {
-    padding: 10px 20px; /* Slightly smaller than auth buttons */
+    padding: 10px 20px;
     font-size: 16px;
-    width: 80%; /* Adjusted width for actions */
-    font-family: 'Montserrat', sans-serif; /* Montserrat for quick action buttons */
+    width: 80%;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 800;
 }
 
-.quick-action-btn.small-btn { /* For "View All Wastage" specifically */
+.quick-action-btn.small-btn {
     font-size: 14px;
     padding: 8px 15px;
     width: 70%;
@@ -630,11 +642,11 @@ body {
 .quick-action-btn.disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    background-color: var(--red); /* Ensure disabled button uses red theme */
+    background-color: var(--red);
     color: var(--yellow);
     border-color: var(--yellow);
 }
-.quick-action-btn.disabled:hover { /* Override hover for disabled state */
+.quick-action-btn.disabled:hover {
     background-color: var(--red);
     color: var(--yellow);
     border-color: var(--yellow);
@@ -643,19 +655,19 @@ body {
 
 /* --- Universal Modal Styles --- */
 .modal-overlay {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top (should be higher than header) */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if content is too long */
-    background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
-    justify-content: center; /* Center content horizontally */
-    align-items: center; /* Center content vertically */
-    -webkit-backdrop-filter: blur(5px); /* Frosted glass effect */
-    backdrop-filter: blur(5px); /* Frosted glass effect */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
 }
 
 .modal-content {
@@ -663,18 +675,17 @@ body {
     border: 5px solid var(--khaki);
     border-radius: 20px;
     padding: 30px;
-    position: relative; /* For close button positioning */
-    width: 90%; /* Responsive width */
-    max-width: 450px; /* Max width for larger screens */
+    position: relative;
+    width: 90%;
+    max-width: 450px;
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
     display: flex;
     flex-direction: column;
     gap: 15px;
     text-align: center;
-    animation: fadeInScale 0.3s ease-out; /* Simple entry animation */
-    /* NEW: Constrain height and enable internal scrolling */
-    max-height: 90vh; /* Max height to fit within viewport */
-    overflow: hidden; /* Hide overflow of modal content itself, letting internal elements scroll */
+    animation: fadeInScale 0.3s ease-out;
+    max-height: 90vh;
+    overflow: hidden;
 }
 
 @keyframes fadeInScale {
@@ -683,7 +694,7 @@ body {
 }
 
 .modal-title {
-    font-family: 'Fraunces', serif; /* Fraunces for modal title */
+    font-family: 'Fraunces', serif;
     font-weight: 900;
     font-size: 28px;
     color: var(--red);
@@ -691,8 +702,8 @@ body {
     margin: 0 0 10px 0;
     border-bottom: 2px solid var(--salmon);
     padding-bottom: 10px;
-    text-rendering: optimizeLegibility; /* Added for "supersoft" appearance */
-    flex-shrink: 0; /* Prevent title from shrinking */
+    text-rendering: optimizeLegibility;
+    flex-shrink: 0;
 }
 
 .close-button {
@@ -704,7 +715,7 @@ body {
     right: 20px;
     cursor: pointer;
     transition: color 0.2s ease;
-    z-index: 10; /* Ensure it's above other modal elements */
+    z-index: 10;
 }
 
 .close-button:hover,
@@ -719,29 +730,28 @@ body {
     gap: 15px;
     width: 100%;
     align-items: center;
-    /* NEW: Make modal body scrollable if content overflows */
     overflow-y: auto;
-    flex-grow: 1; /* Allow body to take up remaining space */
-    padding-right: 5px; /* Prevent scrollbar from overlapping content */
+    flex-grow: 1;
+    padding-right: 5px;
 }
 
 .modal-input-group {
     display: flex;
-    flex-direction: column; /* Stack inputs vertically */
+    flex-direction: column;
     gap: 15px;
     width: 100%;
     align-items: center;
 }
 
-.modal-input-group .select-wrapper { /* Reusing select-wrapper styles for modal dropdowns */
-    width: calc(100% - 20px); /* Adjust for select wrapper padding */
-    margin-bottom: 0; /* Remove default margin-bottom */
+.modal-input-group .select-wrapper {
+    width: calc(100% - 20px);
+    margin-bottom: 0;
 }
 
 /* Specific styling for modal inputs to match other auth-inputs */
 .modal-input {
-    font-family: 'Futura', Arial, sans-serif; /* Futura for modal inputs */
-    width: calc(100% - 20px); /* Full width minus padding */
+    font-family: 'Futura', Arial, sans-serif;
+    width: calc(100% - 20px);
     padding: 12px 10px;
     border: 2px solid var(--red);
     border-radius: 8px;
@@ -749,7 +759,7 @@ body {
     color: var(--dim-grey);
     background-color: var(--yellow);
     box-sizing: border-box;
-    margin-bottom: 0; /* Override default auth-input margin */
+    margin-bottom: 0;
 }
 
 .modal-footer {
@@ -757,14 +767,14 @@ body {
     justify-content: center;
     gap: 15px;
     margin-top: 20px;
-    flex-shrink: 0; /* Prevent footer from shrinking */
+    flex-shrink: 0;
 }
 
 .modal-footer .auth-button {
-    width: auto; /* Allow buttons to size naturally */
-    padding: 10px 25px; /* Adjust padding for modal buttons */
+    width: auto;
+    padding: 10px 25px;
     font-size: 16px;
-    flex-grow: 1; /* Allow buttons to grow to fill space */
+    flex-grow: 1;
 }
 
 .modal-footer .secondary-btn {
@@ -780,12 +790,12 @@ body {
 
 .modal-message {
     color: var(--red);
-    font-family: 'Futura', Arial, sans-serif; /* Futura for modal messages */
+    font-family: 'Futura', Arial, sans-serif;
     font-size: 14px;
     margin-top: 5px;
     text-align: center;
-    display: none; /* Hidden by default */
-    flex-shrink: 0; /* Prevent message from shrinking */
+    display: none;
+    flex-shrink: 0;
 }
 /* Info message for the modal */
 .modal-message.info-message {
@@ -800,38 +810,38 @@ body {
 /* Accordion icon (hidden by default on desktop) */
 .accordion-icon {
     display: none;
-    font-size: 20px; /* Default size for icon */
-    color: var(--red); /* Default color for icon */
-    transition: transform 0.3s ease; /* Smooth rotation transition */
+    font-size: 20px;
+    color: var(--red);
+    transition: transform 0.3s ease;
 }
 
 /* Default desktop state for item-list (expanded) */
 .item-list {
-    display: flex; /* Keep flex display for desktop grid layout */
+    display: flex;
     flex-direction: column;
-    gap: 15px; /* Space between individual stock items */
-    max-height: none; /* No max-height limit on desktop */
-    overflow: visible; /* No overflow hidden on desktop */
-    transition: none; /* No transition on desktop */
-    padding-top: 0; /* No extra padding on desktop */
-    margin-top: 0; /* No extra margin on desktop */
+    gap: 15px;
+    max-height: none;
+    overflow: visible;
+    transition: none;
+    padding-top: 0;
+    margin-top: 0;
 }
 
 /* Grid for holding category cards in Stock Management (Desktop) */
 .stock-items-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive columns, min 280px, max 1fr */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
     margin-top: 20px;
 }
 
 /* Individual category cards within stock management */
 .category-card {
-    background-color: var(--yellow); /* Card background (same as main content) */
+    background-color: var(--yellow);
     border: 5px solid var(--khaki);
     border-radius: 20px;
     padding: 25px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
 }
@@ -844,7 +854,6 @@ body {
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 2px solid var(--salmon);
-    /* cursor: pointer; // Cursor will be applied in media query for mobile */
 }
 
 
@@ -855,22 +864,22 @@ body {
 
 /* Title within category headers (Meat, Cheeses) */
 .category-title {
-    font-family: 'Fraunces', serif; /* Fraunces for category titles */
+    font-family: 'Fraunces', serif;
     font-weight: 900;
-    font-size: 24px; /* Slightly smaller than page-title */
+    font-size: 24px;
     color: var(--red);
     text-transform: uppercase;
     margin: 0;
-    text-rendering: optimizeLegibility; /* Added for "supersoft" appearance */
+    text-rendering: optimizeLegibility;
 }
 
 /* Edit icon next to category titles (future use) */
 .edit-icon {
     color: var(--red);
-    font-size: 20px; /* Slightly smaller icon */
+    font-size: 20px;
     cursor: pointer;
     transition: color 0.2s ease;
-    margin-right: 10px; /* Space between edit and accordion icon */
+    margin-right: 10px;
 }
 
 .edit-icon:hover {
@@ -881,12 +890,12 @@ body {
 /* Individual stock item row (Beef Patties, Chicken Filletz) */
 .stock-item {
     display: flex;
-    flex-direction: column; /* Stack name above controls */
-    align-items: center; /* Center horizontally */
-    gap: 10px; /* Space between name and controls/button */
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     padding: 10px 0;
-    border-bottom: 1px dashed var(--salmon); /* Dashed separator */
-    text-align: center; /* Center text as well */
+    border-bottom: 1px dashed var(--salmon);
+    text-align: center;
 }
 
 /* Remove border from the last item in a list */
@@ -896,52 +905,52 @@ body {
 
 /* Name of the stock item (Beef Patties, etc.) */
 .item-name {
-    flex-grow: 0; /* No longer needs to grow */
-    font-family: 'Futura', Arial, sans-serif; /* Futura for item names */
+    flex-grow: 0;
+    font-family: 'Futura', Arial, sans-serif;
     font-size: 18px;
-    font-weight: 800; /* Bolder as per concept */
+    font-weight: 800;
     text-transform: uppercase;
     color: var(--dim-grey);
-    white-space: nowrap; /* Prevent wrapping */
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Add ellipsis for long names */
-    width: 100%; /* Take full width to center text */
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 /* Container for + / - / quantity input AND the circular plus button */
 .stock-controls-group {
     display: flex;
     align-items: center;
-    width: 75%; /* Set to 75% as requested */
-    justify-content: center; /* Center content within this group */
-    gap: 5px; /* At least 5px padding/margin between elements */
+    width: 75%;
+    justify-content: center;
+    gap: 5px;
 }
 
 /* Container for + / - / quantity input */
 .stock-controls {
     display: flex;
-    justify-content: space-between; /* CORRECTED: User's previous request */
-    align-items: stretch; /* Stretch children to full height */
-    border: 2px solid var(--khaki); /* Khaki border */
-    border-radius: 9999px; /* Make it fully rounded (a large number ensures full circle) */
-    overflow: hidden; /* Crucial for inner elements to respect outer border-radius */
-    flex-shrink: 0; /* Prevent shrinking */
-    background-color: var(--khaki); /* Entire control group background is khaki */
-    flex-grow: 1; /* Allow it to take up available space within its 75% parent */
-    height: 40px; /* Explicit height to match circle button */
+    justify-content: space-between;
+    align-items: stretch;
+    border: 2px solid var(--khaki);
+    border-radius: 9999px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background-color: var(--khaki);
+    flex-grow: 1;
+    height: 40px;
 }
 
 /* + / - buttons */
 .control-button {
-    background-color: var(--red); /* Red background for buttons */
-    color: var(--yellow); /* Yellow text */
+    background-color: var(--red);
+    color: var(--yellow);
     border: none;
-    height: 100%; /* Take full height of parent .stock-controls */
-    width: 40px; /* Fixed width for buttons */
-    display: flex; /* For centering content */
+    height: 100%;
+    width: 40px;
+    display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Montserrat', sans-serif; /* Montserrat for control buttons */
+    font-family: 'Montserrat', sans-serif;
     font-weight: 800;
     font-size: 20px;
     cursor: pointer;
@@ -951,23 +960,23 @@ body {
 /* + / - button hover effect */
 .control-button:hover {
     background-color: var(--yellow);
-    color: var(--red); /* Red text on hover */
+    color: var(--red);
 }
 
 /* Stock quantity input field */
 .stock-input {
-    width: 60px; /* Increased width for 3 digits + padding */
+    width: 60px;
     text-align: center;
-    border: none; /* No border for input itself */
-    font-family: 'Fraunces', serif; /* Fraunces for quantity in input */
+    border: none;
+    font-family: 'Fraunces', serif;
     font-weight: 800;
     font-size: 20px;
-    color: var(--red); /* Red text */
-    background-color: var(--yellow); /* Yellow background */
-    height: 100%; /* Take full height of parent .stock-controls */
-    padding: 0; /* Remove default padding to ensure full height */
-    box-sizing: border-box; /* Include border/padding in width/height */
-    -moz-appearance: textfield; /* Remove default spinner for Firefox */
+    color: var(--red);
+    background-color: var(--yellow);
+    height: 100%;
+    padding: 0;
+    box-sizing: border-box;
+    -moz-appearance: textfield;
 }
 
 /* Remove default spinner for Chrome, Safari, Edge */
@@ -980,11 +989,11 @@ body {
 /* Button to message supplier (+ icon) */
 .add-stock-button {
     background-color: var(--red);
-    color: var(--yellow); /* Plus icon is white/yellow */
+    color: var(--yellow);
     border: none;
     border-radius: 50%;
-    width: 40px; /* Consistent size */
-    height: 40px; /* Consistent size */
+    width: 40px;
+    height: 40px;
     font-size: 25px;
     display: flex;
     justify-content: center;
@@ -992,7 +1001,6 @@ body {
     cursor: pointer;
     transition: background-color 0.2s ease;
     flex-shrink: 0;
-    /* margin-left handled by .stock-controls-group gap */
 }
 
 /* Supplier button hover effect */
@@ -1005,12 +1013,12 @@ body {
 
 /* Card container for wastage input and log */
 .wastage-card {
-    background-color: var(--yellow); /* Card background (same as main content) */
+    background-color: var(--yellow);
     border: 5px solid var(--khaki);
     border-radius: 20px;
     padding: 25px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-    margin-bottom: 10px; /* Reduced margin-bottom as requested */
+    margin-bottom: 10px;
 }
 
 /* Container for the new "Log New Waste Entry" button */
@@ -1019,9 +1027,9 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    margin-bottom: 20px; /* Space before the waste log heading */
+    margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 2px dashed var(--salmon); /* Add a subtle separator */
+    border-bottom: 2px dashed var(--salmon);
     text-align: center;
     color: var(--dim-grey);
     font-family: 'Futura', Arial, sans-serif;
@@ -1034,7 +1042,7 @@ body {
 }
 
 .wastage-actions .quick-action-btn {
-    width: auto; /* Allow button to size to its content */
+    width: auto;
     padding: 10px 30px;
     font-size: 18px;
 }
@@ -1050,20 +1058,20 @@ body {
 
 /* List for displaying waste log entries */
 .waste-log-list {
-    list-style: none; /* Remove default list bullets */
+    list-style: none;
     padding: 0;
     margin: 0;
 }
 
 /* Individual waste log item styling */
 .waste-log-item {
-    font-family: 'Futura', Arial, sans-serif; /* Futura for waste item text */
+    font-family: 'Futura', Arial, sans-serif;
     font-size: 16px;
     color: var(--dim-grey);
     margin-bottom: 8px;
-    padding-left: 15px; /* Space for custom bullet */
+    padding-left: 15px;
     position: relative;
-    word-break: break-word; /* Allow long text to wrap */
+    word-break: break-word;
 }
 
 /* Custom bullet point for waste log items */
@@ -1073,14 +1081,14 @@ body {
     position: absolute;
     left: 0;
     font-size: 1.2em;
-    line-height: 1; /* Align bullet vertically */
+    line-height: 1;
 }
 
 
 /* --- Suppliers Page Specific Styles --- */
 .suppliers-actions {
     display: flex;
-    justify-content: center; /* Center the add supplier button */
+    justify-content: center;
     margin-bottom: 30px;
     padding-bottom: 15px;
     border-bottom: 2px dashed var(--salmon);
@@ -1094,7 +1102,7 @@ body {
 
 .supplier-list-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid for supplier cards */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
     margin-top: 20px;
 }
@@ -1113,7 +1121,7 @@ body {
 }
 
 .supplier-card:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
+    transform: translateY(-5px);
 }
 
 .supplier-name {
@@ -1158,7 +1166,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    text-align: left; /* Align labels/inputs left within the modal */
+    text-align: left;
 }
 
 .modal-supplier-details-form .modal-input-group {
@@ -1176,28 +1184,28 @@ body {
 }
 
 .modal-supplier-details-form .modal-input[readonly] {
-    background-color: #f0f0f0; /* Lighter background for readonly fields */
+    background-color: #f0f0f0;
     cursor: not-allowed;
 }
 
 .modal-supplier-details-form textarea.modal-input {
-    min-height: 80px; /* Larger textarea for address/notes */
+    min-height: 80px;
     resize: vertical;
 }
 
 /* Styles for the "Items Supplied" checkboxes in the modal */
 .modal-supplier-details-form .items-supplied-section {
-    max-height: 250px; /* Limit height for scrollable items list */
+    max-height: 250px;
     overflow-y: auto;
     border: 1px dashed var(--salmon);
     padding: 10px;
     border-radius: 8px;
-    background-color: #fcfcfc; /* Slightly off-white background */
-    min-height: 100px; /* Added min-height to ensure the border is visible as per screenshot */
+    background-color: #fcfcfc;
+    min-height: 100px;
 }
 
 .modal-supplier-details-form .items-supplied-section > label {
-    margin-bottom: 10px; /* Space between label and content */
+    margin-bottom: 10px;
 }
 
 .modal-supplier-details-form .item-category-group {
@@ -1217,8 +1225,8 @@ body {
 
 .modal-supplier-details-form .item-checkboxes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid for checkboxes */
-    gap: 8px 15px; /* Row and column gap */
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px 15px;
 }
 
 .modal-supplier-details-form .item-checkbox-label {
@@ -1229,7 +1237,7 @@ body {
     font-size: 15px;
     color: var(--dim-grey);
     cursor: pointer;
-    white-space: nowrap; /* Prevent wrapping for each item name */
+    white-space: nowrap;
 }
 
 .modal-supplier-details-form .item-checkbox-label input[type="checkbox"] {
@@ -1238,13 +1246,13 @@ body {
     border: 2px solid var(--khaki);
     border-radius: 4px;
     background-color: var(--yellow);
-    appearance: none; /* Hide default checkbox */
+    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     cursor: pointer;
     flex-shrink: 0;
     position: relative;
-    top: -1px; /* Adjust vertical alignment */
+    top: -1px;
 }
 
 /* Custom checkbox checked state */
@@ -1255,12 +1263,12 @@ body {
 
 /* Checkmark for custom checkbox */
 .modal-supplier-details-form .item-checkbox-label input[type="checkbox"]:checked::before {
-    content: '\2713'; /* Unicode checkmark character */
+    content: '\2713';
     display: block;
     color: var(--yellow);
     font-size: 14px;
     text-align: center;
-    line-height: 1.2; /* Center vertically */
+    line-height: 1.2;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1275,7 +1283,7 @@ body {
     text-align: center;
 }
 
-.modal-supplier-details-form .no-items-message { /* Added class for consistency */
+.modal-supplier-details-form .no-items-message {
     text-align: center;
     font-style: italic;
     color: var(--dim-grey);
@@ -1292,18 +1300,18 @@ body {
     .dashboard-header {
         position: static;
         top: auto;
-        z-index: auto; /* Reset z-index */
-        flex-direction: column; /* Stack header elements vertically */
+        z-index: auto;
+        flex-direction: column;
         align-items: flex-start;
         padding-top: 10px;
         padding-bottom: 10px;
-        height: auto; /* Allow header to grow with content */
+        height: auto;
     }
 
     .header-left,
     .header-right {
         width: 100%;
-        justify-content: space-between; /* Space out elements within these groups */
+        justify-content: space-between;
         margin-bottom: 10px;
     }
 
@@ -1313,53 +1321,52 @@ body {
     }
 
     .main-dashboard-container {
-        grid-template-columns: 1fr; /* Stack sidebar on top for tablets */
-        grid-template-rows: auto auto 1fr; /* Header, then sidebar, then content */
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
     }
 
     .dashboard-sidebar {
-        /* Reset sticky properties for mobile */
         position: static;
         top: auto;
         height: auto;
-        overflow-y: visible; /* Allow content to overflow naturally */
+        overflow-y: visible;
         
         grid-column: 1;
-        grid-row: 2; /* Sidebar moves to the second row */
-        border-right: none; /* Remove right border */
-        border-bottom: 5px solid var(--yellow); /* Add yellow border to bottom */
+        grid-row: 2;
+        border-right: none;
+        border-bottom: 5px solid var(--yellow);
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        flex-direction: row; /* Horizontal sidebar */
-        overflow-x: auto; /* Enable horizontal scrolling for navigation */
-        -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
+        flex-direction: row;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
         justify-content: flex-start;
         padding: 10px 0;
-        min-height: auto; /* Allow height to collapse */
-        z-index: auto; /* Reset z-index */
+        min-height: auto;
+        z-index: auto;
     }
 
     .sidebar-nav {
-        flex-direction: row; /* Horizontal navigation items */
-        width: max-content; /* Allow content to dictate width for scrolling */
-        gap: 5px; /* Reduce space between nav items */
+        flex-direction: row;
+        width: max-content;
+        gap: 5px;
     }
 
     .nav-item {
-        flex-shrink: 0; /* Prevent items from shrinking */
-        padding: 10px 15px; /* Adjust padding for horizontal layout */
+        flex-shrink: 0;
+        padding: 10px 15px;
     }
 
     /* Active nav item styling for horizontal sidebar */
     .nav-item.active {
-        border-left: none; /* Remove left border */
-        border-bottom: 3px solid var(--khaki); /* Use bottom border for active indicator */
-        padding-left: 15px; /* Restore padding */
+        border-left: none;
+        border-bottom: 3px solid var(--khaki);
+        padding-left: 15px;
     }
 
     .dashboard-content {
         grid-column: 1;
-        grid-row: 3; /* Content moves to the third row */
-        padding: 20px;
+        grid-row: 3;
+        padding: 20px; /* Adjust padding for mobile */
     }
 
     /* Adjust font sizes for smaller screens */
@@ -1374,8 +1381,8 @@ body {
     /* Stock/Wastage sections */
     .stock-section,
     .wastage-section {
-        flex: auto; /* Allow them to fill available space */
-        width: 100%; /* Take full width of parent */
+        flex: auto;
+        width: 100%;
     }
 
     .subsection-title {
@@ -1384,39 +1391,39 @@ body {
 
     /* Stock Management Specific: Convert to Accordion on smaller screens */
     .stock-items-grid {
-        grid-template-columns: 1fr; /* Full width for category cards */
-        gap: 10px; /* Smaller gap between cards */
+        grid-template-columns: 1fr;
+        gap: 10px;
     }
 
     .category-card {
-        padding: 15px; /* Adjust padding */
+        padding: 15px;
     }
 
     .category-header {
-        margin-bottom: 0; /* Remove margin-bottom as item-list is now hidden/shown */
-        padding-bottom: 0; /* Remove padding-bottom */
-        border-bottom: none; /* Remove border-bottom for a cleaner look */
-        cursor: pointer; /* Enable click cursor for accordion */
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+        cursor: pointer;
     }
 
     /* Accordion icon (visible on mobile) */
     .accordion-icon {
-        display: inline-block; /* Make it visible on mobile */
+        display: inline-block;
     }
 
     /* Accordion specific styles for the item-list */
     .item-list {
-        max-height: 0; /* Hidden by default for accordion */
-        overflow: hidden; /* Hide content when collapsed */
-        transition: max-height 0.3s ease-out; /* Smooth collapse/expand */
-        padding-top: 0; /* No padding when collapsed */
-        margin-top: 0; /* No margin when collapsed */
-        display: flex; /* Ensure flex behavior when collapsed (for flex children sizing) */
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+        padding-top: 0;
+        margin-top: 0;
+        display: flex;
     }
 
     /* When category card is active, show the item list */
     .category-card.active .item-list {
-        max-height: 1000px; /* A sufficiently large value to reveal content */
+        max-height: 1000px;
         padding-top: 10px;
         margin-top: 10px;
     }
@@ -1429,7 +1436,7 @@ body {
 
     /* Dashboard specific adjustments for smaller screens (stack cards) */
     .dashboard-summary-grid {
-        grid-template-columns: 1fr; /* Stack cards vertically */
+        grid-template-columns: 1fr;
     }
 
     .dashboard-card {
@@ -1441,17 +1448,17 @@ body {
     }
 
     .summary-card {
-        min-width: unset; /* Allow cards to adjust width */
+        min-width: unset;
     }
 
     .summary-circle {
-        width: 60px; /* Smaller circles on mobile */
+        width: 60px;
         height: 60px;
         font-size: 24px;
     }
 
     .quick-action-btn {
-        width: 95%; /* Wider buttons on very small mobile */
+        width: 95%;
         font-size: 14px;
     }
     .quick-action-btn.small-btn {
@@ -1465,7 +1472,7 @@ body {
 
     /* Suppliers specific adjustments for smaller screens */
     .supplier-list-grid {
-        grid-template-columns: 1fr; /* Stack supplier cards vertically */
+        grid-template-columns: 1fr;
     }
     .supplier-card {
         padding: 20px;
@@ -1494,7 +1501,7 @@ body {
 
     /* Adjust checkbox grid for smaller screens */
     .modal-supplier-details-form .item-checkboxes-grid {
-        grid-template-columns: 1fr; /* Stack checkboxes vertically on smaller screens */
+        grid-template-columns: 1fr;
     }
     .modal-supplier-details-form .category-heading {
         font-size: 16px;
@@ -1504,17 +1511,17 @@ body {
     }
 }
 
-/* NEW: Desktop-specific modal form layout for larger screens */
+/* Desktop-specific modal form layout for larger screens */
 @media screen and (min-width: 769px) {
     .modal-content {
-        max-width: 700px; /* Allow wider modal on desktop */
+        max-width: 700px;
         padding: 40px;
     }
 
     .modal-supplier-details-form {
         display: grid;
-        grid-template-columns: repeat(2, 1fr); /* Two columns for inputs */
-        gap: 20px 30px; /* Row and column gap */
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px 30px;
     }
 
     /* Make these fields span both columns on desktop */
@@ -1526,19 +1533,19 @@ body {
     }
 
     .modal-supplier-details-form .modal-input-group {
-        gap: 8px; /* Slightly more space between label and input */
+        gap: 8px;
     }
 
     .modal-supplier-details-form .modal-input {
-        width: 100%; /* Ensure inputs take full width of their grid cell */
+        width: 100%;
     }
 
     .modal-supplier-details-form .items-supplied-section {
-        min-height: 150px; /* Give more space for items list on desktop */
-        max-height: 300px; /* Adjust max height for desktop */
+        min-height: 150px;
+        max-height: 300px;
     }
 
     .modal-supplier-details-form .item-checkboxes-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* More columns for checkboxes */
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
 }
