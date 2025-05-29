@@ -230,6 +230,7 @@ export function getCurrentStockItems() {
  * @returns {Promise<Array<Object>>} A promise that resolves to an array of unique item objects.
  */
 export async function getAllUniqueStockItems() {
+    console.log('stock.js: Fetching all unique items from all locations...');
     const uniqueItemsMap = new Map(); // Use a Map to store unique items by their ID
     const allLocations = locations; // Get locations from config.js
 
@@ -245,14 +246,13 @@ export async function getAllUniqueStockItems() {
                 }
             });
         }
-        console.log(`Fetched ${uniqueItemsMap.size} unique items across all locations.`);
-        // Convert Map values back to an array
         const uniqueItemsArray = Array.from(uniqueItemsMap.values());
+        console.log(`stock.js: Fetched ${uniqueItemsArray.length} unique items across all locations. Sample:`, uniqueItemsArray.slice(0, 5)); // Log a sample
         // Optionally sort them for consistent display
         return uniqueItemsArray.sort((a, b) => a.name.localeCompare(b.name));
 
     } catch (error) {
-        console.error('Error fetching all unique stock items:', error);
+        console.error('stock.js: Error fetching all unique stock items:', error);
         return []; // Return empty array on error
     }
 }
