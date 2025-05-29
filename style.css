@@ -1023,55 +1023,6 @@ body {
 }
 
 
-/* Grouping for wastage item select, quantity select, and log button - THIS IS NO LONGER USED ON WASTAGE.JS */
-/*
-.wastage-input-group {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.wastage-input-group .select-wrapper {
-    flex-grow: 1;
-    min-width: 150px;
-}
-*/
-
-/* Waste Log Select Arrow (Specific Override) - THIS IS NO LONGER USED ON WASTAGE.JS */
-/*
-.wastage-input-group .select-arrow {
-    display: none;
-}
-*/
-
-/* Waste log button (trash icon) - THIS IS NO LONGER USED ON WASTAGE.JS */
-/*
-.log-waste-button {
-    background-color: var(--red);
-    color: var(--yellow);
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    flex-shrink: 0;
-}
-*/
-
-/* Waste log button hover effect - THIS IS NO LONGER USED ON WASTAGE.JS */
-/*
-.log-waste-button:hover {
-    background-color: var(--khaki);
-    color: var(--red);
-}
-*/
-
 /* Heading for the waste log list */
 .wastage-log-heading {
     text-align: left;
@@ -1284,30 +1235,6 @@ body {
         width: 80%;
     }
 
-    /* Wastage input group stacking - NO LONGER APPLICABLE */
-    /*
-    .wastage-input-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    */
-
-    /* Remove min-width to allow select boxes to stretch fully - NO LONGER APPLICABLE */
-    /*
-    .wastage-input-group .select-wrapper {
-        min-width: unset;
-    }
-    */
-
-    /* Center and make waste log button smaller - NO LONGER APPLICABLE */
-    /*
-    .log-waste-button {
-        align-self: center;
-        width: 45px;
-        height: 45px;
-    }
-    */
-
     /* Smaller font for waste log items */
     .waste-log-item {
         font-size: 14px;
@@ -1392,30 +1319,6 @@ body {
     .quick-action-btn.small-btn {
         width: 80%;
     }
-
-    /* Wastage input group stacking - NO LONGER APPLICABLE */
-    /*
-    .wastage-input-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    */
-
-    /* Remove min-width to allow select boxes to stretch fully - NO LONGER APPLICABLE */
-    /*
-    .wastage-input-group .select-wrapper {
-        min-width: unset;
-    }
-    */
-
-    /* Center and make waste log button smaller - NO LONGER APPLICABLE */
-    /*
-    .log-waste-button {
-        align-self: center;
-        width: 45px;
-        height: 45px;
-    }
-    */
 
     /* Smaller font for waste log items */
     .waste-log-item {
