@@ -11,6 +11,9 @@ import { getAllUniqueStockItems } from './stock.js'; // NEW: To get a global lis
 // No direct DOM element retrieval here, instead use window.mainApp.openModal/closeModal
 // and modalMessage for feedback.
 
+// Define a variable to hold all unique items globally for the suppliers module
+let allUniqueStockItemsCache = [];
+
 /**
  * Renders the Suppliers Management page.
  * Fetches and displays supplier information.
@@ -43,6 +46,9 @@ export async function renderSuppliersPage() {
 
     addSupplierBtn.addEventListener('click', () => openSupplierModal());
 
+    // Pre-fetch all unique items once when rendering the page
+    allUniqueStockItemsCache = await getAllUniqueStockItems();
+
     await loadSuppliers(supplierListContainer);
     console.log('Suppliers page rendered.');
 }
@@ -66,7 +72,8 @@ async function loadSuppliers(container) {
         }
 
         suppliers.forEach(supplier => {
-            container.insertAdjacentHTML('beforeend', createSupplierCardHtml(supplier));
+            // Pass the cached allUniqueStockItemsCache to the card template
+            container.insertAdjacentHTML('beforeend', createSupplierCardHtml(supplier, allUniqueStockItemsCache));
         });
 
         // Attach event listeners to "View Details" buttons
@@ -103,11 +110,8 @@ async function openSupplierModal(supplierData = null) {
     const isNew = !supplierData || !supplierData.id; // Corrected check for new supplier
     const title = isNew ? 'Add New Supplier' : `Details: ${supplierData.name}`;
 
-    // NEW: Fetch all available items
-    const allAvailableItems = await getAllUniqueStockItems();
-    console.log('suppliers.js: All available items for modal:', allAvailableItems); // Log items for debugging
-
-    const bodyHtml = createSupplierDetailsModalBodyHtml(supplierData, allAvailableItems);
+    // Use the pre-fetched allUniqueStockItemsCache
+    const bodyHtml = createSupplierDetailsModalBodyHtml(supplierData, allUniqueStockItemsCache);
     let footerHtml = '';
 
     if (isNew) {
