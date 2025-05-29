@@ -29,7 +29,7 @@ export function createSupplierCardHtml(supplier, allUniqueItems) {
         const iconInfo = itemCategoryIcons[category] || itemCategoryIcons['Uncategorized'];
         if (iconInfo) {
             iconsHtml += `
-                <div class="supplier-icon ${iconInfo.colorClass}" title="${category}">
+                <div class="supplier-icon ${iconInfo.colorClass}" data-tooltip-text="${category}"> <!-- REMOVED title, ADDED data-tooltip-text -->
                     <i class="${iconInfo.icon}"></i>
                 </div>
             `;
@@ -44,7 +44,7 @@ export function createSupplierCardHtml(supplier, allUniqueItems) {
             <h3 class="supplier-name">${supplier.name}</h3>
             <p class="supplier-contact">Contact: ${supplier.contactPerson}</p>
             <p class="supplier-email"><i class="fas fa-envelope"></i> ${supplier.email}</p>
-            <p class="supplier-phone"><i class="fas fa-phone-alt"></i> ${supplier.phone}</p>
+            <p class="fas fa-phone-alt supplier-phone"><i class="fas fa-phone-alt"></i> ${supplier.phone}</p>
             <button class="auth-button small-btn view-details-btn">View Details</button>
         </div>
     `;
