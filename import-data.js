@@ -22,33 +22,89 @@ const allIngredientsDataMultiLocation = [
     { id: 'bacon_strips', name: 'Bacon Strips', category: 'Meat', unit: 'packs', currentStock: 60, reorderPoint: 25, reorderQuantity: 120 },
     { id: 'pastrami_slices', name: 'Pastrami Slices', category: 'Meat', unit: 'lbs', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
     { id: 'pulled_turkey', name: 'Pulled Turkey', category: 'Meat', unit: 'lbs', currentStock: 25, reorderPoint: 10, reorderQuantity: 40 },
+    // NEW Meat Items
+    { id: 'sausage_patties', name: 'Sausage Patties', category: 'Meat', unit: 'pcs', currentStock: 60, reorderPoint: 20, reorderQuantity: 100 },
+
 
     // Standard Cheese Items
     { id: 'american_cheese_slices', name: 'American Cheese', category: 'Cheeses', unit: 'slices', currentStock: 120, reorderPoint: 50, reorderQuantity: 200 },
     { id: 'halloumi_cheese', name: 'Halloumi Cheese', category: 'Cheeses', unit: 'blocks', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
     { id: 'mozzarella_patties', name: 'Mozzarella Patties', category: 'Cheeses', unit: 'pcs', currentStock: 45, reorderPoint: 15, reorderQuantity: 75 },
+    // NEW Cheese Items
+    { id: 'oumi_cheese', name: 'Oumi Cheese', category: 'Cheeses', unit: 'pcs', currentStock: 35, reorderPoint: 12, reorderQuantity: 60 },
+    { id: 'cheddar_cheese_slices', name: 'Cheddar Cheese Slices', category: 'Cheeses', unit: 'slices', currentStock: 100, reorderPoint: 40, reorderQuantity: 150 }, // For "Cheeze Style Slices"
+
 
     // Example Specialz/Filletz/Milkshake Ingredients (these would be location-specific typically)
     { id: 'special_sauce_base', name: 'Special Sauce Base', category: 'Specialz Ingredients', unit: 'liters', currentStock: 10, reorderPoint: 3, reorderQuantity: 10 },
     { id: 'crispy_onions', name: 'Crispy Onions', category: 'Specialz Ingredients', unit: 'kg', currentStock: 8, reorderPoint: 2, reorderQuantity: 15 },
     { id: 'honey_chilli_glaze', name: 'Honey Chilli Glaze', category: 'Filletz Ingredients', unit: 'liters', currentStock: 5, reorderPoint: 1, reorderQuantity: 5 },
     { id: 'mango_puree', name: 'Mango Puree', category: 'Milkshakes of the Week', unit: 'liters', currentStock: 8, reorderPoint: 2, reorderQuantity: 5 },
+    // NEW Specialz Ingredients
+    { id: 'shoestring_onions', name: 'Shoestring Onions', category: 'Specialz Ingredients', unit: 'kg', currentStock: 10, reorderPoint: 3, reorderQuantity: 20 },
+    { id: 'bacon_crumbs', name: 'Bacon Crumbs', category: 'Specialz Ingredients', unit: 'kg', currentStock: 5, reorderPoint: 1, reorderQuantity: 10 },
+
 
     // General Produce & Vegetables
     { id: 'lettuce_shredded', name: 'Shredded Lettuce', category: 'Produce & Vegetables', unit: 'bags', currentStock: 25, reorderPoint: 10, reorderQuantity: 40 },
     { id: 'onions_diced', name: 'Diced Onions', category: 'Produce & Vegetables', unit: 'kg', currentStock: 15, reorderPoint: 5, reorderQuantity: 25 },
     { id: 'potatoes_fries', name: 'Fries Potatoes', category: 'Produce & Vegetables', unit: 'kg', currentStock: 80, reorderPoint: 25, reorderQuantity: 100 },
+    // NEW Produce & Vegetables
+    { id: 'dill_pickles', name: 'Dill Pickles', category: 'Produce & Vegetables', unit: 'jars', currentStock: 10, reorderPoint: 3, reorderQuantity: 15 },
+    { id: 'pickled_onions', name: 'Pickled Onions', category: 'Produce & Vegetables', unit: 'jars', currentStock: 8, reorderPoint: 2, reorderQuantity: 12 },
+    { id: 'fresh_chillies', name: 'Fresh Chillies', category: 'Produce & Vegetables', unit: 'kg', currentStock: 4, reorderPoint: 1, reorderQuantity: 8 },
+    { id: 'coleslaw_mix', name: 'Coleslaw Mix', category: 'Produce & Vegetables', unit: 'bags', currentStock: 12, reorderPoint: 4, reorderQuantity: 20 },
+    { id: 'hash_browns', name: 'Hash Browns', category: 'Produce & Vegetables', unit: 'packs', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
+    { id: 'hash_tots', name: 'Hash Tots', category: 'Produce & Vegetables', unit: 'packs', currentStock: 25, reorderPoint: 8, reorderQuantity: 40 },
+    { id: 'eggs', name: 'Eggs', category: 'Produce & Vegetables', unit: 'trays', currentStock: 20, reorderPoint: 7, reorderQuantity: 30 }, // For omelettes
+    { id: 'strawberry_puree', name: 'Strawberry Puree', category: 'Fruits', unit: 'liters', currentStock: 10, reorderPoint: 3, reorderQuantity: 5 },
+    { id: 'banana_puree', name: 'Banana Puree', category: 'Fruits', unit: 'liters', currentStock: 10, reorderPoint: 3, reorderQuantity: 5 },
+    { id: 'lemon_puree', name: 'Lemon Puree', category: 'Fruits', unit: 'liters', currentStock: 5, reorderPoint: 1, reorderQuantity: 3 }, // For cheesecake
+
 
     // General Sauces & Condiments
     { id: 'classic_sauce', name: 'Classic Sauce', category: 'Sauces & Condiments', unit: 'gallons', currentStock: 15, reorderPoint: 5, reorderQuantity: 20 },
     { id: 'ketchup_heinz', name: 'Heinz Ketchup', category: 'Sauces & Condiments', unit: 'gallons', currentStock: 20, reorderPoint: 8, reorderQuantity: 30 },
+    // NEW Sauces & Condiments
+    { id: 'sweet_n_smokey_sauce', name: 'Sweet N Smokey Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 10, reorderPoint: 4, reorderQuantity: 15 },
+    { id: 'creamy_garlic_sauce', name: 'Creamy Garlic Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 8, reorderPoint: 3, reorderQuantity: 12 },
+    { id: 'smokey_bbq_sauce', name: 'Smokey BBQ Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 10, reorderPoint: 4, reorderQuantity: 15 },
+    { id: 'chipotle_mayo', name: 'Chipotle Mayo', category: 'Sauces & Condiments', unit: 'liters', currentStock: 7, reorderPoint: 2, reorderQuantity: 10 },
+    { id: 'garlic_parmesan_sauce', name: 'Garlic Parmesan Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 6, reorderPoint: 2, reorderQuantity: 10 },
+    { id: 'hot_cheese_sauce', name: 'Hot Cheese Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 10, reorderPoint: 3, reorderQuantity: 15 },
+    { id: 'brown_sauce', name: 'Brown Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 8, reorderPoint: 2, reorderQuantity: 10 },
+    { id: 'sweet_n_spicy_sauce', name: 'Sweet N Spicy Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 7, reorderPoint: 2, reorderQuantity: 10 },
+    { id: 'mayonnaise', name: 'Mayonnaise', category: 'Sauces & Condiments', unit: 'gallons', currentStock: 15, reorderPoint: 5, reorderQuantity: 20 },
+
 
     // General Breads & Baked Goods
     { id: 'burger_buns', name: 'Burger Buns', category: 'Breads & Baked Goods', unit: 'packs', currentStock: 40, reorderPoint: 15, reorderQuantity: 50 },
 
+
     // General Other Essentials
     { id: 'frying_oil', name: 'Frying Oil', category: 'Other Essentials', unit: 'gallons', currentStock: 5, reorderPoint: 2, reorderQuantity: 10 },
     { id: 'disposable_gloves', name: 'Disposable Gloves', category: 'Other Essentials', unit: 'boxes', currentStock: 18, reorderPoint: 5, reorderQuantity: 25 },
+    // NEW Other Essentials
+    { id: 'milk_whole', name: 'Whole Milk', category: 'Other Essentials', unit: 'liters', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
+    { id: 'cream_dairy', name: 'Dairy Cream', category: 'Other Essentials', unit: 'liters', currentStock: 15, reorderPoint: 5, reorderQuantity: 20 },
+    { id: 'coffee_beans', name: 'Coffee Beans', category: 'Other Essentials', unit: 'kg', currentStock: 5, reorderPoint: 2, reorderQuantity: 10 },
+    { id: 'tea_bags', name: 'Tea Bags', category: 'Other Essentials', unit: 'packs', currentStock: 10, reorderPoint: 3, reorderQuantity: 15 },
+    { id: 'hot_chocolate_powder', name: 'Hot Chocolate Powder', category: 'Other Essentials', unit: 'kg', currentStock: 5, reorderPoint: 2, reorderQuantity: 10 },
+    { id: 'seasoning_powder', name: 'Seasoning Powder', category: 'Other Essentials', unit: 'kg', currentStock: 7, reorderPoint: 2, reorderQuantity: 10 },
+
+
+    // NEW Dessert Ingredients (assuming some pre-made components or base ingredients)
+    { id: 'cheesecake_base_mix', name: 'Cheesecake Base Mix', category: 'Desserts', unit: 'kg', currentStock: 8, reorderPoint: 3, reorderQuantity: 15 },
+    { id: 'biscuit_base', name: 'Biscuit Base Crumbles', category: 'Desserts', unit: 'kg', currentStock: 5, reorderPoint: 2, reorderQuantity: 10 },
+    { id: 'biscoff_spread', name: 'Biscoff Spread', category: 'Desserts', unit: 'jars', currentStock: 6, reorderPoint: 2, reorderQuantity: 8 },
+    { id: 'oreo_crumbles', name: 'Oreo Crumbles', category: 'Desserts', unit: 'kg', currentStock: 4, reorderPoint: 1, reorderQuantity: 6 },
+    { id: 'banoffee_topping', name: 'Banoffee Topping', category: 'Desserts', unit: 'liters', currentStock: 5, reorderPoint: 2, reorderQuantity: 8 },
+
+
+    // NEW Milkshake Ingredients (Flavorings)
+    { id: 'vanilla_syrup', name: 'Vanilla Syrup', category: 'Milkshakes of the Week', unit: 'liters', currentStock: 12, reorderPoint: 4, reorderQuantity: 15 },
+    { id: 'chocolate_syrup', name: 'Chocolate Syrup', category: 'Milkshakes of the Week', unit: 'liters', currentStock: 12, reorderPoint: 4, reorderQuantity: 15 },
+
 ];
 
 /**
