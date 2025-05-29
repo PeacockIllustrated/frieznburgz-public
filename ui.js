@@ -7,17 +7,38 @@ const sidebarNavItems = document.querySelectorAll('.nav-item'); // All sidebar n
 const contentPages = document.querySelectorAll('.content-page'); // All content sections
 
 /**
+ * Helper function to convert kebab-case string to camelCase.
+ * Example: "stock-management" -> "stockManagement"
+ * @param {string} kebabCaseString - The string in kebab-case (e.g., "my-data-page").
+ * @returns {string} The converted string in camelCase.
+ */
+function kebabToCamelCase(kebabCaseString) {
+    return kebabCaseString.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+}
+
+/**
  * Initializes sidebar navigation click listeners.
  * Sets up dynamic page switching.
+ * @param {function} onNavLinkClickCallback - A callback function from main.js to be called when a navigation link is clicked,
+ *                                            responsible for rendering the content of the selected page.
  */
-export function initSidebarNav() {
+export function initSidebarNav(onNavLinkClickCallback) { // Now correctly accepts the callback
     sidebarNavItems.forEach(item => {
         item.addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default link behavior
-            const pageId = event.currentTarget.dataset.page; // Get page ID from data-page attribute
+            event.preventDefault(); // Prevent default link behavior (e.g., jumping to #)
+            const pageId = event.currentTarget.dataset.page; // Get page ID from data-page attribute (e.g., "dashboard", "stock-management")
+
             if (pageId) {
-                showPage(pageId); // Show the selected page
-                updateSidebarActiveState(pageId); // Update active class
+                // Step 1: Manage UI visibility (hide all, show target section)
+                showPage(pageId);
+                // Step 2: Update the active state in the sidebar
+                updateSidebarActiveState(pageId);
+
+                // Step 3: Call the provided callback to render the specific content for the page.
+                // This is crucial for modules like stock.js and wastage.js to populate their divs.
+                if (onNavLinkClickCallback && typeof onNavLinkClickCallback === 'function') {
+                    onNavLinkClickCallback(pageId);
+                }
             }
         });
     });
@@ -25,24 +46,38 @@ export function initSidebarNav() {
 }
 
 /**
- * Shows a specific content page and hides all others.
- * @param {string} pageId - The ID of the page to show (e.g., 'dashboard', 'stock-management').
+ * Shows a specific content page element and hides all others.
+ * This function primarily manages the `display` CSS property of the content sections.
+ * @param {string} pageId - The base ID of the page to show (e.g., 'dashboard', 'stock-management').
+ *                          This will be converted from kebab-case (from data-page) to camelCase
+ *                          to match the HTML section IDs (e.g., 'stockManagementPage').
  */
 export function showPage(pageId) {
+    // Step 1: Hide all content pages and remove 'active-page' class
     contentPages.forEach(page => {
-        if (page.id === `${pageId}Page`) { // Match ID with 'Page' suffix (e.g., 'dashboardPage')
-            page.classList.add('active-page');
-            page.style.display = 'block'; // Ensure it's displayed
-        } else {
-            page.classList.remove('active-page');
-            page.style.display = 'none'; // Ensure it's hidden
-        }
+        page.classList.remove('active-page');
+        page.style.display = 'none'; // Ensure all are hidden via inline style
     });
-    console.log(`Showing page: ${pageId}`);
+
+    // Convert the pageId from kebab-case (from data-page) to camelCase
+    // to match the HTML element IDs (e.g., 'stockManagementPage' from 'stock-management').
+    const camelCasePageId = kebabToCamelCase(pageId);
+    const targetPage = document.getElementById(`${camelCasePageId}Page`); // Corrected ID lookup
+
+    if (targetPage) {
+        targetPage.classList.add('active-page');
+        targetPage.style.display = 'block'; // Explicitly set to 'block' to show it
+    } else {
+        // This warning should now only trigger if a truly unknown pageId is passed,
+        // or if there's a mismatch between kebabToCamelCase and HTML IDs.
+        console.warn(`UI Error: Attempted to show unknown page with ID: ${camelCasePageId}Page`);
+    }
+    console.log(`Showing page: ${pageId}`); // Log the original pageId for clarity
 }
 
 /**
  * Hides all content pages.
+ * Used when switching to non-dashboard sections (like auth or location selection).
  */
 export function hideAllPages() {
     contentPages.forEach(page => {
@@ -53,8 +88,8 @@ export function hideAllPages() {
 }
 
 /**
- * Updates the 'active' class on sidebar navigation items.
- * @param {string} activePageId - The ID of the currently active page.
+ * Updates the 'active' class on sidebar navigation items based on the currently displayed page.
+ * @param {string} activePageId - The ID of the currently active page (e.g., 'dashboard', 'stock-management').
  */
 function updateSidebarActiveState(activePageId) {
     sidebarNavItems.forEach(item => {
@@ -68,16 +103,16 @@ function updateSidebarActiveState(activePageId) {
 
 /**
  * Shows the main dashboard container.
- * This is a utility for main.js to call, if needed.
+ * This utility function is called by main.js when the user logs in and selects a location.
  */
 export function showDashboardContainer() {
-    mainDashboardContainer.style.display = 'grid'; // Use grid for dashboard layout
+    mainDashboardContainer.style.display = 'grid'; // Use grid for dashboard layout as defined in CSS
     console.log('Main dashboard container shown.');
 }
 
 /**
  * Hides the main dashboard container.
- * This is a utility for main.js to call, if needed.
+ * This utility function is called by main.js when the user logs out or decides to change location.
  */
 export function hideDashboardContainer() {
     mainDashboardContainer.style.display = 'none';

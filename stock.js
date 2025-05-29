@@ -67,6 +67,7 @@ export async function renderStockManagementPage() {
                 <div class="category-header">
                     <h3 class="category-title">${categoryName}</h3>
                     <i class="fas fa-edit edit-icon" title="Edit category items (future)"></i>
+                    <i class="fas fa-chevron-down accordion-icon"></i> <!-- New accordion icon -->
                 </div>
                 <div class="item-list">
                     <!-- Items will be appended here -->
@@ -97,7 +98,16 @@ export async function renderStockManagementPage() {
                 if (stockInput) stockInput.addEventListener('change', () => updateStock(item.id, 0, stockInput));
                 if (reorderBtn) reorderBtn.addEventListener('click', () => messageSupplier(item));
             });
+
+            // Initialize the accordion state (all closed by default on mobile)
+            // categoryCardDiv.classList.add('collapsed'); // All start collapsed on mobile
+            // No, the initial state should be that the first one is open, the others closed
+            // Or all start closed? Let's make them all start collapsed for cleanliness.
+            // But we'll manage this in CSS for conditional display.
         }
+
+        // Initialize accordion behavior after all category cards are rendered
+        initializeStockAccordion();
 
         console.log(`Stock items loaded and rendered for ${selectedLocationId}.`);
 
@@ -106,6 +116,24 @@ export async function renderStockManagementPage() {
         stockManagementContent.innerHTML = `<h3 class="subsection-title">Inventory for ${locationDisplayName}</h3><p style="color:red;">Error loading stock items: ${error.message}. Please check console and Firebase permissions.</p>`;
     }
 }
+
+/**
+ * Initializes accordion behavior for stock categories on mobile.
+ */
+function initializeStockAccordion() {
+    const categoryHeaders = document.querySelectorAll('.category-header');
+    categoryHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const categoryCard = header.closest('.category-card');
+            if (categoryCard) {
+                // Toggle 'active' class on the card
+                categoryCard.classList.toggle('active');
+            }
+        });
+    });
+    console.log('Stock accordion initialized for category headers.');
+}
+
 
 /**
  * Updates the stock level for a specific item in Firestore.
@@ -124,29 +152,49 @@ async function updateStock(itemId, change, inputElement) {
     const itemDocRef = db.collection('locations').doc(selectedLocationId).collection('items').doc(itemId);
     let newStockValue;
 
-    if (change === 0) { // Manual input change
+    if (change === 0) { // Manual input change (user typed a value)
         newStockValue = parseInt(inputElement.value, 10);
         if (isNaN(newStockValue) || newStockValue < 0) {
             alert('Please enter a valid stock quantity (non-negative number).');
-            // Re-render to revert invalid input to last known good state
+            // Re-render to revert invalid input to last known good state from Firestore
             await renderStockManagementPage();
             return;
         }
     } else { // Increment/Decrement button click
-        const currentDisplayedStock = parseInt(inputElement.value, 10);
-        newStockValue = currentDisplayedStock + change;
+        // Fetch the current stock from Firestore to ensure the calculation is based on the latest data
+        const doc = await itemDocRef.get();
+        if (!doc.exists) {
+            console.error("Item document not found for stock update:", itemId);
+            alert("Could not find item to update. Please refresh the page.");
+            return;
+        }
+        let currentFirestoreStock = doc.data().currentStock;
+
+        // Ensure currentFirestoreStock is a number, default to 0 if not
+        if (typeof currentFirestoreStock !== 'number') {
+            console.warn(`Firestore stock for ${itemId} is not a number: ${currentFirestoreStock}. Defaulting to 0 for calculation.`);
+            currentFirestoreStock = 0;
+        }
+
+        newStockValue = currentFirestoreStock + change;
         if (newStockValue < 0) newStockValue = 0; // Prevent negative stock
     }
 
     try {
         await itemDocRef.update({ currentStock: newStockValue });
-        // After successful update, re-render the stock page to reflect changes
-        // This ensures visual indicators and numbers are fully consistent.
+        console.log(`Firestore updated: Stock for ${itemId} at ${selectedLocationId} set to ${newStockValue}`);
+
+        // Immediately update the specific input field to reflect the change visually
+        inputElement.value = newStockValue;
+
+        // Re-render the entire stock management page to update status indicators and ensure consistency
         await renderStockManagementPage();
-        console.log(`Stock for ${itemId} at ${selectedLocationId} updated to ${newStockValue}`);
+        console.log(`Stock for ${itemId} at ${selectedLocationId} updated and page re-rendered.`);
     } catch (error) {
         console.error('Error updating stock:', error);
         alert('Failed to update stock. Please check Firebase permissions or network.');
+        // On error, re-render to revert to the correct state from Firestore
+        await renderStockManagementPage();
     }
 }
 

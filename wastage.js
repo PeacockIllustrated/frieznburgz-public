@@ -7,8 +7,7 @@ import { getSelectedLocation } from './config.js';
 import { getCurrentStockItems, renderStockManagementPage } from './stock.js'; // To get item list for dropdown and trigger stock re-render
 import { createWasteLogItemHtml } from './wastage-template.js'; // Template for individual waste log items
 
-// --- DOM Elements ---
-const wastageLogContent = document.getElementById('wastageLogContent'); // Main content area for wastage page
+// We no longer get these elements at the top, but inside the render function.
 
 
 /**
@@ -16,15 +15,19 @@ const wastageLogContent = document.getElementById('wastageLogContent'); // Main 
  * Populates dropdowns and loads recent waste entries for the selected location.
  */
 export async function renderWastageLogPage() {
+    const wastageLogContent = document.getElementById('wastageLogContent'); // GET IT HERE!
+    console.log('wastage.js: renderWastageLogPage called.');
+
     const selectedLocationId = getSelectedLocation();
     if (!selectedLocationId) {
         wastageLogContent.innerHTML = '<p>Please select a location first to log waste.</p>';
+        console.warn('wastage.js: No location selected for wastage log.');
         return;
     }
 
     const locationDisplayName = selectedLocationId.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
-    // Set up the basic HTML structure for the wastage page
+    // 1. Set up the basic HTML structure for the wastage page
     // Important: We rebuild the wastage-card HTML structure each time to ensure fresh event listeners.
     wastageLogContent.innerHTML = `
         <h3 class="subsection-title">Wastage Log for ${locationDisplayName}</h3>
@@ -48,22 +51,28 @@ export async function renderWastageLogPage() {
             </ul>
         </div>
     `;
+    console.log('wastage.js: Base HTML structure for wastage page set.');
 
-    // Get references to the newly created DOM elements within this page
-    // IMPORTANT: Get these elements *after* innerHTML has been set.
+
+    // 2. IMPORTANT: Get references to the newly created DOM elements *within this page*
+    // These must be retrieved *after* the innerHTML assignment.
     const currentWasteItemSelect = document.getElementById('wasteItemSelect');
     const currentWasteQtySelect = document.getElementById('wasteQtySelect');
     const currentLogWasteBtn = document.getElementById('logWasteBtn');
     const currentWasteLogList = document.getElementById('wasteLogList');
 
-    // Attach event listeners to newly created elements
-    currentLogWasteBtn.addEventListener('click', () => handleLogWaste(currentWasteItemSelect, currentWasteQtySelect, currentWasteLogList));
+    // 3. Attach event listeners to newly created elements
+    if (currentLogWasteBtn) {
+        currentLogWasteBtn.addEventListener('click', () => handleLogWaste(currentWasteItemSelect, currentWasteQtySelect, currentWasteLogList));
+    } else {
+        console.error('wastage.js: Log Waste button not found after rendering.');
+    }
 
-    // Populate dropdowns and load log entries
+
+    // 4. Populate dropdowns and load log entries
     populateWasteDropdowns(currentWasteItemSelect, currentWasteQtySelect);
     await loadWasteLog(currentWasteLogList); // Load initial log entries
-
-    console.log(`Wastage log page rendered for ${selectedLocationId}.`);
+    console.log(`wastage.js: Wastage log page rendered for ${selectedLocationId}.`);
 }
 
 /**
@@ -72,12 +81,20 @@ export async function renderWastageLogPage() {
  * @param {HTMLSelectElement} qtySelect - The quantity select element.
  */
 function populateWasteDropdowns(itemSelect, qtySelect) {
+    // Defensive check: Ensure itemSelect and qtySelect are valid HTML elements
+    if (!itemSelect || !qtySelect) {
+        console.error('wastage.js: Waste dropdown elements are null. Cannot populate.');
+        return;
+    }
+
     const items = getCurrentStockItems(); // Get current items from stock.js
 
     if (items.length === 0) {
-        itemSelect.innerHTML = '<option value="" disabled selected>No items found</option>';
+        itemSelect.innerHTML = '<option value="" disabled selected>No items found (check Stock Management)</option>';
+        itemSelect.disabled = true; // Disable if no items
     } else {
         itemSelect.innerHTML = '<option value="" disabled selected>Select Item</option>';
+        itemSelect.disabled = false;
         // Sort items alphabetically for easier selection
         const sortedItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
         sortedItems.forEach(item => {
@@ -169,6 +186,11 @@ async function loadWasteLog(logList) {
     const selectedLocationId = getSelectedLocation();
     if (!selectedLocationId) {
         logList.innerHTML = '<li>No location selected.</li>';
+        return;
+    }
+
+    if (!logList) {
+        console.error('wastage.js: Waste log list element not found. Cannot load log.');
         return;
     }
 

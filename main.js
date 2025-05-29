@@ -18,8 +18,9 @@ import { initLocationSelection, showLocationSelection, hideLocationSelection, up
 import { showPage, hideAllPages, initSidebarNav, showDashboardContainer, hideDashboardContainer } from './ui.js';
 
 // Import specific page rendering functions
-import { renderStockManagementPage } from './stock.js'; // New import
-import { renderWastageLogPage } from './wastage.js';   // New import
+import { renderStockManagementPage } from './stock.js';
+import { renderWastageLogPage } from './wastage.js';
+import { renderDashboardOverviewPage } from './dashboard.js'; // NEW IMPORT
 
 
 // --- DOM Elements (centralized for main.js's direct use) ---
@@ -40,7 +41,7 @@ function initializeApp() {
     initLocationSelection();
 
     // Initialize sidebar navigation from ui.js, passing the content rendering callback
-    initSidebarNav(handleNavigationClick);
+    initSidebarNav(handleNavigationClick); // Ensure ui.js is correctly setup to receive and use this callback
 
     // Set up general event listeners for main dashboard controls
     logoutBtn.addEventListener('click', handleLogout);
@@ -151,15 +152,8 @@ async function renderPageContent(pageId) {
     // Use a switch statement to call the appropriate rendering function
     switch (pageId) {
         case 'dashboard':
-            // Placeholder for Dashboard overview content
-            // In future, you might have a dedicated renderDashboardOverviewPage()
+            await renderDashboardOverviewPage(); // CALL NEW FUNCTION HERE
             console.log('Rendering Dashboard Overview...');
-            document.getElementById('dashboardPage').innerHTML = `
-                <h2 class="page-title">Dashboard Overview</h2>
-                <p>Welcome to your Friez n Burgz Admin Dashboard for ${getLocationDisplayName(selectedLocationId)}!</p>
-                <p>Use the sidebar to navigate and manage your stock.</p>
-                <!-- Critical alerts and summary data will go here -->
-            `;
             break;
         case 'stock-management':
             await renderStockManagementPage(); // Call function from stock.js
@@ -189,8 +183,10 @@ async function renderPageContent(pageId) {
 
 
 // Expose showDashboard to the window object so location.js can call it
+// Also expose handleNavigationClick for the quick action buttons on the dashboard
 window.mainApp = {
     showDashboard: showDashboard,
+    handleNavigationClick: handleNavigationClick, // EXPOSE FOR QUICK ACTIONS
     // Also expose getSelectedLocation and getLocations from config for external scripts (like import-data.js)
     getSelectedLocation: getSelectedLocation,
     getLocations: () => locations // Expose the full locations array
