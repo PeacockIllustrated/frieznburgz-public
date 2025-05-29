@@ -6,6 +6,20 @@
     --khaki: #fbae29; /* Vibrant orange-yellow */
     --salmon: #ff9686; /* Lighter red/orange tone */
     --dark-slate-grey: #050505; /* Near black, used for body background */
+
+    /* NEW: Icon Colors */
+    --color-meat: #A0522D;      /* Sienna */
+    --color-cheese: #FFD700;    /* Gold */
+    --color-veggies: #228B22;   /* Forest Green */
+    --color-bread: #D2B48C;     /* Tan */
+    --color-sauces: #B22222;    /* Firebrick */
+    --color-specialz: #8A2BE2;  /* Blue Violet */
+    --color-filletz: #DC143C;   /* Crimson */
+    --color-milkshake: #8B4513; /* Saddle Brown */
+    --color-essentials: #696969;/* Dim Gray */
+    --color-fruit: #FF6347;     /* Tomato */
+    --color-desserts: #FFC0CB;  /* Pink */
+    --color-uncategorized: #999999; /* Light Grey */
 }
 
 /* Global Styles */
@@ -896,13 +910,12 @@ body {
     padding: 10px 0;
     border-bottom: 1px dashed var(--salmon);
     text-align: center;
-    /* NEW: Visual feedback for pending changes */
     transition: border-color 0.2s ease;
 }
 
 .stock-item.has-pending-changes {
-    border: 1px dashed var(--red); /* Red border for unconfirmed changes */
-    padding: 9px; /* Adjust padding to keep size consistent with border */
+    border: 1px dashed var(--red);
+    padding: 9px;
 }
 
 
@@ -911,7 +924,7 @@ body {
     border-bottom: none;
 }
 .stock-item.has-pending-changes:last-child {
-    border-bottom: 1px dashed var(--red); /* Keep border on last item if it has changes */
+    border-bottom: 1px dashed var(--red);
 }
 
 
@@ -1030,13 +1043,12 @@ body {
 }
 
 .category-footer .confirm-changes-btn {
-    width: 80%; /* Adjust width for consistency */
+    width: 80%;
     padding: 10px 20px;
     font-size: 16px;
-    /* Styles for disabled state */
     opacity: 0.6;
     cursor: not-allowed;
-    background-color: var(--red); /* Ensure disabled button uses red theme */
+    background-color: var(--red);
     color: var(--yellow);
     border-color: var(--yellow);
 }
@@ -1048,7 +1060,7 @@ body {
 }
 
 .category-footer .confirm-changes-btn.saving {
-    background-color: #5cb85c; /* Greenish for saving state */
+    background-color: #5cb85c;
     cursor: progress;
     opacity: 0.8;
 }
@@ -1162,11 +1174,58 @@ body {
     align-items: center;
     text-align: center;
     transition: transform 0.2s ease;
+    /* NEW: Position relative for absolute children (icons) */
+    position: relative;
+    overflow: hidden; /* Ensure icons don't spill out if they are larger than card on small screens */
+    padding-top: 40px; /* Make space for icons at the top */
 }
 
 .supplier-card:hover {
     transform: translateY(-5px);
 }
+
+/* NEW: Container for icons in supplier card */
+.supplier-icons-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px; /* Space between multiple icons */
+    z-index: 5; /* Ensure icons are above other card content */
+    flex-wrap: wrap; /* Allow icons to wrap if too many */
+    justify-content: flex-end; /* Align icons to the right */
+    max-width: calc(100% - 20px); /* Limit width to card */
+}
+
+/* NEW: Individual supplier icon styling */
+.supplier-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%; /* Circular icons */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px; /* Size of the Font Awesome icon */
+    color: var(--yellow); /* Default icon color */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    flex-shrink: 0; /* Prevent icons from shrinking */
+}
+
+/* NEW: Specific color classes for icons */
+.supplier-icon.icon-meat { background-color: var(--color-meat); }
+.supplier-icon.icon-cheese { background-color: var(--color-cheese); }
+.supplier-icon.icon-veggies { background-color: var(--color-veggies); }
+.supplier-icon.icon-bread { background-color: var(--color-bread); }
+.supplier-icon.icon-sauces { background-color: var(--color-sauces); }
+.supplier-icon.icon-specialz { background-color: var(--color-specialz); }
+.supplier-icon.icon-filletz { background-color: var(--color-filletz); }
+.supplier-icon.icon-milkshake { background-color: var(--color-milkshake); }
+.supplier-icon.icon-essentials { background-color: var(--color-essentials); }
+.supplier-icon.icon-fruit { background-color: var(--color-fruit); }
+.supplier-icon.icon-desserts { background-color: var(--color-desserts); }
+.supplier-icon.icon-uncategorized { background-color: var(--color-uncategorized); }
+
+
 
 .supplier-name {
     font-family: 'Fraunces', serif;
@@ -1520,6 +1579,8 @@ body {
     }
     .supplier-card {
         padding: 20px;
+        /* Adjust padding-top for mobile icons to prevent content overlap */
+        padding-top: 35px;
     }
     .supplier-name {
         font-size: 20px;
@@ -1532,6 +1593,18 @@ body {
     .supplier-card .view-details-btn {
         font-size: 12px;
         padding: 6px 12px;
+    }
+
+    /* Adjust icon size for mobile */
+    .supplier-icon {
+        width: 25px;
+        height: 25px;
+        font-size: 14px;
+    }
+    .supplier-icons-container {
+        top: 8px;
+        right: 8px;
+        gap: 3px;
     }
 
     /* Modal adjustments for very small screens */
@@ -1573,7 +1646,7 @@ body {
     .modal-supplier-details-form .items-supplied-section, /* Items Supplied */
     .modal-supplier-details-form .modal-input-group:last-child /* Notes */
     {
-        grid-column: 1 / -1; /* Span all columns */
+        grid-column: 1 / -1;
     }
 
     .modal-supplier-details-form .modal-input-group {
