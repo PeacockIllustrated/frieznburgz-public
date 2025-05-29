@@ -21,9 +21,10 @@ export function createSupplierCardHtml(supplier) {
 /**
  * Generates the HTML for the supplier details modal body.
  * @param {Object} supplier - The supplier object. Can be null/undefined for 'add new'.
+ * @param {Array<Object>} allAvailableItems - A list of all unique items available in the system.
  * @returns {string} The HTML string for the supplier details form/display.
  */
-export function createSupplierDetailsModalBodyHtml(supplier) {
+export function createSupplierDetailsModalBodyHtml(supplier, allAvailableItems = []) {
     // Safely destructure properties, providing default empty values if supplier is null/undefined
     const {
         id,
@@ -37,8 +38,41 @@ export function createSupplierDetailsModalBodyHtml(supplier) {
     } = supplier || {}; // If supplier is null/undefined, use an empty object
 
     const isNew = !id; // Determine if it's a new supplier based on 'id' existence
-    const itemsSuppliedList = itemsSupplied
-        .map(item => `<li>${item}</li>`).join('');
+
+    // Group all available items by category
+    const categorizedItems = allAvailableItems.reduce((acc, item) => {
+        const category = item.category || 'Uncategorized';
+        if (!acc[category]) {
+            acc[category] = [];
+        }
+        acc[category].push(item);
+        return acc;
+    }, {});
+
+    // Generate HTML for item checkboxes, grouped by category
+    let itemsCheckboxesHtml = '';
+    const sortedCategories = Object.keys(categorizedItems).sort();
+
+    if (allAvailableItems.length === 0) {
+        itemsCheckboxesHtml = '<p class="modal-message info-message">No items found in your inventory to list here.</p>';
+    } else {
+        sortedCategories.forEach(category => {
+            itemsCheckboxesHtml += `<div class="item-category-group">`;
+            itemsCheckboxesHtml += `<h5 class="category-heading">${category}</h5>`;
+            itemsCheckboxesHtml += `<div class="item-checkboxes-grid">`;
+            categorizedItems[category].sort((a, b) => a.name.localeCompare(b.name)).forEach(item => {
+                // Check if the current supplier already supplies this item by name
+                const isChecked = itemsSupplied.includes(item.name);
+                itemsCheckboxesHtml += `
+                    <label class="item-checkbox-label">
+                        <input type="checkbox" name="itemsSupplied" value="${item.name}" ${isChecked ? 'checked' : ''}>
+                        ${item.name}
+                    </label>
+                `;
+            });
+            itemsCheckboxesHtml += `</div></div>`;
+        });
+    }
 
     return `
         <div class="modal-supplier-details-form">
@@ -62,13 +96,13 @@ export function createSupplierDetailsModalBodyHtml(supplier) {
                 <label for="supplierAddress">Address (Optional):</label>
                 <textarea id="supplierAddress" class="auth-input modal-input" placeholder="e.g., 123 Food Street, City, Postcode">${address || ''}</textarea>
             </div>
-            <div class="modal-input-group">
+
+            <div class="modal-input-group items-supplied-section">
                 <label>Items Supplied:</label>
-                <ul class="items-supplied-list">
-                    ${itemsSuppliedList || '<li class="no-items-listed">No specific items listed.</li>'}
-                </ul>
-                <p class="small-text">Note: Items supplied is for display only. Not directly editable here.</p>
+                ${itemsCheckboxesHtml}
+                <p class="small-text">Select all items this supplier provides.</p>
             </div>
+
             <div class="modal-input-group">
                 <label for="supplierNotes">Notes:</label>
                 <textarea id="supplierNotes" class="auth-input modal-input" placeholder="Any special notes about this supplier...">${notes || ''}</textarea>
