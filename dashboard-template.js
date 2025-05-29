@@ -33,8 +33,10 @@ export function createCriticalItemHtml(item) {
             <div class="critical-indicator-circle ${stockStatusClass}">
                 <span class="critical-stock-count">${item.currentStock}</span>
             </div>
-            <p class="critical-item-name">${item.name} (${item.unit || 'units'})</p>
-            <span class="critical-reorder-info">Reorder Pt: ${item.reorderPoint}</span>
+            <div class="critical-item-details"> <!-- NEW container for stacking name and reorder info -->
+                <p class="critical-item-name">${item.name} (${item.unit || 'units'})</p>
+                <span class="critical-reorder-info">Reorder Pt: ${item.reorderPoint}</span>
+            </div>
         </div>
     `;
 }
