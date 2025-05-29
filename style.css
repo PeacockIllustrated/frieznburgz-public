@@ -767,7 +767,7 @@ body {
 /* Custom Tooltip Styles (for supplier icons) */
 .custom-tooltip {
     position: absolute;
-    background-color: var(--dim-grey); /* Dark background */
+    background-color: var(--red); /* Dark background */
     color: var(--yellow); /* Yellow text */
     padding: 8px 12px;
     border-radius: 8px;
