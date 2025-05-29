@@ -42,7 +42,7 @@ function closeModal() {
     universalModal.style.display = 'none';
     modalTitle.textContent = '';
     modalBody.innerHTML = '';
-    modalFooter.innerHTML = '';
+    modalFooter.textContent = ''; // Use textContent to clear buttons properly
     modalMessage.textContent = '';
 }
 
@@ -257,10 +257,16 @@ export async function showQuickAdjustmentModal(type) { // Exported this function
         });
     }
 
-    let qtyOptions = '<option value="" disabled selected>Select Qty</option>';
-    for (let i = 1; i <= 50; i++) { // Max 50 units for quick adjustment
-        qtyOptions += `<option value="${i}">${i}</option>`;
-    }
+    // NEW: Use the stock control input structure instead of a select for quantity
+    const qtyControlsHtml = `
+        <div class="stock-controls-group">
+            <div class="stock-controls">
+                <button class="control-button decrement-btn">-</button>
+                <input type="number" id="modalQtyInput" class="stock-input" value="1" min="1">
+                <button class="control-button increment-btn">+</button>
+            </div>
+        </div>
+    `;
 
     const bodyHtml = `
         <div class="modal-input-group">
@@ -268,10 +274,7 @@ export async function showQuickAdjustmentModal(type) { // Exported this function
                 <select id="modalItemSelect" class="waste-select">${itemOptions}</select>
                 <i class="fas fa-chevron-down select-arrow"></i>
             </div>
-            <div class="select-wrapper">
-                <select id="modalQtySelect" class="waste-select">${qtyOptions}</select>
-                <i class="fas fa-chevron-down select-arrow"></i>
-            </div>
+            ${qtyControlsHtml} <!-- Insert the new quantity controls here -->
             ${type === 'waste' ? `<input type="text" id="modalReasonInput" placeholder="Reason for waste" class="auth-input modal-input">` : ''}
         </div>
     `;
@@ -286,6 +289,35 @@ export async function showQuickAdjustmentModal(type) { // Exported this function
     // Attach event listeners to modal elements after they are in the DOM
     document.getElementById('modalConfirmBtn').addEventListener('click', () => handleModalAdjustment(type));
     document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
+
+    // NEW: Setup quantity controls for modal
+    const modalQtyInput = document.getElementById('modalQtyInput');
+    if (modalQtyInput) {
+        const decrementBtn = modalQtyInput.closest('.stock-controls').querySelector('.decrement-btn');
+        const incrementBtn = modalQtyInput.closest('.stock-controls').querySelector('.increment-btn');
+
+        if (decrementBtn) {
+            decrementBtn.addEventListener('click', () => {
+                let currentVal = parseInt(modalQtyInput.value, 10);
+                if (isNaN(currentVal)) currentVal = 1; // Default to 1 if input is empty or invalid
+                modalQtyInput.value = Math.max(1, currentVal - 1); // Ensure minimum is 1
+            });
+        }
+        if (incrementBtn) {
+            incrementBtn.addEventListener('click', () => {
+                let currentVal = parseInt(modalQtyInput.value, 10);
+                if (isNaN(currentVal)) currentVal = 0; // If starting from 0, increment to 1
+                modalQtyInput.value = currentVal + 1;
+            });
+        }
+        // Add change listener for manual input to enforce min/type
+        modalQtyInput.addEventListener('change', () => {
+            let currentVal = parseInt(modalQtyInput.value, 10);
+            if (isNaN(currentVal) || currentVal < 1) {
+                modalQtyInput.value = 1; // Enforce minimum 1
+            }
+        });
+    }
 }
 
 /**
@@ -295,11 +327,13 @@ export async function showQuickAdjustmentModal(type) { // Exported this function
 async function handleModalAdjustment(type) {
     const selectedLocationId = getSelectedLocation();
     const itemSelect = document.getElementById('modalItemSelect');
-    const qtySelect = document.getElementById('modalQtySelect');
+    // MODIFIED: Get quantity from input field instead of select
+    const qtyInput = document.getElementById('modalQtyInput');
     const reasonInput = document.getElementById('modalReasonInput');
 
     const itemId = itemSelect.value;
-    const quantity = parseInt(qtySelect.value, 10);
+    // MODIFIED: Read quantity from input value
+    const quantity = parseInt(qtyInput.value, 10);
     const reason = type === 'waste' ? reasonInput.value.trim() : '';
 
     if (!itemId || isNaN(quantity) || quantity <= 0) {
