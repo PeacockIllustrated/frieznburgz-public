@@ -720,7 +720,7 @@ body {
     display: flex;
     flex-direction: column; /* Stack inputs vertically */
     gap: 15px;
-    width: 100%; /* Full width within modal body */
+    width: 100%;
     align-items: center;
 }
 
@@ -1182,6 +1182,7 @@ body {
     padding: 10px;
     border-radius: 8px;
     background-color: #fcfcfc; /* Slightly off-white background */
+    min-height: 100px; /* Added min-height to ensure the border is visible */
 }
 
 .modal-supplier-details-form .items-supplied-section > label {
@@ -1263,7 +1264,7 @@ body {
     text-align: center;
 }
 
-.modal-supplier-details-form .no-items-listed {
+.modal-supplier-details-form .no-items-message { /* Added class for consistency */
     text-align: center;
     font-style: italic;
     color: var(--dim-grey);
