@@ -10,6 +10,9 @@ import { createStockItemHtml } from './stock-template.js'; // Template for indiv
 const stockManagementContent = document.getElementById('stockManagementContent'); // Main content area for stock page
 
 let currentItemsData = []; // Store current loaded items for the selected location
+// NEW: Object to track pending changes for items, structured by categoryId
+// { categoryId: { itemId: newStockValue, ... }, ... }
+let pendingStockChanges = {};
 
 /**
  * Renders the Stock Management page content.
@@ -24,7 +27,17 @@ export async function renderStockManagementPage() {
 
     const locationDisplayName = selectedLocationId.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
-    // Clear previous content and set up base HTML structure for this page
+    // Check for unconfirmed changes before re-rendering the whole page
+    const hasUnconfirmedChanges = Object.keys(pendingStockChanges).some(catId => Object.keys(pendingStockChanges[catId]).length > 0);
+    if (hasUnconfirmedChanges) {
+        // Option: Warn user or try to restore changes.
+        // For simplicity, for now, we'll just log and proceed.
+        // A more robust solution might use a confirmation dialog here.
+        console.warn('Re-rendering Stock Management page with unconfirmed changes. Changes will be lost if not committed.');
+        // Clear pending changes as they will be re-fetched/overwritten from Firestore anyway
+        pendingStockChanges = {};
+    }
+
     stockManagementContent.innerHTML = `
         <h3 class="subsection-title">Inventory for ${locationDisplayName}</h3>
         <div id="stockItemsGrid" class="stock-items-grid">
@@ -32,13 +45,11 @@ export async function renderStockManagementPage() {
         </div>
     `;
 
-    // IMPORTANT: Get the grid container *after* it's been injected into the DOM
     const stockItemsGrid = document.getElementById('stockItemsGrid');
 
     try {
-        // Fetch items from the specific location's subcollection
         const itemsRef = db.collection('locations').doc(selectedLocationId).collection('items');
-        const querySnapshot = await itemsRef.orderBy('category').orderBy('name').get(); // Order by category then name
+        const querySnapshot = await itemsRef.orderBy('category').orderBy('name').get();
         currentItemsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         if (currentItemsData.length === 0) {
@@ -48,67 +59,67 @@ export async function renderStockManagementPage() {
 
         // Group items by category
         const categorizedItems = currentItemsData.reduce((acc, item) => {
-            if (!acc[item.category]) {
-                acc[item.category] = [];
+            const categoryKey = item.category || 'Uncategorized';
+            if (!acc[categoryKey]) {
+                acc[categoryKey] = [];
             }
-            acc[item.category].push(item);
+            acc[categoryKey].push(item);
             return acc;
         }, {});
 
-        // Render each category card and its items
-        for (const categoryName of Object.keys(categorizedItems).sort()) { // Sort categories alphabetically
+        for (const categoryName of Object.keys(categorizedItems).sort()) {
             const categoryItems = categorizedItems[categoryName];
+            const categoryId = categoryName.toLowerCase().replace(/[^a-z0-9]+/g, '_'); // Simple ID for category
 
-            // Create the category card HTML structure
             const categoryCardDiv = document.createElement('div');
             categoryCardDiv.classList.add('category-card');
-            // Using template literals to inject the HTML directly
+            categoryCardDiv.dataset.categoryId = categoryId; // Store category ID
+
             categoryCardDiv.innerHTML = `
                 <div class="category-header">
                     <h3 class="category-title">${categoryName}</h3>
                     <i class="fas fa-edit edit-icon" title="Edit category items (future)"></i>
-                    <i class="fas fa-chevron-down accordion-icon"></i> <!-- New accordion icon -->
+                    <i class="fas fa-chevron-down accordion-icon"></i>
                 </div>
-                <div class="item-list">
+                <div class="item-list" id="itemList-${categoryId}">
                     <!-- Items will be appended here -->
                 </div>
+                <div class="category-footer">
+                    <button class="auth-button confirm-changes-btn" id="confirm-${categoryId}" disabled>Confirm Changes</button>
+                </div>
             `;
-            stockItemsGrid.appendChild(categoryCardDiv); // Append card to the grid
+            stockItemsGrid.appendChild(categoryCardDiv);
 
-            // IMPORTANT: Get reference to the item list container *inside* the newly created categoryCardDiv
             const itemListContainer = categoryCardDiv.querySelector('.item-list');
 
             categoryItems.forEach(item => {
                 const itemDiv = document.createElement('div');
                 itemDiv.classList.add('stock-item');
-                itemDiv.dataset.itemId = item.id; // Store ID for updates
-                itemDiv.innerHTML = createStockItemHtml(item); // Populate with HTML from template
-
+                itemDiv.dataset.itemId = item.id;
+                itemDiv.dataset.categoryId = categoryId; // Store category ID on item for easier lookup
+                // Pass current stock from `currentItemsData` to template directly
+                itemDiv.innerHTML = createStockItemHtml(item);
                 itemListContainer.appendChild(itemDiv);
 
-                // Attach event listeners to the newly created elements
                 const decrementBtn = itemDiv.querySelector('.decrement-btn');
                 const incrementBtn = itemDiv.querySelector('.increment-btn');
                 const stockInput = itemDiv.querySelector('.stock-input');
                 const reorderBtn = itemDiv.querySelector('.reorder-btn');
 
-                // Ensure elements exist before adding listeners (defensive coding)
-                if (decrementBtn) decrementBtn.addEventListener('click', () => updateStock(item.id, -1, stockInput));
-                if (incrementBtn) incrementBtn.addEventListener('click', () => updateStock(item.id, 1, stockInput));
-                if (stockInput) stockInput.addEventListener('change', () => updateStock(item.id, 0, stockInput));
+                if (decrementBtn) decrementBtn.addEventListener('click', () => updateLocalStock(item.id, categoryId, -1, stockInput, itemDiv));
+                if (incrementBtn) incrementBtn.addEventListener('click', () => updateLocalStock(item.id, categoryId, 1, stockInput, itemDiv));
+                if (stockInput) stockInput.addEventListener('change', () => updateLocalStock(item.id, categoryId, 0, stockInput, itemDiv));
                 if (reorderBtn) reorderBtn.addEventListener('click', () => messageSupplier(item));
             });
 
-            // Initialize the accordion state (all closed by default on mobile)
-            // categoryCardDiv.classList.add('collapsed'); // All start collapsed on mobile
-            // No, the initial state should be that the first one is open, the others closed
-            // Or all start closed? Let's make them all start collapsed for cleanliness.
-            // But we'll manage this in CSS for conditional display.
+            // Attach listener for the new Confirm Changes button
+            const confirmBtn = document.getElementById(`confirm-${categoryId}`);
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => handleConfirmCategoryChanges(categoryId, confirmBtn));
+            }
         }
 
-        // Initialize accordion behavior after all category cards are rendered
         initializeStockAccordion();
-
         console.log(`Stock items loaded and rendered for ${selectedLocationId}.`);
 
     } catch (error) {
@@ -126,7 +137,6 @@ function initializeStockAccordion() {
         header.addEventListener('click', () => {
             const categoryCard = header.closest('.category-card');
             if (categoryCard) {
-                // Toggle 'active' class on the card
                 categoryCard.classList.toggle('active');
             }
         });
@@ -134,69 +144,129 @@ function initializeStockAccordion() {
     console.log('Stock accordion initialized for category headers.');
 }
 
-
 /**
  * Updates the stock level for a specific item in Firestore.
  * This function is now multi-location aware.
  * @param {string} itemId - The ID of the item document.
  * @param {number} change - The amount to change stock by (+1, -1) or 0 for manual input.
  * @param {HTMLInputElement} inputElement - The input field element.
+ * @deprecated - Replaced by updateLocalStock for local changes before batch commit.
  */
-async function updateStock(itemId, change, inputElement) {
-    const selectedLocationId = getSelectedLocation();
-    if (!selectedLocationId) {
-        alert('No location selected. Cannot update stock.');
-        return;
-    }
+// async function updateStock(itemId, change, inputElement) { /* ... old function ... */ }
 
-    const itemDocRef = db.collection('locations').doc(selectedLocationId).collection('items').doc(itemId);
+
+/**
+ * Updates the stock level for a specific item locally and tracks it for batch commit.
+ * @param {string} itemId - The ID of the item document.
+ * @param {string} categoryId - The ID of the category this item belongs to.
+ * @param {number} change - The amount to change stock by (+1, -1) or 0 for manual input.
+ * @param {HTMLInputElement} inputElement - The input field element.
+ * @param {HTMLElement} itemDiv - The parent div for the item, to apply visual feedback.
+ */
+async function updateLocalStock(itemId, categoryId, change, inputElement, itemDiv) {
     let newStockValue;
 
     if (change === 0) { // Manual input change (user typed a value)
         newStockValue = parseInt(inputElement.value, 10);
         if (isNaN(newStockValue) || newStockValue < 0) {
             alert('Please enter a valid stock quantity (non-negative number).');
-            // Re-render to revert invalid input to last known good state from Firestore
-            await renderStockManagementPage();
+            // Revert input to last known valid state (from currentItemsData or pending changes)
+            const currentItem = currentItemsData.find(item => item.id === itemId);
+            inputElement.value = pendingStockChanges[categoryId]?.[itemId] || currentItem?.currentStock || 0;
             return;
         }
     } else { // Increment/Decrement button click
-        // Fetch the current stock from Firestore to ensure the calculation is based on the latest data
-        const doc = await itemDocRef.get();
-        if (!doc.exists) {
-            console.error("Item document not found for stock update:", itemId);
-            alert("Could not find item to update. Please refresh the page.");
-            return;
+        let currentLocalStock = parseInt(inputElement.value, 10);
+        if (isNaN(currentLocalStock)) { // If input is empty, start from the current Firestore value
+            const currentItem = currentItemsData.find(item => item.id === itemId);
+            currentLocalStock = currentItem ? currentItem.currentStock : 0;
         }
-        let currentFirestoreStock = doc.data().currentStock;
-
-        // Ensure currentFirestoreStock is a number, default to 0 if not
-        if (typeof currentFirestoreStock !== 'number') {
-            console.warn(`Firestore stock for ${itemId} is not a number: ${currentFirestoreStock}. Defaulting to 0 for calculation.`);
-            currentFirestoreStock = 0;
-        }
-
-        newStockValue = currentFirestoreStock + change;
+        newStockValue = currentLocalStock + change;
         if (newStockValue < 0) newStockValue = 0; // Prevent negative stock
     }
 
+    inputElement.value = newStockValue; // Update UI immediately
+
+    // Initialize category entry if it doesn't exist
+    if (!pendingStockChanges[categoryId]) {
+        pendingStockChanges[categoryId] = {};
+    }
+    pendingStockChanges[categoryId][itemId] = newStockValue;
+
+    // Add visual feedback to the item
+    itemDiv.classList.add('has-pending-changes');
+
+    // Enable the corresponding Confirm Changes button
+    const confirmBtn = document.getElementById(`confirm-${categoryId}`);
+    if (confirmBtn) {
+        confirmBtn.disabled = false;
+    }
+    console.log(`Local update: Item ${itemId} in category ${categoryId} set to ${newStockValue}. Pending changes:`, pendingStockChanges);
+}
+
+/**
+ * Handles confirming changes for a specific category by batch updating Firestore.
+ * @param {string} categoryId - The ID of the category whose changes are to be confirmed.
+ * @param {HTMLButtonElement} confirmBtn - The confirm button element.
+ */
+async function handleConfirmCategoryChanges(categoryId, confirmBtn) {
+    const selectedLocationId = getSelectedLocation();
+    if (!selectedLocationId) {
+        alert('No location selected. Cannot save stock changes.');
+        return;
+    }
+
+    const categoryChanges = pendingStockChanges[categoryId];
+    if (!categoryChanges || Object.keys(categoryChanges).length === 0) {
+        console.log('No pending changes for this category.');
+        confirmBtn.disabled = true; // Ensure disabled if no changes
+        return;
+    }
+
+    confirmBtn.textContent = 'Saving...';
+    confirmBtn.disabled = true; // Disable during saving
+    confirmBtn.classList.add('saving'); // Add saving visual feedback
+
+    const batch = db.batch();
+    let numChanges = 0;
+
+    for (const itemId in categoryChanges) {
+        if (Object.prototype.hasOwnProperty.call(categoryChanges, itemId)) {
+            const newStockValue = categoryChanges[itemId];
+            const itemDocRef = db.collection('locations').doc(selectedLocationId).collection('items').doc(itemId);
+            batch.update(itemDocRef, { currentStock: newStockValue });
+            numChanges++;
+        }
+    }
+
     try {
-        await itemDocRef.update({ currentStock: newStockValue });
-        console.log(`Firestore updated: Stock for ${itemId} at ${selectedLocationId} set to ${newStockValue}`);
+        await batch.commit();
+        console.log(`Successfully committed ${numChanges} changes for category ${categoryId}.`);
 
-        // Immediately update the specific input field to reflect the change visually
-        inputElement.value = newStockValue;
+        // Clear confirmed changes
+        delete pendingStockChanges[categoryId];
 
-        // Re-render the entire stock management page to update status indicators and ensure consistency
+        // Remove visual feedback from affected items by re-rendering the whole page
+        // This ensures currentItemsData is perfectly in sync with Firestore
         await renderStockManagementPage();
-        console.log(`Stock for ${itemId} at ${selectedLocationId} updated and page re-rendered.`);
+        console.log('Stock management page re-rendered after category commit.');
+
+        // The re-render will reset button states, so no need to explicitly reset text/class here
+
     } catch (error) {
-        console.error('Error updating stock:', error);
-        alert('Failed to update stock. Please check Firebase permissions or network.');
-        // On error, re-render to revert to the correct state from Firestore
+        console.error(`Error committing changes for category ${categoryId}:`, error);
+        alert(`Failed to save changes for ${categoryId}. Please try again: ${error.message}`);
+
+        confirmBtn.textContent = 'Confirm Changes';
+        confirmBtn.disabled = false; // Re-enable on error
+        confirmBtn.classList.remove('saving'); // Remove saving visual feedback
+
+        // Restore visual feedback for items that failed
+        // For simplicity, we'll just re-render on error, which will show the old state if the save failed
         await renderStockManagementPage();
     }
 }
+
 
 /**
  * Generates an email to the supplier for reordering a specific item.
