@@ -3,7 +3,7 @@
 
 import { db } from './firebase.js';
 import { auth } from './firebase.js'; // Needed for getting current user email for waste logging
-import { getSelectedLocation } from './config.js';
+import { getSelectedLocation, locations } from './config.js'; // Import locations for global item fetching
 import { createStockItemHtml } from './stock-template.js'; // Template for individual stock items
 
 // --- DOM Elements ---
@@ -222,4 +222,37 @@ function messageSupplier(item) {
  */
 export function getCurrentStockItems() {
     return currentItemsData;
+}
+
+/**
+ * Fetches all unique stock items from all locations.
+ * This is useful for global lists, e.g., for suppliers.
+ * @returns {Promise<Array<Object>>} A promise that resolves to an array of unique item objects.
+ */
+export async function getAllUniqueStockItems() {
+    const uniqueItemsMap = new Map(); // Use a Map to store unique items by their ID
+    const allLocations = locations; // Get locations from config.js
+
+    try {
+        for (const location of allLocations) {
+            const itemsRef = db.collection('locations').doc(location.id).collection('items');
+            const querySnapshot = await itemsRef.get();
+            querySnapshot.forEach(doc => {
+                const item = { id: doc.id, ...doc.data() };
+                // Only add if not already present, or if new data is more complete
+                if (!uniqueItemsMap.has(item.id)) {
+                    uniqueItemsMap.set(item.id, item);
+                }
+            });
+        }
+        console.log(`Fetched ${uniqueItemsMap.size} unique items across all locations.`);
+        // Convert Map values back to an array
+        const uniqueItemsArray = Array.from(uniqueItemsMap.values());
+        // Optionally sort them for consistent display
+        return uniqueItemsArray.sort((a, b) => a.name.localeCompare(b.name));
+
+    } catch (error) {
+        console.error('Error fetching all unique stock items:', error);
+        return []; // Return empty array on error
+    }
 }
