@@ -5,82 +5,25 @@ import { db } from './firebase.js'; // Firebase Firestore instance
 import { getSelectedLocation } from './config.js'; // To ensure a location is selected (though suppliers might be global)
 import { createSupplierCardHtml, createSupplierDetailsModalBodyHtml } from './suppliers-template.js'; // Template for supplier cards and modal body
 
-// --- DOM Elements ---
-const suppliersPage = document.getElementById('suppliersPage');
+// --- Universal Modal Elements ---
+// (Assume these are managed by dashboard.js and exposed via window.mainApp)
+// No direct DOM element retrieval here, instead use window.mainApp.openModal/closeModal
+// and modalMessage for feedback.
 
-// Universal Modal Elements (assume it's managed by dashboard.js, but suppliers.js will use it)
-const universalModal = document.getElementById('universalModal');
-const modalTitle = document.getElementById('modalTitle');
-const modalBody = document.getElementById('modalBody');
-const modalMessage = document.getElementById('modalMessage');
-const modalFooter = document.getElementById('modalFooter');
-
-// Mock data for suppliers (will eventually come from Firestore)
-const mockSuppliers = [
-    {
-        id: 'meat_co_ltd',
-        name: 'F&B Meat & Poultry Ltd',
-        contactPerson: 'Sarah Jenkins',
-        email: 'sales@fnbmeat.co.uk',
-        phone: '+44 191 234 5678',
-        address: '123 Slaughter Lane, Newcastle, NE1 1AA',
-        itemsSupplied: ['Beef Patties', 'Plain Chicken Filletz', 'Chicken Breast', 'Bacon Strips'],
-        notes: 'Primary supplier for all meat and poultry products. Deliveries Mon/Wed/Fri.'
-    },
-    {
-        id: 'veg_supply_uk',
-        name: 'Fresh Veg UK',
-        contactPerson: 'Mohammed Ali',
-        email: 'orders@freshveguk.co.uk',
-        phone: '+44 7712 345678',
-        address: 'Unit 5, Green Market, Durham, DH1 1BB',
-        itemsSupplied: ['Shredded Lettuce', 'Diced Onions', 'Fries Potatoes'],
-        notes: 'Local produce supplier. Offers organic options. Deliveries Tue/Thu.'
-    },
-    {
-        id: 'dairy_direct',
-        name: 'Dairy Direct Group',
-        contactPerson: 'Emily White',
-        email: 'info@dairydirect.com',
-        phone: '+44 20 7946 0000',
-        address: 'Dairy House, London, SW1A 0AA',
-        itemsSupplied: ['American Cheese', 'Halloumi Cheese', 'Mozzarella Patties'],
-        notes: 'Cheese and dairy products. Minimum order quantity applies.'
-    },
-    {
-        id: 'sauce_solutions',
-        name: 'Sauce & Condiment Solutions',
-        contactPerson: 'David Lee',
-        email: 'support@saucesolutions.co.uk',
-        phone: '+44 161 789 0123',
-        address: 'The Condiment Hub, Manchester, M1 2BB',
-        itemsSupplied: ['Classic Sauce', 'Heinz Ketchup', 'Special Sauce Base', 'Honey Chilli Glaze'],
-        notes: 'Specializes in custom sauces. Lead time of 3-5 days for bespoke orders.'
-    },
-    {
-        id: 'bakery_bakes',
-        name: 'Daily Bakes Bakery',
-        contactPerson: 'Chris Green',
-        email: 'contact@dailybakes.co.uk',
-        phone: '+44 113 555 1234',
-        address: 'Bakers Lane, Leeds, LS1 3AB',
-        itemsSupplied: ['Burger Buns'],
-        notes: 'Freshly baked buns daily. Orders must be placed 24 hours in advance.'
-    }
-];
-
+// Removed mock data, now using Firebase
 
 /**
  * Renders the Suppliers Management page.
  * Fetches and displays supplier information.
  */
 export async function renderSuppliersPage() {
-    const selectedLocationId = getSelectedLocation(); // Still good to check for location context
+    const suppliersPage = document.getElementById('suppliersPage'); // Get it here on render
+
+    const selectedLocationId = getSelectedLocation();
     if (!selectedLocationId) {
-        // While suppliers might be global, we still assume a location context for the dashboard
         suppliersPage.innerHTML = `
             <h2 class="page-title">Suppliers</h2>
-            <p>Please select a location first to manage suppliers, or manage global suppliers (future feature).</p>
+            <p>Please select a location first to manage suppliers.</p>
         `;
         return;
     }
@@ -106,44 +49,51 @@ export async function renderSuppliersPage() {
 }
 
 /**
- * Loads and displays supplier cards.
+ * Loads and displays supplier cards from Firestore.
  * @param {HTMLElement} container - The DOM element to append supplier cards to.
  */
 async function loadSuppliers(container) {
     container.innerHTML = ''; // Clear loading message
 
-    // In a real app, this would fetch from Firestore:
-    // const suppliersRef = db.collection('suppliers'); // Or db.collection('locations').doc(selectedLocationId).collection('suppliers');
-    // const querySnapshot = await suppliersRef.get();
-    // const suppliers = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    try {
+        // Fetch suppliers from a global 'suppliers' collection
+        const suppliersRef = db.collection('suppliers');
+        const querySnapshot = await suppliersRef.orderBy('name').get();
+        const suppliers = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    const suppliers = mockSuppliers; // Using mock data for now
+        if (suppliers.length === 0) {
+            container.innerHTML = '<p>No suppliers found. Click "Add New Supplier" to get started.</p>';
+            return;
+        }
 
-    if (suppliers.length === 0) {
-        container.innerHTML = '<p>No suppliers found. Click "Add New Supplier" to get started.</p>';
-        return;
-    }
-
-    suppliers.forEach(supplier => {
-        container.insertAdjacentHTML('beforeend', createSupplierCardHtml(supplier));
-    });
-
-    // Attach event listeners to "View Details" buttons
-    container.querySelectorAll('.view-details-btn').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const supplierCard = event.target.closest('.supplier-card');
-            const supplierId = supplierCard.dataset.supplierId;
-            const supplierData = suppliers.find(s => s.id === supplierId);
-            if (supplierData) {
-                openSupplierModal(supplierData);
-            } else {
-                console.error('Supplier data not found for ID:', supplierId);
-                alert('Could not retrieve supplier details.');
-            }
+        suppliers.forEach(supplier => {
+            container.insertAdjacentHTML('beforeend', createSupplierCardHtml(supplier));
         });
-    });
 
-    console.log(`Loaded ${suppliers.length} suppliers.`);
+        // Attach event listeners to "View Details" buttons
+        container.querySelectorAll('.view-details-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const supplierCard = event.target.closest('.supplier-card');
+                const supplierId = supplierCard.dataset.supplierId;
+                const supplierData = suppliers.find(s => s.id === supplierId);
+                if (supplierData) {
+                    openSupplierModal(supplierData);
+                } else {
+                    console.error('Supplier data not found for ID:', supplierId);
+                    // Use modal message for user feedback
+                    if (window.mainApp && typeof window.mainApp.openModal === 'function') {
+                        window.mainApp.openModal('Error', '<p>Could not retrieve supplier details.</p>', '', 'red');
+                    }
+                }
+            });
+        });
+
+        console.log(`Loaded ${suppliers.length} suppliers from Firestore.`);
+
+    } catch (error) {
+        console.error('Error loading suppliers from Firestore:', error);
+        container.innerHTML = `<p style="color:red;">Error loading suppliers: ${error.message}. Check console and Firebase permissions.</p>`;
+    }
 }
 
 /**
@@ -151,15 +101,22 @@ async function loadSuppliers(container) {
  * @param {Object|null} supplierData - The supplier object if editing, or null for adding a new one.
  */
 function openSupplierModal(supplierData = null) {
-    const isNew = !supplierData;
+    const isNew = !supplierData || !supplierData.id; // Corrected check for new supplier
     const title = isNew ? 'Add New Supplier' : `Details: ${supplierData.name}`;
     const bodyHtml = createSupplierDetailsModalBodyHtml(supplierData);
-    const footerHtml = `
-        ${isNew ? `<button id="saveSupplierBtn" class="auth-button">Add Supplier</button>` : `<button id="editSupplierBtn" class="auth-button">Edit Details</button>`}
-        <button id="cancelSupplierBtn" class="auth-button secondary-btn">Cancel</button>
-    `;
+    let footerHtml = '';
 
-    // Helper from dashboard.js to open the modal
+    if (isNew) {
+        footerHtml = `<button id="saveSupplierBtn" class="auth-button">Add Supplier</button>`;
+    } else {
+        footerHtml = `<button id="editSupplierBtn" class="auth-button">Save Changes</button>`;
+        // Consider a delete button for existing suppliers
+        footerHtml += `<button id="deleteSupplierBtn" class="auth-button secondary-btn" style="background-color: #dc3545; border-color: #dc3545;">Delete Supplier</button>`;
+    }
+    footerHtml += `<button id="cancelSupplierBtn" class="auth-button secondary-btn">Cancel</button>`;
+
+
+    // Use modal functions exposed by main.js
     if (window.mainApp && typeof window.mainApp.openModal === 'function') {
         window.mainApp.openModal(title, bodyHtml, footerHtml);
     } else {
@@ -174,17 +131,22 @@ function openSupplierModal(supplierData = null) {
     const saveOrEditBtn = document.getElementById(isNew ? 'saveSupplierBtn' : 'editSupplierBtn');
     if (saveOrEditBtn) {
         saveOrEditBtn.addEventListener('click', () => handleSaveOrEditSupplier(supplierData));
-        if (!isNew) { // If editing existing, initially disable edit button until changes are made (optional)
-            // For now, we'll just allow direct editing after clicking "Edit Details"
-        }
+    }
+
+    const deleteBtn = document.getElementById('deleteSupplierBtn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => handleDeleteSupplier(supplierData.id, supplierData.name));
     }
 }
 
 /**
- * Handles saving or editing a supplier via the modal.
+ * Handles saving or editing a supplier via the modal, connecting to Firestore.
  * @param {Object|null} originalSupplierData - The original supplier object if editing, null if adding.
  */
 async function handleSaveOrEditSupplier(originalSupplierData) {
+    const modalMessage = document.getElementById('modalMessage'); // Get modal message element
+    modalMessage.style.display = 'none'; // Hide previous message
+
     // Get values from modal inputs
     const supplierId = originalSupplierData ? originalSupplierData.id : null;
     const name = document.getElementById('supplierName').value.trim();
@@ -207,47 +169,73 @@ async function handleSaveOrEditSupplier(originalSupplierData) {
         phone,
         address,
         notes,
-        // For new suppliers, itemsSupplied would typically be empty or linked in stock
-        itemsSupplied: originalSupplierData ? originalSupplierData.itemsSupplied : []
+        // When adding, itemsSupplied is an empty array; when updating, retain existing itemsSupplied
+        itemsSupplied: originalSupplierData ? originalSupplierData.itemsSupplied || [] : []
     };
 
-    modalMessage.textContent = 'Saving supplier...';
+    modalMessage.textContent = 'Processing...';
     modalMessage.style.display = 'block';
 
     try {
-        // In a real Firebase app:
-        // if (supplierId) {
-        //     await db.collection('suppliers').doc(supplierId).update(supplierToSave);
-        //     console.log(`Supplier ${supplierId} updated.`);
-        // } else {
-        //     await db.collection('suppliers').add(supplierToSave); // Firestore will generate ID
-        //     console.log('New supplier added.');
-        // }
-
-        // For mock data, simulate save
-        if (originalSupplierData) {
-            Object.assign(originalSupplierData, supplierToSave); // Update in mock array
-            console.log(`Mock supplier ${supplierId} updated.`);
+        if (supplierId) {
+            // Update existing supplier
+            await db.collection('suppliers').doc(supplierId).update(supplierToSave);
+            console.log(`Supplier ${supplierId} updated in Firestore.`);
         } else {
-            // Assign a simple mock ID for the new entry for display purposes
-            const newMockId = `mock_supplier_${mockSuppliers.length + 1}`;
-            mockSuppliers.push({ id: newMockId, ...supplierToSave });
-            console.log('New mock supplier added.');
+            // Add new supplier
+            await db.collection('suppliers').add(supplierToSave); // Firestore will generate ID
+            console.log('New supplier added to Firestore.');
         }
-
 
         modalMessage.textContent = 'Supplier saved successfully!';
         setTimeout(() => {
-            closeModal(); // Call dashboard.js's closeModal helper
+            closeModal(); // Call main.js's exposed closeModal helper
             renderSuppliersPage(); // Re-render the suppliers page to show updates
         }, 800);
 
     } catch (error) {
-        console.error('Error saving supplier:', error);
+        console.error('Error saving supplier to Firestore:', error);
         modalMessage.textContent = `Error saving supplier: ${error.message}`;
         modalMessage.style.display = 'block';
     }
 }
+
+/**
+ * Handles deleting a supplier from Firestore.
+ * @param {string} supplierId - The ID of the supplier to delete.
+ * @param {string} supplierName - The name of the supplier for confirmation message.
+ */
+async function handleDeleteSupplier(supplierId, supplierName) {
+    const modalMessage = document.getElementById('modalMessage');
+    modalMessage.style.display = 'none';
+
+    const confirmDelete = confirm(`Are you sure you want to delete supplier "${supplierName}"? This action cannot be undone.`);
+    if (!confirmDelete) {
+        modalMessage.textContent = 'Deletion cancelled.';
+        modalMessage.style.display = 'block';
+        return;
+    }
+
+    modalMessage.textContent = 'Deleting supplier...';
+    modalMessage.style.display = 'block';
+
+    try {
+        await db.collection('suppliers').doc(supplierId).delete();
+        console.log(`Supplier ${supplierId} deleted from Firestore.`);
+
+        modalMessage.textContent = 'Supplier deleted successfully!';
+        setTimeout(() => {
+            closeModal();
+            renderSuppliersPage(); // Re-render the suppliers page after deletion
+        }, 800);
+
+    } catch (error) {
+        console.error('Error deleting supplier from Firestore:', error);
+        modalMessage.textContent = `Error deleting supplier: ${error.message}`;
+        modalMessage.style.display = 'block';
+    }
+}
+
 
 // Re-expose closeModal from mainApp/dashboard.js for use within this module
 // This is a workaround since modal functions are centralized in dashboard.js
