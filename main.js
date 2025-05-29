@@ -20,7 +20,7 @@ import { showPage, hideAllPages, initSidebarNav, showDashboardContainer, hideDas
 // Import specific page rendering functions
 import { renderStockManagementPage } from './stock.js';
 import { renderWastageLogPage } from './wastage.js';
-import { renderDashboardOverviewPage, showQuickAdjustmentModal } from './dashboard.js'; // NEW IMPORT + showQuickAdjustmentModal
+import { renderDashboardOverviewPage, showQuickAdjustmentModal, openModal, closeModal } from './dashboard.js'; // NEW IMPORT + showQuickAdjustmentModal, openModal, closeModal
 import { renderSuppliersPage } from './suppliers.js'; // NEW IMPORT for Suppliers Page
 
 
@@ -189,49 +189,8 @@ window.mainApp = {
     showDashboard: showDashboard,
     handleNavigationClick: handleNavigationClick, // EXPOSE FOR QUICK ACTIONS
     showQuickAdjustmentModal: showQuickAdjustmentModal, // EXPOSE FOR WASTAGE PAGE
-    // Expose modal control functions from dashboard.js for other modules (like suppliers.js) to use
-    openModal: (title, bodyHtml, footerHtml, message) => {
-        // This is a direct call to the openModal function which is not exported from dashboard.js.
-        // It needs to be explicitly exposed or passed through.
-        // For simplicity, let's assume openModal and closeModal in dashboard.js are made globally accessible
-        // via window.mainApp.openModal and window.mainApp.closeModal, as done previously for showQuickAdjustmentModal.
-        // A better approach would be to make them truly exported from dashboard.js and import them here.
-        // Given the current structure, let's add them to window.mainApp in dashboard.js directly.
-        // NO, the current setup of universal modal within dashboard.js means dashboard.js is the only one
-        // that directly manipulates it. Other modules should call a wrapper in main.js IF openModal
-        // wasn't exported from dashboard.js. But openModal/closeModal in dashboard.js are currently not exported.
-        // Let's modify dashboard.js to export openModal and closeModal and then import them here.
-        // Or, for speed, I can just create simple wrappers here that call the non-exported functions
-        // by directly referencing `universalModal` elements, but that breaks module encapsulation.
-        // The *most* proper way is to export openModal/closeModal from dashboard.js and import them here.
-        // Then, suppliers.js imports them from main.js or directly from dashboard.js.
-
-        // Re-evaluating: dashboard.js already has openModal/closeModal as private helper functions.
-        // The intention was that showQuickAdjustmentModal handles *opening* the modal, and other modules
-        // like wastage.js simply call `showQuickAdjustmentModal('waste')`.
-        // For suppliers, we need a generic way to open it.
-        // It's cleaner to make `openModal` and `closeModal` in `dashboard.js` *exported* functions
-        // and then import them into `main.js` and re-expose them, or have suppliers.js import them directly.
-
-        // Let's modify dashboard.js first to export openModal and closeModal.
-        // This will be done in the next output. For now, I'll assume they will be exposed via window.mainApp.
-        // This is a common pattern for "facade" functions.
-
-        // Assuming openModal and closeModal from dashboard.js are now directly callable via mainApp:
-        // (This will be fixed in the dashboard.js file, but for now, this indicates the intended usage)
-        if (typeof window.mainApp.dashboardOpenModal === 'function') { // Using a distinct name to avoid conflict
-            window.mainApp.dashboardOpenModal(title, bodyHtml, footerHtml, message);
-        } else {
-            console.error("Dashboard modal functions not exposed correctly!");
-        }
-    },
-    closeModal: () => {
-        if (typeof window.mainApp.dashboardCloseModal === 'function') {
-            window.mainApp.dashboardCloseModal();
-        } else {
-            console.error("Dashboard modal functions not exposed correctly!");
-        }
-    },
+    openModal: openModal, // EXPOSE openModal from dashboard.js
+    closeModal: closeModal, // EXPOSE closeModal from dashboard.js
     // Also expose getSelectedLocation and getLocations from config for external scripts (like import-data.js)
     getSelectedLocation: getSelectedLocation,
     getLocations: () => locations // Expose the full locations array
