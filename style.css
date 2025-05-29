@@ -555,10 +555,10 @@ body {
 /* NEW styles for stacking critical item details */
 .critical-item-details {
     display: flex;
-    flex-direction: column; /* Stack vertically */
-    flex-grow: 1; /* Allow to take available space */
-    align-items: flex-start; /* Align text to the left within its container */
-    overflow: hidden; /* Hide overflow of text */
+    flex-direction: column;
+    flex-grow: 1;
+    align-items: flex-start;
+    overflow: hidden;
 }
 
 .critical-item-name {
@@ -569,8 +569,8 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 100%; /* Ensure it fills its container for ellipsis */
-    margin-bottom: 2px; /* Small space between name and reorder info */
+    width: 100%;
+    margin-bottom: 2px;
 }
 
 .critical-reorder-info {
@@ -580,10 +580,10 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 100%; /* Ensure it fills its container for ellipsis */
+    width: 100%;
 }
 
-/* Recent Wastage Card specific styles */
+/* Recent Wastage Log Card specific styles */
 .recent-wastage-card .waste-log-list {
     list-style: none;
     padding: 0;
@@ -896,12 +896,24 @@ body {
     padding: 10px 0;
     border-bottom: 1px dashed var(--salmon);
     text-align: center;
+    /* NEW: Visual feedback for pending changes */
+    transition: border-color 0.2s ease;
 }
+
+.stock-item.has-pending-changes {
+    border: 1px dashed var(--red); /* Red border for unconfirmed changes */
+    padding: 9px; /* Adjust padding to keep size consistent with border */
+}
+
 
 /* Remove border from the last item in a list */
 .stock-item:last-child {
     border-bottom: none;
 }
+.stock-item.has-pending-changes:last-child {
+    border-bottom: 1px dashed var(--red); /* Keep border on last item if it has changes */
+}
+
 
 /* Name of the stock item (Beef Patties, etc.) */
 .item-name {
@@ -1007,6 +1019,38 @@ body {
 .add-stock-button:hover {
     background-color: var(--khaki);
     color: var(--red);
+}
+
+/* NEW: Category Footer for Confirm Button */
+.category-footer {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px dashed var(--salmon);
+    text-align: center;
+}
+
+.category-footer .confirm-changes-btn {
+    width: 80%; /* Adjust width for consistency */
+    padding: 10px 20px;
+    font-size: 16px;
+    /* Styles for disabled state */
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: var(--red); /* Ensure disabled button uses red theme */
+    color: var(--yellow);
+    border-color: var(--yellow);
+}
+
+.category-footer .confirm-changes-btn:not(:disabled):hover {
+    background-color: var(--yellow);
+    color: var(--red);
+    border-color: var(--red);
+}
+
+.category-footer .confirm-changes-btn.saving {
+    background-color: #5cb85c; /* Greenish for saving state */
+    cursor: progress;
+    opacity: 0.8;
 }
 
 /* --- Wastage Log Specific Styles --- */
@@ -1366,7 +1410,7 @@ body {
     .dashboard-content {
         grid-column: 1;
         grid-row: 3;
-        padding: 20px; /* Adjust padding for mobile */
+        padding: 20px;
     }
 
     /* Adjust font sizes for smaller screens */
