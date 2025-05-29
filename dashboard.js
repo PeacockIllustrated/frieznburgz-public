@@ -7,7 +7,6 @@ import { getSelectedLocation, getLocationDisplayName } from './config.js';
 import { createDashboardCardHtml, createCriticalItemHtml, createRecentWasteItemHtml } from './dashboard-template.js';
 import { getCurrentStockItems } from './stock.js'; // To get the list of items for the modal dropdown
 import { renderStockManagementPage } from './stock.js'; // To re-render stock page after adjustment
-import { renderDashboardOverviewPage, showQuickAdjustmentModal, openModal, closeModal } from './dashboard.js';
 
 // --- DOM Elements ---
 const dashboardPage = document.getElementById('dashboardPage');
@@ -28,7 +27,9 @@ universalModal.addEventListener('click', (event) => {
     }
 });
 
-// Helper to open modal (NEW)
+/**
+ * Helper to open modal (NEW) - Now exported
+ */
 export function openModal(title, bodyHtml, footerHtml = '', message = '') {
     modalTitle.textContent = title;
     modalBody.innerHTML = bodyHtml;
@@ -38,7 +39,9 @@ export function openModal(title, bodyHtml, footerHtml = '', message = '') {
     modalMessage.style.display = 'none'; // Hide message initially
 }
 
-// Helper to close modal (NEW)
+/**
+ * Helper to close modal (NEW) - Now exported
+ */
 export function closeModal() {
     universalModal.style.display = 'none';
     modalTitle.textContent = '';
