@@ -218,7 +218,7 @@ export async function renderDashboardOverviewPage() {
  * Shows the quick stock adjustment modal.
  * @param {'add'|'waste'} type - The type of adjustment ('add' or 'waste').
  */
-async function showQuickAdjustmentModal(type) {
+export async function showQuickAdjustmentModal(type) { // Exported this function
     const selectedLocationId = getSelectedLocation();
     if (!selectedLocationId) {
         alert('Please select a location first.');
@@ -228,13 +228,32 @@ async function showQuickAdjustmentModal(type) {
     const title = type === 'add' ? 'Quick Add Stock' : 'Quick Log Waste';
     const items = getCurrentStockItems(); // Get current items from stock.js
 
-    let itemOptions = '<option value="" disabled selected>Select Item</option>';
+    let itemOptions = '';
     if (items.length === 0) {
         itemOptions = '<option value="" disabled selected>No items found</option>';
     } else {
-        const sortedItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
-        sortedItems.forEach(item => {
-            itemOptions += `<option value="${item.id}">${item.name}</option>`;
+        // Group items by category and sort them
+        const categorizedItems = items.reduce((acc, item) => {
+            const category = item.category || 'Uncategorized';
+            if (!acc[category]) {
+                acc[category] = [];
+            }
+            acc[category].push(item);
+            return acc;
+        }, {});
+
+        // Sort categories alphabetically
+        const sortedCategories = Object.keys(categorizedItems).sort();
+
+        // Build item options with optgroups
+        itemOptions += '<option value="" disabled selected>Select Item</option>';
+        sortedCategories.forEach(category => {
+            itemOptions += `<optgroup label="${category}">`;
+            // Sort items within each category alphabetically
+            categorizedItems[category].sort((a, b) => a.name.localeCompare(b.name)).forEach(item => {
+                itemOptions += `<option value="${item.id}">${item.name} (${item.unit || 'units'})</option>`;
+            });
+            itemOptions += `</optgroup>`;
         });
     }
 
