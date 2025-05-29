@@ -763,6 +763,43 @@ body {
 }
 
 /* Specific styling for modal inputs to match other auth-inputs */
+
+/* Custom Tooltip Styles (for supplier icons) */
+.custom-tooltip {
+    position: absolute;
+    background-color: var(--dim-grey); /* Dark background */
+    color: var(--yellow); /* Yellow text */
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 14px;
+    white-space: nowrap; /* Prevent text wrapping */
+    z-index: 1001; /* Higher than modal overlay */
+    pointer-events: none; /* Crucial: allows mouse events to pass through to elements below */
+    display: none; /* Hidden by default */
+    opacity: 0; /* Start invisible for fade-in */
+    /* Position above and horizontally centered relative to its calculated JS position */
+    transform: translate(-50%, -100%); /* Centers horizontally, moves up by its own height */
+    transition: opacity 0.15s ease-out; /* Smooth fade-in/out */
+}
+
+/* Make tooltip visible with transition */
+.custom-tooltip.visible {
+    opacity: 1;
+}
+
+/* Optional: Add a small arrow to the tooltip */
+.custom-tooltip::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -5px; /* Adjust based on border-radius and desired gap from tooltip box */
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--dim-grey) transparent transparent transparent; /* Arrow pointing down */
+}
+
 .modal-input {
     font-family: 'Futura', Arial, sans-serif;
     width: calc(100% - 20px);
