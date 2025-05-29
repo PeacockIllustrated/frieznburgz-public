@@ -44,7 +44,7 @@ export function createSupplierCardHtml(supplier, allUniqueItems) {
             <h3 class="supplier-name">${supplier.name}</h3>
             <p class="supplier-contact">Contact: ${supplier.contactPerson}</p>
             <p class="supplier-email"><i class="fas fa-envelope"></i> ${supplier.email}</p>
-            <p class="fas fa-phone-alt supplier-phone"><i class="fas fa-phone-alt"></i> ${supplier.phone}</p>
+            <p class="supplier-phone"><i class="fas fa-phone-alt"></i> ${supplier.phone}</p> <!-- CORRECTED line -->
             <button class="auth-button small-btn view-details-btn">View Details</button>
         </div>
     `;
