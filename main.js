@@ -20,7 +20,7 @@ import { showPage, hideAllPages, initSidebarNav, showDashboardContainer, hideDas
 // Import specific page rendering functions
 import { renderStockManagementPage } from './stock.js';
 import { renderWastageLogPage } from './wastage.js';
-import { renderDashboardOverviewPage } from './dashboard.js'; // NEW IMPORT
+import { renderDashboardOverviewPage, showQuickAdjustmentModal } from './dashboard.js'; // NEW IMPORT + showQuickAdjustmentModal
 
 
 // --- DOM Elements (centralized for main.js's direct use) ---
@@ -187,6 +187,7 @@ async function renderPageContent(pageId) {
 window.mainApp = {
     showDashboard: showDashboard,
     handleNavigationClick: handleNavigationClick, // EXPOSE FOR QUICK ACTIONS
+    showQuickAdjustmentModal: showQuickAdjustmentModal, // EXPOSE FOR WASTAGE PAGE
     // Also expose getSelectedLocation and getLocations from config for external scripts (like import-data.js)
     getSelectedLocation: getSelectedLocation,
     getLocations: () => locations // Expose the full locations array
