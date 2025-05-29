@@ -14,6 +14,68 @@ import { getAllUniqueStockItems } from './stock.js'; // NEW: To get a global lis
 // Define a variable to hold all unique items globally for the suppliers module
 let allUniqueStockItemsCache = [];
 
+// NEW: Global variable for the single custom tooltip element
+let customTooltipElement = null;
+
+/**
+ * Creates the single custom tooltip element if it doesn't exist and appends it to the body.
+ */
+function createCustomTooltipElement() {
+    if (!customTooltipElement) {
+        customTooltipElement = document.createElement('div');
+        customTooltipElement.classList.add('custom-tooltip');
+        document.body.appendChild(customTooltipElement);
+    }
+}
+
+/**
+ * Shows the custom tooltip near the hovered element.
+ * @param {Event} event - The mouseover event.
+ */
+function showCustomTooltip(event) {
+    createCustomTooltipElement(); // Ensure the tooltip element exists
+    const targetIcon = event.currentTarget;
+    const tooltipText = targetIcon.dataset.tooltipText;
+
+    if (!tooltipText) {
+        return; // No text to show
+    }
+
+    customTooltipElement.textContent = tooltipText;
+
+    // Position the tooltip relative to the hovered icon
+    const rect = targetIcon.getBoundingClientRect();
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+    // Position the tooltip's bottom edge aligned with the top of the icon, centered horizontally
+    // `transform: translate(-50%, -100%)` in CSS will then adjust it correctly above and centered
+    customTooltipElement.style.left = `${rect.left + (rect.width / 2) + scrollLeft}px`;
+    customTooltipElement.style.top = `${rect.top + scrollTop}px`; // Aligns top of icon
+
+    customTooltipElement.style.display = 'block';
+    // Use a short delay for 'visible' class to ensure display block takes effect first
+    setTimeout(() => {
+        customTooltipElement.classList.add('visible');
+    }, 10);
+}
+
+/**
+ * Hides the custom tooltip.
+ */
+function hideCustomTooltip() {
+    if (customTooltipElement) {
+        customTooltipElement.classList.remove('visible');
+        // Delay display: none to allow CSS transition to finish
+        setTimeout(() => {
+            if (customTooltipElement && !customTooltipElement.classList.contains('visible')) {
+                customTooltipElement.style.display = 'none';
+            }
+        }, 150); // Matches the CSS transition duration
+    }
+}
+
+
 /**
  * Renders the Suppliers Management page.
  * Fetches and displays supplier information.
@@ -75,6 +137,15 @@ async function loadSuppliers(container) {
             // Pass the cached allUniqueStockItemsCache to the card template
             container.insertAdjacentHTML('beforeend', createSupplierCardHtml(supplier, allUniqueStockItemsCache));
         });
+
+        // NEW: Attach event listeners for custom tooltips to all supplier icons
+        document.querySelectorAll('.supplier-icon').forEach(icon => {
+            icon.addEventListener('mouseover', showCustomTooltip);
+            icon.addEventListener('mouseout', hideCustomTooltip);
+            // Optional: Also consider mousemove if you want the tooltip to follow the cursor precisely
+            // icon.addEventListener('mousemove', showCustomTooltip);
+        });
+
 
         // Attach event listeners to "View Details" buttons
         container.querySelectorAll('.view-details-btn').forEach(button => {
