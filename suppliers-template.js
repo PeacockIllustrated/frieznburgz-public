@@ -54,7 +54,7 @@ export function createSupplierDetailsModalBodyHtml(supplier, allAvailableItems =
     const sortedCategories = Object.keys(categorizedItems).sort();
 
     if (allAvailableItems.length === 0) {
-        itemsCheckboxesHtml = '<p class="modal-message info-message">No items found in your inventory to list here.</p>';
+        itemsCheckboxesHtml = '<p class="modal-message info-message no-items-message">No inventory items found to list here. Add items to a location first.</p>';
     } else {
         sortedCategories.forEach(category => {
             itemsCheckboxesHtml += `<div class="item-category-group">`;
