@@ -18,10 +18,10 @@ import { initLocationSelection, showLocationSelection, hideLocationSelection, up
 import { showPage, hideAllPages, initSidebarNav, showDashboardContainer, hideDashboardContainer } from './ui.js';
 
 // Import specific page rendering functions
-import { renderStockManagementPage } from './stock.js';
+import { renderStockManagementPage, getAllUniqueStockItems } from './stock.js'; // NEW IMPORT for getAllUniqueStockItems
 import { renderWastageLogPage } from './wastage.js';
-import { renderDashboardOverviewPage, showQuickAdjustmentModal, openModal, closeModal } from './dashboard.js'; // NEW IMPORT + showQuickAdjustmentModal, openModal, closeModal
-import { renderSuppliersPage } from './suppliers.js'; // NEW IMPORT for Suppliers Page
+import { renderDashboardOverviewPage, showQuickAdjustmentModal, openModal, closeModal } from './dashboard.js';
+import { renderSuppliersPage } from './suppliers.js';
 
 
 // --- DOM Elements (centralized for main.js's direct use) ---
@@ -191,6 +191,7 @@ window.mainApp = {
     showQuickAdjustmentModal: showQuickAdjustmentModal, // EXPOSE FOR WASTAGE PAGE
     openModal: openModal, // EXPOSE openModal from dashboard.js
     closeModal: closeModal, // EXPOSE closeModal from dashboard.js
+    getAllUniqueStockItems: getAllUniqueStockItems, // NEW: EXPOSE for Suppliers page to get all items
     // Also expose getSelectedLocation and getLocations from config for external scripts (like import-data.js)
     getSelectedLocation: getSelectedLocation,
     getLocations: () => locations // Expose the full locations array
