@@ -15,7 +15,7 @@ const ordersPage = document.getElementById('ordersPage');
 // Caches for frequently needed data
 let allUniqueStockItemsCache = [];
 let allSuppliersCache = [];
-let filteredSupplierItemsCache = []; // NEW: Cache for items available from selected supplier
+let filteredSupplierItemsCache = []; // Cache for items available from selected supplier
 
 /**
  * Renders the Orders page content.
@@ -130,14 +130,14 @@ async function loadOrders(container) {
 async function openOrderModal(orderData = null) {
     const isNew = !orderData || !orderData.id;
     const title = isNew ? 'Create New Order' : `Order: ${orderData.supplierName || 'Details'}`;
-    const bodyHtml = createOrderFormModalBodyHtml(orderData, allSuppliersCache); // Only pass suppliers here
+    const bodyHtml = createOrderFormModalBodyHtml(orderData, allSuppliersCache);
     let footerHtml = '';
 
     if (isNew) {
         footerHtml = `<button id="saveOrderBtn" class="auth-button">Save Order</button>`;
     } else {
         footerHtml = `<button id="updateOrderBtn" class="auth-button">Update Order</button>`;
-        if (orderData.status === 'Pending') { // Only allow cancellation if pending
+        if (orderData.status === 'Pending') {
             footerHtml += `<button id="cancelOrderBtn" class="auth-button secondary-btn" style="background-color: #dc3545; border-color: #dc3545;">Cancel Order</button>`;
         }
     }
@@ -151,13 +151,13 @@ async function openOrderModal(orderData = null) {
         return;
     }
 
-    // --- NEW: Retrieve DOM elements once after modal is rendered ---
+    // --- Retrieve DOM elements once after modal is rendered ---
     const orderSupplierSelect = document.getElementById('orderSupplierSelect');
     const orderItemsList = document.getElementById('orderItemsList');
     const addOrderItemBtn = document.getElementById('addOrderItemBtn');
     const orderItemMessage = document.getElementById('orderItemMessage');
 
-    // --- NEW: Dynamic Item Filtering Logic ---
+    // --- Dynamic Item Filtering Logic ---
     const updateItemDropdowns = (selectedSupplierId) => {
         const selectedSupplier = allSuppliersCache.find(s => s.id === selectedSupplierId);
         filteredSupplierItemsCache = []; // Clear previous filtered items
@@ -181,16 +181,20 @@ async function openOrderModal(orderData = null) {
         orderItemsList.querySelectorAll('.order-item-select').forEach(selectElement => {
             const currentSelectedValue = selectElement.value; // Preserve current selection if it's valid
             selectElement.innerHTML = itemOptionsHtml;
+            // Re-select the value if it was previously set and is still in the filtered list
             if (currentSelectedValue && filteredSupplierItemsCache.some(item => item.id === currentSelectedValue)) {
-                selectElement.value = currentSelectedValue; // Restore selection if still valid
+                selectElement.value = currentSelectedValue;
             } else {
-                selectElement.value = ""; // Reset if old selection is no longer valid
+                selectElement.value = ""; // Reset if old selection is no longer valid or was empty
             }
             selectElement.disabled = (filteredSupplierItemsCache.length === 0);
-            // Also enable/disable quantity input for this row
+            // Also enable/disable quantity input for this row based on item selection
             const qtyInput = selectElement.closest('.order-item-row').querySelector('.order-item-qty');
             if (qtyInput) {
-                qtyInput.disabled = (filteredSupplierItemsCache.length === 0);
+                qtyInput.disabled = (selectElement.value === ''); // Disable if no item selected in this specific row
+                if (selectElement.value !== '' && (isNaN(parseInt(qtyInput.value)) || parseInt(qtyInput.value) < 1)) {
+                    qtyInput.value = 1; // Default to 1 if item selected and qty invalid
+                }
             }
         });
     };
@@ -198,21 +202,28 @@ async function openOrderModal(orderData = null) {
     // Event listener for supplier selection change
     orderSupplierSelect.addEventListener('change', (event) => {
         updateItemDropdowns(event.target.value);
+        // Clear all item rows and add one new empty row when supplier changes in a new order
+        if (isNew) {
+            orderItemsList.innerHTML = '';
+            addOrderItemRow(orderItemsList, filteredSupplierItemsCache);
+        }
     });
 
-    // If editing an existing order, pre-populate item dropdowns based on its supplier
-    if (!isNew && orderData.supplierId) {
+    // Initial population of item dropdowns based on selected supplier (if any)
+    if (orderData?.supplierId) { // Use optional chaining for safe access
         updateItemDropdowns(orderData.supplierId);
-    } else if (isNew && orderData.supplierId) { // Handles case where new order might have initial supplier pre-selected (e.g. from a quick action)
-        updateItemDropdowns(orderData.supplierId);
+    } else if (isNew) {
+        // For a brand new order, initialize dropdowns with no items until supplier is chosen
+        orderItemsList.innerHTML = ''; // Clear any default single row
+        orderItemMessage.textContent = 'Please select a supplier to add items.';
+        orderItemMessage.style.display = 'block';
+        addOrderItemBtn.disabled = true;
     }
-    // --- END: Dynamic Item Filtering Logic ---
 
 
-    // Attach event listeners for dynamic form elements AFTER modal is rendered
+    // Attach event listeners for dynamic form elements
     if (addOrderItemBtn) {
         addOrderItemBtn.addEventListener('click', () => {
-            // Ensure addOrderItemRow uses filteredSupplierItemsCache
             addOrderItemRow(orderItemsList, filteredSupplierItemsCache);
         });
     }
@@ -220,8 +231,7 @@ async function openOrderModal(orderData = null) {
     orderItemsList.addEventListener('click', (event) => {
         if (event.target.classList.contains('remove-item-btn') || event.target.closest('.remove-item-btn')) {
             const rowToRemove = event.target.closest('.order-item-row');
-            // Ensure at least one row remains
-            if (orderItemsList.children.length > 1) {
+            if (orderItemsList.children.length > 1) { // Ensure at least one row remains
                 rowToRemove.remove();
             } else {
                 alert('An order must have at least one item.');
@@ -243,7 +253,7 @@ async function openOrderModal(orderData = null) {
             if (qtyInput) {
                 qtyInput.disabled = (selectedOption.value === '');
                 if (selectedOption.value !== '' && (isNaN(parseInt(qtyInput.value)) || parseInt(qtyInput.value) < 1)) {
-                    qtyInput.value = 1; // Default to 1 if no valid qty
+                    qtyInput.value = 1;
                 }
             }
         }
@@ -269,7 +279,6 @@ async function openOrderModal(orderData = null) {
  * @param {Object} [initialItem={}] - Optional initial item data for pre-filling.
  */
 function addOrderItemRow(container, itemsForDropdown, initialItem = {}) {
-    // Dynamically generate options based on itemsForDropdown
     const itemOptions = getItemOptionsHtml(itemsForDropdown);
 
     const newRowHtml = `
@@ -310,7 +319,8 @@ async function handleSaveOrder(originalOrderData) {
     const orderNotes = document.getElementById('orderNotes');
 
     const supplierId = supplierSelect.value;
-    const supplierName = supplierSelect.options[supplierSelect.selectedIndex].text;
+    // Check if an option is selected before accessing its text
+    const supplierName = supplierSelect.options[supplierSelect.selectedIndex] ? supplierSelect.options[supplierSelect.selectedIndex].text : '';
     const notes = orderNotes.value.trim();
 
     const items = [];
@@ -324,7 +334,8 @@ async function handleSaveOrder(originalOrderData) {
 
         const itemId = itemSelect.value;
         const quantity = parseInt(qtyInput.value, 10);
-        const itemName = itemSelect.options[itemSelect.selectedIndex].text.split('(')[0].trim();
+        // Safely get item name from selected option
+        const itemName = itemSelect.options[itemSelect.selectedIndex] ? itemSelect.options[itemSelect.selectedIndex].text.split('(')[0].trim() : '';
         const itemUnit = unitSpan.textContent;
 
         if (itemId && !isNaN(quantity) && quantity > 0) {
