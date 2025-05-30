@@ -4,7 +4,7 @@
 import { db } from './firebase.js';
 import { auth } from './firebase.js'; // To log who created/received the order
 import { getSelectedLocation } from './config.js';
-import { createOrderCardHtml, createOrderFormModalBodyHtml, getItemOptionsHtml } from './orders-template.js';
+import { createOrderCardHtml, createOrderFormModalBodyHtml, getItemOptionsHtml, createCompactSupplierCardHtml } from './orders-template.js'; // NEW: createCompactSupplierCardHtml
 import { getAllUniqueStockItems } from './stock.js'; // To get item list for order form
 import { renderStockManagementPage } from './stock.js'; // To re-render stock page after receiving order
 import { getSuppliers } from './suppliers.js'; // To get supplier list for order form
@@ -16,6 +16,68 @@ const ordersPage = document.getElementById('ordersPage');
 let allUniqueStockItemsCache = [];
 let allSuppliersCache = [];
 let filteredSupplierItemsCache = []; // Cache for items available from selected supplier
+
+// NEW: Global variable for the single custom tooltip element (reused from suppliers.js logic)
+let customTooltipElement = null;
+
+/**
+ * Creates the single custom tooltip element if it doesn't exist and appends it to the body.
+ */
+function createCustomTooltipElement() {
+    if (!customTooltipElement) {
+        customTooltipElement = document.createElement('div');
+        customTooltipElement.classList.add('custom-tooltip');
+        document.body.appendChild(customTooltipElement);
+    }
+}
+
+/**
+ * Shows the custom tooltip near the hovered element.
+ * @param {Event} event - The mouseover event.
+ */
+function showCustomTooltip(event) {
+    createCustomTooltipElement(); // Ensure the tooltip element exists
+    const targetIcon = event.currentTarget;
+    const tooltipText = targetIcon.dataset.tooltipText;
+
+    if (!tooltipText) {
+        return; // No text to show
+    }
+
+    customTooltipElement.textContent = tooltipText;
+
+    // Position the tooltip relative to the hovered icon
+    const rect = targetIcon.getBoundingClientRect();
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+    // Position the tooltip's bottom edge aligned with the top of the icon, centered horizontally
+    // `transform: translate(-50%, -100%)` in CSS will then adjust it correctly above and centered
+    customTooltipElement.style.left = `${rect.left + (rect.width / 2) + scrollLeft}px`;
+    customTooltipElement.style.top = `${rect.top + scrollTop}px`; // Aligns top of icon
+
+    customTooltipElement.style.display = 'block';
+    // Use a short delay for 'visible' class to ensure display block takes effect first
+    setTimeout(() => {
+        customTooltipElement.classList.add('visible');
+    }, 10);
+}
+
+/**
+ * Hides the custom tooltip.
+ */
+function hideCustomTooltip() {
+    if (customTooltipElement) {
+        customTooltipElement.classList.remove('visible');
+        // Delay display: none to allow CSS transition to finish
+        setTimeout(() => {
+            if (customTooltipElement && !customTooltipElement.classList.contains('visible')) {
+                customTooltipElement.style.display = 'none';
+            }
+        }, 150); // Matches the CSS transition duration
+    }
+}
+
 
 /**
  * Renders the Orders page content.
@@ -130,7 +192,8 @@ async function loadOrders(container) {
 async function openOrderModal(orderData = null) {
     const isNew = !orderData || !orderData.id;
     const title = isNew ? 'Create New Order' : `Order: ${orderData.supplierName || 'Details'}`;
-    const bodyHtml = createOrderFormModalBodyHtml(orderData, allSuppliersCache);
+    // Pass allUniqueItemsCache to template for rendering supplier card icons
+    const bodyHtml = createOrderFormModalBodyHtml(orderData, allSuppliersCache, allUniqueStockItemsCache);
     let footerHtml = '';
 
     if (isNew) {
@@ -152,76 +215,109 @@ async function openOrderModal(orderData = null) {
     }
 
     // --- Retrieve DOM elements once after modal is rendered ---
-    const orderSupplierSelect = document.getElementById('orderSupplierSelect');
+    const orderSupplierCardsContainer = document.getElementById('orderSupplierCardsContainer'); // NEW
+    const orderSupplierIdInput = document.getElementById('orderSupplierId'); // NEW hidden input for selected supplier ID
+    const orderSupplierNameInput = document.getElementById('orderSupplierName'); // NEW hidden input for selected supplier Name
+    const supplierSelectionMessage = document.getElementById('supplierSelectionMessage'); // NEW message for supplier selection
+
     const orderItemsList = document.getElementById('orderItemsList');
     const addOrderItemBtn = document.getElementById('addOrderItemBtn');
     const orderItemMessage = document.getElementById('orderItemMessage');
 
+    // --- Supplier Card Selection Logic ---
+    const selectSupplierCard = (supplierId, supplierName) => {
+        // Remove 'selected' class from all cards
+        orderSupplierCardsContainer.querySelectorAll('.compact-supplier-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+
+        // Add 'selected' class to the clicked card
+        const selectedCard = orderSupplierCardsContainer.querySelector(`[data-supplier-id="${supplierId}"]`);
+        if (selectedCard) {
+            selectedCard.classList.add('selected');
+        }
+
+        // Update hidden inputs
+        orderSupplierIdInput.value = supplierId;
+        orderSupplierNameInput.value = supplierName;
+        supplierSelectionMessage.style.display = 'none'; // Hide message once selected
+
+        // Trigger item dropdown update
+        updateItemDropdowns(supplierId);
+
+        // For new orders, ensure one empty item row exists and is enabled
+        if (isNew) {
+            orderItemsList.innerHTML = ''; // Clear existing empty rows if any
+            addOrderItemRow(orderItemsList, filteredSupplierItemsCache); // Add one new row
+            addOrderItemBtn.disabled = false; // Enable Add Item button
+        }
+    };
+
+    // Attach click listeners to supplier cards
+    orderSupplierCardsContainer.querySelectorAll('.compact-supplier-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const supplierId = card.dataset.supplierId;
+            const supplierName = card.dataset.supplierName;
+            selectSupplierCard(supplierId, supplierName);
+        });
+
+        // Attach tooltip listeners to icons within supplier cards
+        card.querySelectorAll('.supplier-icon').forEach(icon => {
+            icon.addEventListener('mouseover', showCustomTooltip);
+            icon.addEventListener('mouseout', hideCustomTooltip);
+        });
+    });
+
     // --- Dynamic Item Filtering Logic ---
     const updateItemDropdowns = (selectedSupplierId) => {
         const selectedSupplier = allSuppliersCache.find(s => s.id === selectedSupplierId);
-        filteredSupplierItemsCache = []; // Clear previous filtered items
+        filteredSupplierItemsCache = [];
 
         if (selectedSupplier && selectedSupplier.itemsSupplied && selectedSupplier.itemsSupplied.length > 0) {
-            // Filter all unique items to only those supplied by the selected supplier
             filteredSupplierItemsCache = allUniqueStockItemsCache.filter(item =>
                 selectedSupplier.itemsSupplied.includes(item.name)
             );
-            orderItemMessage.style.display = 'none'; // Hide message if items found
-            addOrderItemBtn.disabled = false; // Enable add item button
+            orderItemMessage.style.display = 'none';
+            addOrderItemBtn.disabled = false;
         } else {
             orderItemMessage.textContent = 'No items configured for this supplier, or no supplier selected.';
             orderItemMessage.style.display = 'block';
-            addOrderItemBtn.disabled = true; // Disable add item button
+            addOrderItemBtn.disabled = true;
         }
 
         const itemOptionsHtml = getItemOptionsHtml(filteredSupplierItemsCache);
 
-        // Update all existing item selects and any new ones
         orderItemsList.querySelectorAll('.order-item-select').forEach(selectElement => {
-            const currentSelectedValue = selectElement.value; // Preserve current selection if it's valid
+            const currentSelectedValue = selectElement.value;
             selectElement.innerHTML = itemOptionsHtml;
-            // Re-select the value if it was previously set and is still in the filtered list
             if (currentSelectedValue && filteredSupplierItemsCache.some(item => item.id === currentSelectedValue)) {
                 selectElement.value = currentSelectedValue;
             } else {
-                selectElement.value = ""; // Reset if old selection is no longer valid or was empty
+                selectElement.value = "";
             }
             selectElement.disabled = (filteredSupplierItemsCache.length === 0);
-            // Also enable/disable quantity input for this row based on item selection
             const qtyInput = selectElement.closest('.order-item-row').querySelector('.order-item-qty');
             if (qtyInput) {
-                qtyInput.disabled = (selectElement.value === ''); // Disable if no item selected in this specific row
+                qtyInput.disabled = (selectElement.value === '');
                 if (selectElement.value !== '' && (isNaN(parseInt(qtyInput.value)) || parseInt(qtyInput.value) < 1)) {
-                    qtyInput.value = 1; // Default to 1 if item selected and qty invalid
+                    qtyInput.value = 1;
                 }
             }
         });
     };
 
-    // Event listener for supplier selection change
-    orderSupplierSelect.addEventListener('change', (event) => {
-        updateItemDropdowns(event.target.value);
-        // Clear all item rows and add one new empty row when supplier changes in a new order
-        if (isNew) {
-            orderItemsList.innerHTML = '';
-            addOrderItemRow(orderItemsList, filteredSupplierItemsCache);
-        }
-    });
-
-    // Initial population of item dropdowns based on selected supplier (if any)
-    if (orderData?.supplierId) { // Use optional chaining for safe access
-        updateItemDropdowns(orderData.supplierId);
-    } else if (isNew) {
-        // For a brand new order, initialize dropdowns with no items until supplier is chosen
-        orderItemsList.innerHTML = ''; // Clear any default single row
-        orderItemMessage.textContent = 'Please select a supplier to add items.';
-        orderItemMessage.style.display = 'block';
-        addOrderItemBtn.disabled = true;
+    // Initial state for new orders:
+    if (isNew) {
+        addOrderItemBtn.disabled = true; // Disable Add Item button until supplier is selected
+        supplierSelectionMessage.textContent = 'Please select a supplier to begin adding items.';
+        supplierSelectionMessage.style.display = 'block';
+        orderItemsList.innerHTML = ''; // Ensure no item rows initially
+    } else if (orderData.supplierId) {
+        // For existing orders, pre-select the supplier card and initialize items
+        selectSupplierCard(orderData.supplierId, orderData.supplierName); // This will also trigger updateItemDropdowns
     }
 
-
-    // Attach event listeners for dynamic form elements
+    // Attach event listeners for dynamic form item rows
     if (addOrderItemBtn) {
         addOrderItemBtn.addEventListener('click', () => {
             addOrderItemRow(orderItemsList, filteredSupplierItemsCache);
@@ -249,7 +345,6 @@ async function openOrderModal(orderData = null) {
             if (unitSpan) {
                 unitSpan.textContent = selectedOption.dataset.unit || 'units';
             }
-            // Enable quantity input if an item is selected
             if (qtyInput) {
                 qtyInput.disabled = (selectedOption.value === '');
                 if (selectedOption.value !== '' && (isNaN(parseInt(qtyInput.value)) || parseInt(qtyInput.value) < 1)) {
@@ -258,7 +353,6 @@ async function openOrderModal(orderData = null) {
             }
         }
     });
-
 
     // Attach modal action buttons
     const saveOrderBtn = document.getElementById('saveOrderBtn');
@@ -297,11 +391,10 @@ function addOrderItemRow(container, itemsForDropdown, initialItem = {}) {
     `;
     container.insertAdjacentHTML('beforeend', newRowHtml);
 
-    // After adding a new row, ensure its quantity input is disabled if no item is selected
     const newSelect = container.lastElementChild.querySelector('.order-item-select');
     const newQtyInput = container.lastElementChild.querySelector('.order-item-qty');
-    if (newSelect && newQtyInput && newSelect.value === "") {
-        newQtyInput.disabled = true;
+    if (newSelect && newQtyInput) {
+        newQtyInput.disabled = (newSelect.value === ""); // Disable if no item selected in this specific row
     }
 }
 
@@ -314,13 +407,12 @@ async function handleSaveOrder(originalOrderData) {
     modalMessage.style.display = 'none';
 
     const selectedLocationId = getSelectedLocation();
-    const supplierSelect = document.getElementById('orderSupplierSelect');
+    // MODIFIED: Get supplier info from hidden inputs
+    const supplierId = document.getElementById('orderSupplierId').value;
+    const supplierName = document.getElementById('orderSupplierName').value;
     const orderItemsList = document.getElementById('orderItemsList');
     const orderNotes = document.getElementById('orderNotes');
 
-    const supplierId = supplierSelect.value;
-    // Check if an option is selected before accessing its text
-    const supplierName = supplierSelect.options[supplierSelect.selectedIndex] ? supplierSelect.options[supplierSelect.selectedIndex].text : '';
     const notes = orderNotes.value.trim();
 
     const items = [];
@@ -344,10 +436,9 @@ async function handleSaveOrder(originalOrderData) {
         } else if (itemId || !isNaN(quantity) || quantity > 0) { // If either is filled but not both valid
             isValidOrder = false;
         }
-        // If both are empty, it's considered an empty row and ignored, but ensures at least one valid row exists.
     });
 
-    if (!supplierId) {
+    if (!supplierId) { // Check hidden input value
         modalMessage.textContent = 'Please select a supplier.';
         modalMessage.style.display = 'block';
         return;
@@ -367,13 +458,13 @@ async function handleSaveOrder(originalOrderData) {
 
     const orderToSave = {
         supplierId,
-        supplierName,
+        supplierName, // Use value from hidden input
         items,
         notes,
         locationId: selectedLocationId,
         orderedBy: auth.currentUser ? auth.currentUser.email : 'Unknown User',
         timestampOrdered: firebase.firestore.FieldValue.serverTimestamp(),
-        status: originalOrderData?.status || 'Pending' // Retain status if updating, else 'Pending'
+        status: originalOrderData?.status || 'Pending'
     };
 
     modalMessage.textContent = 'Saving order...';
@@ -381,19 +472,17 @@ async function handleSaveOrder(originalOrderData) {
 
     try {
         if (originalOrderData && originalOrderData.id) {
-            // Update existing order
             await db.collection('locations').doc(selectedLocationId).collection('orders').doc(originalOrderData.id).update(orderToSave);
             console.log(`Order ${originalOrderData.id} updated in Firestore.`);
         } else {
-            // Create new order
             await db.collection('locations').doc(selectedLocationId).collection('orders').add(orderToSave);
             console.log('New order created in Firestore.');
         }
 
         modalMessage.textContent = 'Order saved successfully!';
         setTimeout(() => {
-            closeModal(); // Call main.js's exposed closeModal helper
-            renderOrdersPage(); // Re-render the orders page to show updates
+            closeModal();
+            renderOrdersPage();
         }, 800);
 
     } catch (error) {
@@ -434,10 +523,10 @@ async function handleReceiveOrder(orderData) {
         alert(`Order from ${orderData.supplierName} successfully marked as Received. Stock updated!`);
         console.log(`Order ${orderData.id} received and stock updated.`);
 
-        closeModal(); // Close modal if it was open
-        renderOrdersPage(); // Re-render orders page
+        closeModal();
+        renderOrdersPage();
         if (window.mainApp && typeof window.mainApp.handleNavigationClick === 'function') {
-            window.mainApp.handleNavigationClick('stock-management'); // Optionally navigate to stock page to see changes
+            window.mainApp.handleNavigationClick('stock-management');
         }
 
     } catch (error) {
