@@ -174,6 +174,23 @@ async function loadSuppliers(container) {
 }
 
 /**
+ * Fetches all suppliers from Firestore.
+ * This function is exported so other modules (like orders.js) can use it.
+ * @returns {Promise<Array<Object>>} A promise that resolves to an array of supplier objects.
+ */
+export async function getSuppliers() {
+    try {
+        const suppliersRef = db.collection('suppliers');
+        const querySnapshot = await suppliersRef.orderBy('name').get();
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+        console.error('Error fetching suppliers:', error);
+        return [];
+    }
+}
+
+
+/**
  * Opens the universal modal for adding or viewing/editing a supplier.
  * @param {Object|null} supplierData - The supplier object if editing, or null for adding a new one.
  */
