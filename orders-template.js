@@ -47,7 +47,7 @@ export function createOrderCardHtml(order) {
  * @param {Array<Object>} allUniqueItems - A list of all unique items across all locations, used to determine supplier categories.
  * @returns {string} The HTML string for a compact supplier card.
  */
-export function createCompactSupplierCardHtml(supplier, allUniqueItems) { // ADDED 'export' here
+export function createCompactSupplierCardHtml(supplier, allUniqueItems) {
     const supplierCategories = new Set();
 
     if (supplier.itemsSupplied && Array.isArray(supplier.itemsSupplied)) {
@@ -61,25 +61,34 @@ export function createCompactSupplierCardHtml(supplier, allUniqueItems) { // ADD
 
     let iconsHtml = '';
     const sortedCategories = Array.from(supplierCategories).sort();
-    sortedCategories.forEach(category => {
+    // Limit to a reasonable number of icons if a supplier has many categories
+    const displayCategories = sortedCategories.slice(0, 5); // Display up to 5 icons
+
+    displayCategories.forEach(category => {
         const iconInfo = itemCategoryIcons[category] || itemCategoryIcons['Uncategorized'];
         if (iconInfo) {
             iconsHtml += `
-                <div class="supplier-icon compact-icon ${iconInfo.colorClass}" data-tooltip-text="${category}"> <!-- REMOVED title, ADDED data-tooltip-text -->
+                <div class="supplier-icon compact-icon ${iconInfo.colorClass}" data-tooltip-text="${category}">
                     <i class="${iconInfo.icon}"></i>
                 </div>
             `;
         }
     });
+    // Add "..." if there are more categories than displayed
+    if (sortedCategories.length > displayCategories.length) {
+        iconsHtml += `<span class="more-icons-indicator">...</span>`;
+    }
+
 
     return `
         <div class="compact-supplier-card" data-supplier-id="${supplier.id}" data-supplier-name="${supplier.name}">
-            <div class="supplier-icons-container compact-icons-container">
-                ${iconsHtml}
-            </div>
             <h4 class="compact-supplier-name">${supplier.name}</h4>
+            <div class="supplier-icons-container compact-icons-container">
+                ${iconsHtml || '<span class="no-category-icons">No categories</span>'}
+            </div>
             <div class="contact-short">
                 <p><i class="fas fa-envelope"></i> ${supplier.email}</p>
+                <!-- Removed phone for compactness -->
             </div>
         </div>
     `;
@@ -98,7 +107,7 @@ export function createOrderFormModalBodyHtml(order, allSuppliers = [], allUnique
     const {
         id,
         supplierId,
-        supplierName, // <--- ADDED supplierName to destructuring
+        supplierName,
         items = [], // Default to empty array
         notes,
         orderedBy,
@@ -157,17 +166,17 @@ export function createOrderFormModalBodyHtml(order, allSuppliers = [], allUnique
                 </div>
             ` : ''}
 
-            <div class="modal-input-group">
+            <div class="modal-input-group modal-supplier-selection">
                 <label>Supplier:</label>
                 <div id="orderSupplierCardsContainer" class="order-supplier-cards-grid">
                     ${supplierCardsHtml}
                 </div>
                 <input type="hidden" id="orderSupplierId" value="${supplierId || ''}">
-                <input type="hidden" id="orderSupplierName" value="${supplierName || ''}"> <!-- Used destructured supplierName -->
+                <input type="hidden" id="orderSupplierName" value="${supplierName || ''}">
                 <p class="modal-message info-message" id="supplierSelectionMessage" style="display:none;">Please select a supplier.</p>
             </div>
 
-            <div class="order-items-list-container">
+            <div class="modal-input-group modal-order-items-section">
                 <label>Order Items:</label>
                 <div id="orderItemsList" class="order-items-list">
                     ${initialItemRowsHtml}
@@ -176,7 +185,7 @@ export function createOrderFormModalBodyHtml(order, allSuppliers = [], allUnique
                 <p class="modal-message info-message" id="orderItemMessage" style="display:none;"></p>
             </div>
 
-            <div class="modal-input-group">
+            <div class="modal-input-group modal-notes-section">
                 <label for="orderNotes">Notes:</label>
                 <textarea id="orderNotes" class="auth-input modal-input" placeholder="Any delivery notes or special instructions...">${notes || ''}</textarea>
             </div>
