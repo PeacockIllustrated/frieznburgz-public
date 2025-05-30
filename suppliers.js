@@ -207,7 +207,7 @@ async function openSupplierModal(supplierData = null) {
     } else {
         footerHtml = `<button id="editSupplierBtn" class="auth-button">Save Changes</button>`;
         // Consider a delete button for existing suppliers
-        footerHtml += `<button id="deleteSupplierBtn" class="auth-button secondary-btn" style="background-color: #dc3545; border-color: #dc3545;">Delete Supplier</button>`;
+        footerHtml += `<button id="deleteSupplierBtn" class="auth-button secondary-btn" style="background-color: var(--salmon); border-color: #dc3545;">Delete Supplier</button>`;
     }
     footerHtml += `<button id="cancelSupplierBtn" class="auth-button secondary-btn">Cancel</button>`;
 
