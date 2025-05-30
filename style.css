@@ -135,6 +135,20 @@ body {
     border-color: var(--red);
 }
 
+/* Secondary Button Style (used for Cancel, Delete) */
+.auth-button.secondary-btn {
+    background-color: var(--salmon); /* Changed to salmon */
+    color: var(--red); /* Changed to red for text */
+    border-color: var(--red); /* Changed to red for border */
+}
+
+.auth-button.secondary-btn:hover {
+    background-color: var(--red); /* Changed to red on hover */
+    color: var(--yellow); /* Changed to yellow on hover */
+    border-color: var(--red); /* Changed to red on hover */
+}
+
+
 /* Specific margin for email login button */
 .email-login-btn {
     margin-bottom: 20px;
@@ -778,28 +792,32 @@ body {
 
 .modal-footer {
     display: flex;
-    justify-content: center;
-    gap: 15px;
+    flex-direction: column; /* Stack buttons vertically */
+    justify-content: center; /* Center horizontally */
+    align-items: center;   /* Center items */
+    gap: 15px; /* Space between buttons */
     margin-top: 20px;
     flex-shrink: 0;
+    width: 100%; /* Ensure footer takes full width to allow centering */
 }
 
 .modal-footer .auth-button {
-    width: auto;
+    width: 80%; /* Adjusted width for vertical stacking, ensures consistent size */
+    max-width: 250px; /* Optional: cap max width on very large screens */
     padding: 10px 25px;
     font-size: 16px;
-    flex-grow: 1;
 }
 
+
 .modal-footer .secondary-btn {
-    background-color: var(--khaki);
-    color: var(--red);
-    border-color: var(--red);
+    background-color: var(--salmon); /* Changed to salmon */
+    color: var(--red); /* Changed to red for text */
+    border-color: var(--red); /* Changed to red for border */
 }
 .modal-footer .secondary-btn:hover {
-    background-color: var(--red);
-    color: var(--yellow);
-    border-color: var(--red);
+    background-color: var(--red); /* Changed to red on hover */
+    color: var(--yellow); /* Changed to yellow on hover */
+    border-color: var(--red); /* Changed to red on hover */
 }
 
 .modal-message {
@@ -834,9 +852,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    max-height: none;
-    overflow: visible;
-    transition: none;
+    /* Removed max-height: none; overflow: visible; transition: none; on desktop */
     padding-top: 0;
     margin-top: 0;
 }
@@ -1463,7 +1479,7 @@ body {
 
 .order-status.status-pending { background-color: var(--khaki); }
 .order-status.status-received { background-color: #4CAF50; }
-.order-status.status-cancelled { background-color: var(--salmon); }
+.order-status.status-cancelled { background-color: #dc3545; }
 
 
 .order-summary-details p {
@@ -1527,7 +1543,7 @@ body {
 }
 .modal-order-form .order-info-read-only .order-status-display.status-Pending { background-color: var(--khaki); }
 .modal-order-form .order-info-read-only .order-status-display.status-Received { background-color: #4CAF50; }
-.modal-order-form .order-info-read-only .order-status-display.status-Cancelled { background-color: var(--salmon); }
+.modal-order-form .order-info-read-only .order-status-display.status-Cancelled { background-color: #dc3545; }
 
 
 .modal-order-form .order-items-list-container {
@@ -1658,9 +1674,6 @@ body {
     min-width: 150px;
 }
 
-/* Styles for the supplier select container */
-/* REMOVED .modal-order-form .supplier-select-wrapper as it's no longer a select */
-
 /* Styles for the item select container */
 .modal-order-form .item-select-wrapper {
     width: auto;
@@ -1684,6 +1697,13 @@ body {
 }
 
 /* NEW: Compact Supplier Cards for Order Modal */
+.modal-order-form .modal-supplier-selection {
+    /* Ensures this section acts as a block and styles its children */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Spacing between label, grid, and message */
+}
+
 .order-supplier-cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Compact columns */
@@ -1709,9 +1729,9 @@ body {
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    position: relative;
+    position: relative; /* Changed to relative for icons */
     overflow: hidden;
-    padding-top: 35px; /* Space for compact icons */
+    padding-top: 15px; /* Adjust padding-top to make space for name, icons below */
 }
 
 .compact-supplier-card:hover {
@@ -1731,23 +1751,25 @@ body {
     font-size: 18px; /* Smaller font size */
     color: var(--red);
     text-transform: uppercase;
-    margin: 0 0 5px 0;
+    margin: 0 0 5px 0; /* Space below name */
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-.compact-icons-container {
-    position: absolute;
-    top: 5px; /* Closer to top */
-    right: 5px; /* Closer to right */
+.supplier-icons-container.compact-icons-container { /* Target specifically in compact cards */
+    position: static; /* Position within normal flow */
+    top: auto;
+    right: auto;
     display: flex;
+    justify-content: center; /* Center icons horizontally */
+    align-items: center;
     gap: 3px; /* Smaller gap between icons */
-    z-index: 5;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    max-width: calc(100% - 10px); /* Adjust max-width */
+    z-index: auto; /* Reset z-index */
+    flex-wrap: wrap; /* Allow icons to wrap if too many */
+    margin-bottom: 8px; /* Space below icons */
+    max-width: 100%; /* Ensure it fits */
 }
 
 .supplier-icon.compact-icon {
@@ -1755,6 +1777,21 @@ body {
     height: 25px;
     font-size: 14px; /* Smaller icon glyph */
     box-shadow: none; /* No shadow for compact icons */
+}
+
+.no-category-icons {
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 11px;
+    color: var(--dim-grey);
+    font-style: italic;
+    white-space: nowrap;
+}
+
+.more-icons-indicator {
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 11px;
+    color: var(--dim-grey);
+    white-space: nowrap;
 }
 
 .contact-short p {
@@ -1772,7 +1809,7 @@ body {
 #supplierSelectionMessage {
     margin-top: 10px;
     font-weight: bold;
-    color: var(--red); /* Ensure message is red */
+    color: var(--red);
 }
 
 
@@ -2075,12 +2112,12 @@ body {
 
     /* Compact supplier cards in order modal for mobile */
     .order-supplier-cards-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* Force 1 column on smaller screens */
         gap: 10px;
     }
     .compact-supplier-card {
         padding: 10px;
-        padding-top: 30px;
+        padding-top: 15px; /* Adjust padding-top after moving icons */
     }
     .compact-supplier-name {
         font-size: 16px;
@@ -2091,9 +2128,11 @@ body {
         font-size: 12px;
     }
     .compact-icons-container {
-        top: 3px;
-        right: 3px;
-        gap: 2px;
+        position: static; /* Ensure it stays in flow */
+        margin-top: 5px; /* Space below name */
+        margin-bottom: 5px; /* Space above contact */
+        justify-content: center; /* Center icons below name */
+        top: auto; right: auto; /* Reset absolute positioning */
     }
     .contact-short p {
         font-size: 12px;
@@ -2141,23 +2180,35 @@ body {
     /* Orders modal layout for desktop */
     .modal-order-form {
         display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
+        grid-template-columns: 1fr 1fr; /* Two columns for desktop modal body */
+        gap: 20px 30px; /* Gap between columns and rows */
     }
 
-    /* Supplier Selection Grid */
-    .modal-order-form .modal-input-group:first-child { /* Supplier section */
-        grid-column: 1 / -1;
-        padding-bottom: 10px;
-        border-bottom: 1px dashed var(--salmon);
+    /* Assign sections to grid columns */
+    .modal-order-form .modal-supplier-selection {
+        grid-column: 1; /* Left column */
+        grid-row: 1 / span 2; /* Span multiple rows if needed */
+        padding-bottom: 0; /* Remove extra padding/border if it was there */
+        border-bottom: none;
     }
+    .modal-order-form .modal-order-items-section {
+        grid-column: 2; /* Right column, first row */
+        grid-row: 1;
+    }
+    .modal-order-form .modal-notes-section {
+        grid-column: 2; /* Right column, second row */
+        grid-row: 2;
+    }
+
+
+    /* Supplier Selection Grid */
     .order-supplier-cards-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        max-height: 200px;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Desktop grid for compact supplier cards */
+        max-height: 400px; /* Adjust max height for desktop modal to fill space */
     }
     .compact-supplier-card {
         padding: 15px;
-        padding-top: 35px;
+        padding-top: 15px; /* Adjust padding-top after moving icons */
     }
     .compact-supplier-name {
         font-size: 18px;
@@ -2168,15 +2219,11 @@ body {
         font-size: 15px;
     }
     .compact-icons-container {
-        top: 8px;
-        right: 8px;
-        gap: 4px;
-    }
-
-    /* Order Items and Notes sections */
-    .modal-order-form .order-items-list-container,
-    .modal-order-form .modal-input-group:last-child {
-        grid-column: 1 / -1;
+        position: static; /* Ensure it stays in flow */
+        margin-top: 5px; /* Space below name */
+        margin-bottom: 5px; /* Space above contact */
+        justify-content: center; /* Center icons below name */
+        top: auto; right: auto; /* Reset absolute positioning */
     }
 
     /* Order Item Row Layout */
