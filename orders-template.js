@@ -46,8 +46,21 @@ export function createOrderCardHtml(order) {
  * @param {Array<Object>} allSuppliers - All available suppliers.
  * @returns {string} The HTML string for the order modal form.
  */
-export function createOrderFormModalBodyHtml(order = {}, allItems = [], allSuppliers = []) {
-    const isNew = !order.id;
+export function createOrderFormModalBodyHtml(order, allItems = [], allSuppliers = []) {
+    // Safely destructure properties, providing default empty values if order is null/undefined
+    const {
+        id,
+        supplierId,
+        supplierName,
+        items = [], // Default to empty array
+        notes,
+        orderedBy,
+        timestampOrdered,
+        timestampReceived,
+        status
+    } = order || {}; // If order is null/undefined, use an empty object
+
+    const isNew = !id;
 
     // Build supplier options
     let supplierOptions = '<option value="" disabled selected>Select Supplier</option>';
@@ -55,7 +68,7 @@ export function createOrderFormModalBodyHtml(order = {}, allItems = [], allSuppl
         supplierOptions += '<option value="" disabled>No suppliers found</option>';
     } else {
         allSuppliers.forEach(supplier => {
-            const selected = order.supplierId === supplier.id ? 'selected' : '';
+            const selected = supplierId === supplier.id ? 'selected' : '';
             supplierOptions += `<option value="${supplier.id}" ${selected}>${supplier.name}</option>`;
         });
     }
@@ -85,14 +98,21 @@ export function createOrderFormModalBodyHtml(order = {}, allItems = [], allSuppl
 
     // Generate initial item rows for existing order or one empty row for new order
     let initialItemRowsHtml = '';
-    const itemsToDisplay = (order.items && order.items.length > 0) ? order.items : [{}]; // One empty object for new row
+    const itemsToDisplay = (items && items.length > 0) ? items : [{}]; // One empty object for new row
 
     itemsToDisplay.forEach((item, index) => {
-        const selectedItemOption = item.itemId ? `value="${item.itemId}" selected` : '';
+        const selectedItemOptionValue = item.itemId || ''; // Ensure it's not undefined
         initialItemRowsHtml += `
             <div class="order-item-row" data-item-id="${item.itemId || ''}">
                 <div class="select-wrapper">
-                    <select class="order-item-select">${itemOptions.replace(selectedItemOption, `${selectedItemOption} selected`)}</select>
+                    <select class="order-item-select">
+                        <option value="" disabled ${!item.itemId ? 'selected' : ''}>Select Item</option>
+                        ${allItems.map(i => `
+                            <option value="${i.id}" data-unit="${i.unit || 'units'}" ${selectedItemOptionValue === i.id ? 'selected' : ''}>
+                                ${i.name} (${i.unit || 'units'})
+                            </option>
+                        `).join('')}
+                    </select>
                     <i class="fas fa-chevron-down select-arrow"></i>
                 </div>
                 <input type="number" class="order-item-qty auth-input modal-input" value="${item.quantity || ''}" min="1" placeholder="Qty">
@@ -104,18 +124,18 @@ export function createOrderFormModalBodyHtml(order = {}, allItems = [], allSuppl
 
 
     // Read-only fields for existing orders
-    const orderedBy = order.orderedBy || 'N/A';
-    const timestampOrdered = order.timestampOrdered ? order.timestampOrdered.toDate().toLocaleString() : 'N/A';
-    const timestampReceived = order.timestampReceived ? order.timestampReceived.toDate().toLocaleString() : 'Not Received';
+    const displayedOrderedBy = orderedBy || 'N/A';
+    const displayedTimestampOrdered = timestampOrdered ? timestampOrdered.toDate().toLocaleString() : 'N/A';
+    const displayedTimestampReceived = timestampReceived ? timestampReceived.toDate().toLocaleString() : 'Not Received';
 
     return `
         <div class="modal-order-form">
             ${!isNew ? `
                 <div class="order-info-read-only">
-                    <p><strong>Status:</strong> <span class="order-status-display">${order.status || 'Unknown'}</span></p>
-                    <p><strong>Ordered By:</strong> ${orderedBy}</p>
-                    <p><strong>Ordered On:</strong> ${timestampOrdered}</p>
-                    <p><strong>Received On:</strong> ${timestampReceived}</p>
+                    <p><strong>Status:</strong> <span class="order-status-display ${status ? `status-${status}` : ''}">${status || 'Unknown'}</span></p>
+                    <p><strong>Ordered By:</strong> ${displayedOrderedBy}</p>
+                    <p><strong>Ordered On:</strong> ${displayedTimestampOrdered}</p>
+                    <p><strong>Received On:</strong> ${displayedTimestampReceived}</p>
                     <hr class="order-divider"/>
                 </div>
             ` : ''}
@@ -138,7 +158,7 @@ export function createOrderFormModalBodyHtml(order = {}, allItems = [], allSuppl
 
             <div class="modal-input-group">
                 <label for="orderNotes">Notes:</label>
-                <textarea id="orderNotes" class="auth-input modal-input" placeholder="Any delivery notes or special instructions...">${order.notes || ''}</textarea>
+                <textarea id="orderNotes" class="auth-input modal-input" placeholder="Any delivery notes or special instructions...">${notes || ''}</textarea>
             </div>
         </div>
     `;
