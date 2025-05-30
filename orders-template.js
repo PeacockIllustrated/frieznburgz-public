@@ -1,6 +1,8 @@
 // --- orders-template.js ---
 // Provides HTML templating for the Orders page components.
 
+import { itemCategoryIcons } from './config.js'; // Import icon mappings for supplier icons
+
 /**
  * Generates the HTML for a single order card/summary item.
  * @param {Object} order - The order object.
@@ -40,18 +42,62 @@ export function createOrderCardHtml(order) {
 }
 
 /**
+ * Generates the HTML for the compact supplier card used within the order modal.
+ * @param {Object} supplier - The supplier object.
+ * @param {Array<Object>} allUniqueItems - A list of all unique items across all locations, used to determine supplier categories.
+ * @returns {string} The HTML string for a compact supplier card.
+ */
+export function createCompactSupplierCardHtml(supplier, allUniqueItems) { // ADDED 'export' here
+    const supplierCategories = new Set();
+
+    if (supplier.itemsSupplied && Array.isArray(supplier.itemsSupplied)) {
+        supplier.itemsSupplied.forEach(itemName => {
+            const item = allUniqueItems.find(i => i.name === itemName);
+            if (item && item.category) {
+                supplierCategories.add(item.category);
+            }
+        });
+    }
+
+    let iconsHtml = '';
+    const sortedCategories = Array.from(supplierCategories).sort();
+    sortedCategories.forEach(category => {
+        const iconInfo = itemCategoryIcons[category] || itemCategoryIcons['Uncategorized'];
+        if (iconInfo) {
+            iconsHtml += `
+                <div class="supplier-icon compact-icon ${iconInfo.colorClass}" data-tooltip-text="${category}">
+                    <i class="${iconInfo.icon}"></i>
+                </div>
+            `;
+        }
+    });
+
+    return `
+        <div class="compact-supplier-card" data-supplier-id="${supplier.id}" data-supplier-name="${supplier.name}">
+            <div class="supplier-icons-container compact-icons-container">
+                ${iconsHtml}
+            </div>
+            <h4 class="compact-supplier-name">${supplier.name}</h4>
+            <div class="contact-short">
+                <p><i class="fas fa-envelope"></i> ${supplier.email}</p>
+            </div>
+        </div>
+    `;
+}
+
+/**
  * Generates the HTML for the order form/details modal body.
  * This template now takes a function `getItemOptionsHtml` to dynamically generate item options.
  * @param {Object} order - The order object (for editing) or null/empty (for new).
  * @param {Array<Object>} allSuppliers - All available suppliers.
+ * @param {Array<Object>} allUniqueItems - All unique stock items (needed for compact supplier card icons).
  * @returns {string} The HTML string for the order modal form.
  */
-export function createOrderFormModalBodyHtml(order, allSuppliers = []) {
+export function createOrderFormModalBodyHtml(order, allSuppliers = [], allUniqueItems = []) {
     // Safely destructure properties, providing default empty values if order is null/undefined
     const {
         id,
         supplierId,
-        supplierName,
         items = [], // Default to empty array
         notes,
         orderedBy,
@@ -62,25 +108,21 @@ export function createOrderFormModalBodyHtml(order, allSuppliers = []) {
 
     const isNew = !id;
 
-    // Build supplier options
-    let supplierOptions = '<option value="" disabled selected>-- Select a Supplier --</option>';
+    // Generate compact supplier cards HTML
+    let supplierCardsHtml = '';
     if (allSuppliers.length === 0) {
-        supplierOptions += '<option value="" disabled>No suppliers found</option>';
+        supplierCardsHtml = '<p class="modal-message info-message">No suppliers found. Add suppliers first.</p>';
     } else {
         allSuppliers.forEach(supplier => {
-            const selected = supplierId === supplier.id ? 'selected' : '';
-            supplierOptions += `<option value="${supplier.id}" ${selected}>${supplier.name}</option>`;
+            supplierCardsHtml += createCompactSupplierCardHtml(supplier, allUniqueItems);
         });
     }
 
     // Generate initial item rows for existing order or one empty row for new order
-    // This part is now simplified as the item options will be generated dynamically by JS after supplier selection
     let initialItemRowsHtml = '';
-    const itemsToDisplay = (items && items.length > 0) ? items : [{}]; // One empty object for new row
+    const itemsToDisplay = (items && items.length > 0) ? items : [{}];
 
     itemsToDisplay.forEach((item, index) => {
-        // For existing items, their selected value is kept, but the dropdown for NEW additions will be empty initially
-        // The actual options will be dynamically filled by JS based on supplier.
         initialItemRowsHtml += `
             <div class="order-item-row" data-item-id="${item.itemId || ''}">
                 <div class="select-wrapper item-select-wrapper">
@@ -115,11 +157,13 @@ export function createOrderFormModalBodyHtml(order, allSuppliers = []) {
             ` : ''}
 
             <div class="modal-input-group">
-                <label for="orderSupplierSelect">Supplier:</label>
-                <div class="select-wrapper supplier-select-wrapper">
-                    <select id="orderSupplierSelect" class="order-select" ${!isNew ? 'disabled' : ''}>${supplierOptions}</select>
-                    <i class="fas fa-chevron-down select-arrow"></i>
+                <label>Supplier:</label>
+                <div id="orderSupplierCardsContainer" class="order-supplier-cards-grid">
+                    ${supplierCardsHtml}
                 </div>
+                <input type="hidden" id="orderSupplierId" value="${supplierId || ''}">
+                <input type="hidden" id="orderSupplierName" value="${order.supplierName || ''}">
+                <p class="modal-message info-message" id="supplierSelectionMessage" style="display:none;">Please select a supplier.</p>
             </div>
 
             <div class="order-items-list-container">
