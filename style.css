@@ -137,7 +137,7 @@ body {
 
 /* Secondary Button Style (used for Cancel, Delete) */
 .auth-button.secondary-btn {
-    background-color: var(--salmon); /* Changed to salmon */
+    background-color: var(--yellow); /* Changed to salmon */
     color: var(--red); /* Changed to red for text */
     border-color: var(--red); /* Changed to red for border */
 }
