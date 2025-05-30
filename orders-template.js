@@ -1,3 +1,51 @@
+export function createOrderFormModalBodyHtml(order, allSuppliers = [], allUniqueItems = []) {
+    // ...
+    const {
+        id,
+        supplierId,
+        items = [], // Default to empty array
+        notes,
+        orderedBy,
+        timestampOrdered,
+        timestampReceived,
+        status
+    } = order || {}; // If order is null/undefined, use an empty object
+
+    const isNew = !id;
+
+    // ...
+    // This part is the issue if order.supplierName is accessed directly without being destructured
+    // The previous code block:
+    // const title = isNew ? 'Create New Order' : `Order: ${order.supplierName || 'Details'}`;
+    // This line is in orders.js, not orders-template.js.
+    // The error is actually in the `orders-template.js` on line 165, which is inside `createOrderFormModalBodyHtml`
+
+    // Ah, found it in createOrderFormModalBodyHtml, the line for title is not directly in the template.
+    // The previous error was due to 'order.supplierName' being used in orders.js:196:22 for the modal title
+    // but the template itself *also* references `order.supplierName` in `createOrderFormModalBodyHtml` when it builds the hidden input
+    // <input type="hidden" id="orderSupplierName" value="${order.supplierName || ''}">
+
+    // It seems the problem is the optional chaining `order?.supplierName` was not used in the template,
+    // or the destructuring was insufficient for nested usage when order is null.
+
+    // Let's ensure the `supplierName` property is properly destructured and always defaults to an empty string.
+
+    // Also, the error message in the screenshot shows orders-template.js:165.
+    // Looking at the provided orders-template.js, line 165 is within the `return` statement:
+    // `<input type="hidden" id="orderSupplierName" value="${order.supplierName || ''}">`
+    // This line is trying to read `order.supplierName` directly when `order` is null, which causes the error.
+    // The destructuring: `const { id, supplierId, items = [], notes, orderedBy, timestampOrdered, timestampReceived, status } = order || {};`
+    // **Missed `supplierName` in the destructuring!**
+
+    Yes, that's it! `supplierName` was missing from the destructuring assignment. When `order` is `null`, `order.supplierName` would try to access a property of `null`.
+
+I will update `orders-template.js` to include `supplierName` in the destructuring, ensuring it defaults gracefully when `order` is `null`.
+
+---
+
+### `orders-template.js` (Corrected - Missing `supplierName` in destructuring)
+
+```javascript
 // --- orders-template.js ---
 // Provides HTML templating for the Orders page components.
 
@@ -65,7 +113,7 @@ export function createCompactSupplierCardHtml(supplier, allUniqueItems) { // ADD
         const iconInfo = itemCategoryIcons[category] || itemCategoryIcons['Uncategorized'];
         if (iconInfo) {
             iconsHtml += `
-                <div class="supplier-icon compact-icon ${iconInfo.colorClass}" data-tooltip-text="${category}">
+                <div class="supplier-icon compact-icon ${iconInfo.colorClass}" data-tooltip-text="${category}"> <!-- REMOVED title, ADDED data-tooltip-text -->
                     <i class="${iconInfo.icon}"></i>
                 </div>
             `;
@@ -98,6 +146,7 @@ export function createOrderFormModalBodyHtml(order, allSuppliers = [], allUnique
     const {
         id,
         supplierId,
+        supplierName, // <--- ADDED supplierName to destructuring
         items = [], // Default to empty array
         notes,
         orderedBy,
@@ -162,7 +211,7 @@ export function createOrderFormModalBodyHtml(order, allSuppliers = [], allUnique
                     ${supplierCardsHtml}
                 </div>
                 <input type="hidden" id="orderSupplierId" value="${supplierId || ''}">
-                <input type="hidden" id="orderSupplierName" value="${order.supplierName || ''}">
+                <input type="hidden" id="orderSupplierName" value="${supplierName || ''}"> <!-- Used destructured supplierName -->
                 <p class="modal-message info-message" id="supplierSelectionMessage" style="display:none;">Please select a supplier.</p>
             </div>
 
