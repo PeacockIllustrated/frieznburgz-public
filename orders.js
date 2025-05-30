@@ -201,7 +201,7 @@ async function openOrderModal(orderData = null) {
     } else {
         footerHtml = `<button id="updateOrderBtn" class="auth-button">Update Order</button>`;
         if (orderData.status === 'Pending') {
-            footerHtml += `<button id="cancelOrderBtn" class="auth-button secondary-btn" style="background-color: #dc3545; border-color: #dc3545;">Cancel Order</button>`;
+            footerHtml += `<button id="cancelOrderBtn" class="auth-button secondary-btn" style="background-color: var(--salmon); border-color: #dc3545;">Cancel Order</button>`;
         }
     }
     footerHtml += `<button id="closeModalBtn" class="auth-button secondary-btn">Close</button>`;
