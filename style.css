@@ -7,7 +7,7 @@
     --salmon: #ff9686; /* Lighter red/orange tone */
     --dark-slate-grey: #050505; /* Near black, used for body background */
 
-    /* NEW: Icon Colors */
+    /* Icon Colors */
     --color-meat: #A0522D;      /* Sienna */
     --color-cheese: #FFD700;    /* Gold */
     --color-veggies: #228B22;   /* Forest Green */
@@ -763,43 +763,6 @@ body {
 }
 
 /* Specific styling for modal inputs to match other auth-inputs */
-
-/* Custom Tooltip Styles (for supplier icons) */
-.custom-tooltip {
-    position: absolute;
-    background-color: var(--red); /* Dark background */
-    color: var(--yellow); /* Yellow text */
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-family: 'Futura', Arial, sans-serif;
-    font-size: 14px;
-    white-space: nowrap; /* Prevent text wrapping */
-    z-index: 1001; /* Higher than modal overlay */
-    pointer-events: none; /* Crucial: allows mouse events to pass through to elements below */
-    display: none; /* Hidden by default */
-    opacity: 0; /* Start invisible for fade-in */
-    /* Position above and horizontally centered relative to its calculated JS position */
-    transform: translate(-50%, -100%); /* Centers horizontally, moves up by its own height */
-    transition: opacity 0.15s ease-out; /* Smooth fade-in/out */
-}
-
-/* Make tooltip visible with transition */
-.custom-tooltip.visible {
-    opacity: 1;
-}
-
-/* Optional: Add a small arrow to the tooltip */
-.custom-tooltip::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: -5px; /* Adjust based on border-radius and desired gap from tooltip box */
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: var(--dim-grey) transparent transparent transparent; /* Arrow pointing down */
-}
-
 .modal-input {
     font-family: 'Futura', Arial, sans-serif;
     width: calc(100% - 20px);
@@ -1211,9 +1174,8 @@ body {
     align-items: center;
     text-align: center;
     transition: transform 0.2s ease;
-    /* NEW: Position relative for absolute children (icons) */
     position: relative;
-    overflow: hidden; /* Ensure icons don't spill out if they are larger than card on small screens */
+    overflow: hidden;
     padding-top: 40px; /* Make space for icons at the top */
 }
 
@@ -1221,34 +1183,34 @@ body {
     transform: translateY(-5px);
 }
 
-/* NEW: Container for icons in supplier card */
+/* Container for icons in supplier card */
 .supplier-icons-container {
     position: absolute;
     top: 10px;
     right: 10px;
     display: flex;
-    gap: 5px; /* Space between multiple icons */
-    z-index: 5; /* Ensure icons are above other card content */
-    flex-wrap: wrap; /* Allow icons to wrap if too many */
-    justify-content: flex-end; /* Align icons to the right */
-    max-width: calc(100% - 20px); /* Limit width to card */
+    gap: 5px;
+    z-index: 5;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: calc(100% - 20px);
 }
 
-/* NEW: Individual supplier icon styling */
+/* Individual supplier icon styling */
 .supplier-icon {
     width: 30px;
     height: 30px;
-    border-radius: 50%; /* Circular icons */
+    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 16px; /* Size of the Font Awesome icon */
-    color: var(--yellow); /* Default icon color */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
-    flex-shrink: 0; /* Prevent icons from shrinking */
+    font-size: 16px;
+    color: var(--yellow);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
 }
 
-/* NEW: Specific color classes for icons */
+/* Specific color classes for icons */
 .supplier-icon.icon-meat { background-color: var(--color-meat); }
 .supplier-icon.icon-cheese { background-color: var(--color-cheese); }
 .supplier-icon.icon-veggies { background-color: var(--color-veggies); }
@@ -1428,6 +1390,269 @@ body {
     font-style: italic;
     color: var(--dim-grey);
     margin-top: 10px;
+}
+
+
+/* --- Orders Page Specific Styles --- */
+.orders-actions {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px dashed var(--salmon);
+}
+
+.orders-actions .quick-action-btn {
+    width: auto;
+    padding: 10px 30px;
+    font-size: 18px;
+}
+
+.orders-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.order-card {
+    background-color: var(--yellow);
+    border: 5px solid var(--khaki);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-5px);
+}
+
+.order-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    border-bottom: 2px solid var(--salmon);
+    padding-bottom: 5px;
+}
+
+.order-supplier-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin: 0;
+    flex-grow: 1;
+    text-align: left;
+}
+
+.order-status {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: var(--yellow);
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.order-status.status-pending { background-color: var(--khaki); }
+.order-status.status-received { background-color: #4CAF50; } /* Green */
+.order-status.status-cancelled { background-color: #dc3545; } /* Red */
+
+
+.order-summary-details p {
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 15px;
+    color: var(--dim-grey);
+    margin: 3px 0;
+    text-align: left;
+}
+
+.order-summary-details strong {
+    color: var(--red);
+}
+
+.order-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--salmon);
+}
+
+.order-actions .small-btn {
+    padding: 8px 15px;
+    font-size: 14px;
+    width: auto;
+}
+
+/* Modal Order Form Specific Styles */
+.modal-order-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+}
+
+.modal-order-form .order-info-read-only {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+.modal-order-form .order-info-read-only p {
+    margin: 5px 0;
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 15px;
+    color: var(--dim-grey);
+}
+.modal-order-form .order-info-read-only strong {
+    color: var(--red);
+    text-transform: uppercase;
+}
+.modal-order-form .order-info-read-only .order-status-display {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    display: inline-block; /* To allow background color */
+    padding: 3px 8px;
+    border-radius: 5px;
+    color: var(--yellow);
+    text-transform: uppercase;
+}
+.modal-order-form .order-info-read-only .order-status-display.Pending { background-color: var(--khaki); }
+.modal-order-form .order-info-read-only .order-status-display.Received { background-color: #4CAF50; }
+.modal-order-form .order-info-read-only .order-status-display.Cancelled { background-color: #dc3545; }
+
+
+.modal-order-form .order-items-list-container {
+    border: 1px dashed var(--salmon);
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #fcfcfc;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.modal-order-form .order-items-list-container > label {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--dim-grey);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block; /* Ensure label takes full width */
+}
+
+.modal-order-form .order-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-order-form .order-item-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px dotted rgba(0,0,0,0.1);
+}
+
+.modal-order-form .order-item-row:last-of-type {
+    border-bottom: none;
+}
+
+.modal-order-form .order-item-select {
+    flex-grow: 1;
+    min-width: 150px;
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.modal-order-form .order-item-qty {
+    width: 60px; /* Small fixed width */
+    flex-shrink: 0;
+    padding: 8px 5px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.modal-order-form .order-item-unit {
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 14px;
+    color: var(--dim-grey);
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.modal-order-form .remove-item-btn {
+    background-color: #dc3545; /* Red for remove */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease;
+}
+
+.modal-order-form .remove-item-btn:hover {
+    background-color: #c82333;
+}
+
+.modal-order-form .select-wrapper {
+    margin-bottom: 0; /* Override default margin */
+}
+
+.modal-order-form .small-btn {
+    padding: 8px 15px;
+    font-size: 14px;
+}
+
+/* Custom Tooltip Styles (for supplier icons) */
+.custom-tooltip {
+    position: absolute;
+    background-color: var(--red); /* Changed to brand red */
+    color: var(--yellow); /* Yellow text */
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 14px;
+    white-space: nowrap; /* Prevent text wrapping */
+    z-index: 1001; /* Higher than modal overlay */
+    pointer-events: none; /* Crucial: allows mouse events to pass through to elements below */
+    display: none; /* Hidden by default */
+    opacity: 0; /* Start invisible for fade-in */
+    /* Position above and horizontally centered relative to its calculated JS position */
+    transform: translate(-50%, -100%); /* Centers horizontally, moves up by its own height */
+    transition: opacity 0.15s ease-out; /* Smooth fade-in/out */
+}
+
+/* Make tooltip visible with transition */
+.custom-tooltip.visible {
+    opacity: 1;
+}
+
+/* Optional: Add a small arrow to the tooltip */
+.custom-tooltip::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -5px; /* Adjust based on border-radius and desired gap from tooltip box */
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--red) transparent transparent transparent; /* Arrow pointing down, changed to brand red */
 }
 
 
@@ -1616,7 +1841,6 @@ body {
     }
     .supplier-card {
         padding: 20px;
-        /* Adjust padding-top for mobile icons to prevent content overlap */
         padding-top: 35px;
     }
     .supplier-name {
@@ -1663,6 +1887,33 @@ body {
     .modal-supplier-details-form .item-checkbox-label {
         font-size: 14px;
     }
+
+    /* Orders modal adjustments for mobile */
+    .modal-order-form .order-item-row {
+        flex-wrap: wrap; /* Allow items to wrap */
+        justify-content: center;
+        text-align: center;
+    }
+    .modal-order-form .order-item-select,
+    .modal-order-form .select-wrapper {
+        width: 100%; /* Full width for select on mobile */
+        min-width: unset;
+    }
+    .modal-order-form .order-item-qty {
+        width: 100px; /* Adjust qty input width */
+    }
+    .modal-order-form .order-item-unit {
+        width: 100%; /* Make unit span full width under qty */
+    }
+    .modal-order-form .remove-item-btn {
+        position: absolute; /* Position remove button absolutely */
+        top: 5px;
+        right: 5px;
+    }
+    .modal-order-form .order-item-row {
+        position: relative; /* Make row relative for absolute button */
+        padding-right: 35px; /* Make space for remove button */
+    }
 }
 
 /* Desktop-specific modal form layout for larger screens */
@@ -1701,5 +1952,31 @@ body {
 
     .modal-supplier-details-form .item-checkboxes-grid {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    /* Orders modal layout for desktop */
+    .modal-order-form .order-item-row {
+        flex-wrap: nowrap; /* Prevent wrapping on desktop */
+        justify-content: flex-start;
+        text-align: left;
+    }
+    .modal-order-form .order-item-select,
+    .modal-order-form .select-wrapper {
+        width: auto; /* Allow auto width for select */
+        min-width: 200px; /* Give it a minimum width */
+    }
+    .modal-order-form .order-item-qty {
+        width: 80px; /* Slightly wider for desktop */
+    }
+    .modal-order-form .remove-item-btn {
+        position: static; /* Reset position */
+        top: auto;
+        right: auto;
+        margin-left: auto; /* Push to the right */
+        order: 99; /* Ensure it's last */
+    }
+    .modal-order-form .order-item-row {
+        position: static; /* Reset position */
+        padding-right: 0;
     }
 }
