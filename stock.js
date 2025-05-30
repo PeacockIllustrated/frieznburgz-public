@@ -10,7 +10,7 @@ import { createStockItemHtml } from './stock-template.js'; // Template for indiv
 const stockManagementContent = document.getElementById('stockManagementContent'); // Main content area for stock page
 
 let currentItemsData = []; // Store current loaded items for the selected location
-let pendingStockChanges = {}; // { categoryId: { itemId: newStockValue, ... }, ... }
+let pendingStockChanges = {}; // { categoryId: { itemId: { newStock: value, oldStock: value }, ... }, ... }
 
 // NEW: Global variable to store the last transaction group ID and its timestamp for the current user
 // This helps in grouping consecutive changes by the same user.
@@ -205,7 +205,7 @@ async function updateLocalStock(itemId, categoryId, change, inputElement, itemDi
         }
     } else { // Increment/Decrement button click
         let currentLocalStock = parseInt(inputElement.value, 10);
-        if (isNaN(currentLocalStock)) {
+        if (isNaN(currentLocalStock)) { // If input is empty, start from the current Firestore value
             currentLocalStock = oldStockValue; // Fallback to original if input is empty
         }
         newStockValue = currentLocalStock + change;
@@ -266,7 +266,7 @@ async function handleConfirmCategoryChanges(categoryId, confirmBtn) {
     confirmBtn.disabled = true;
     confirmBtn.classList.add('saving');
 
-    const batch = db.batch();
+    const stockUpdateBatch = db.batch(); // Batch for stock updates
     const transactionGroupId = getOrCreateTransactionGroupId(); // Get or create transaction group ID
     const logEntries = [];
     const changedItemIds = []; // To track items for which stock was updated
@@ -278,7 +278,7 @@ async function handleConfirmCategoryChanges(categoryId, confirmBtn) {
             
             // Only update if stock actually changed
             if (newStock !== oldStock) {
-                batch.update(itemDocRef, { currentStock: newStock });
+                stockUpdateBatch.update(itemDocRef, { currentStock: newStock });
                 changedItemIds.push(itemId);
 
                 // Prepare log entry for stock_log collection
@@ -307,12 +307,13 @@ async function handleConfirmCategoryChanges(categoryId, confirmBtn) {
     }
 
     try {
-        await batch.commit(); // Commit stock updates first
+        await stockUpdateBatch.commit(); // Commit stock updates first
 
-        // Now add log entries in a separate batch or individual writes
-        const logBatch = db.batch();
+        // Now add log entries using a separate batch for the stock_log collection
+        const logBatch = db.batch(); // CORRECTED: New batch for log entries
         logEntries.forEach(logEntry => {
-            logBatch.collection('locations').doc(selectedLocationId).collection('stock_log').add(logEntry);
+            const newLogDocRef = db.collection('locations').doc(selectedLocationId).collection('stock_log').doc(); // Create a new doc reference
+            logBatch.set(newLogDocRef, logEntry); // Use set with the new doc reference
         });
         await logBatch.commit(); // Commit log entries
 
@@ -382,20 +383,21 @@ async function loadStockActivityLog(container) {
 
         // Sort groups by the timestamp of their first entry (most recent first)
         const sortedGroupKeys = Object.keys(groupedLog).sort((a, b) => {
-            const timeA = groupedLog[a][0].timestamp ? groupedLog[a][0].timestamp.toMillis() : 0;
-            const timeB = groupedLog[b][0].timestamp ? groupedLog[b][0].timestamp.toMillis() : 0;
+            // Ensure timestamp is a valid object before calling toMillis()
+            const timeA = groupedLog[a][0].timestamp && typeof groupedLog[a][0].timestamp.toMillis === 'function' ? groupedLog[a][0].timestamp.toMillis() : 0;
+            const timeB = groupedLog[b][0].timestamp && typeof groupedLog[b][0].timestamp.toMillis === 'function' ? groupedLog[b][0].timestamp.toMillis() : 0;
             return timeB - timeA;
         });
 
         sortedGroupKeys.forEach(groupKey => {
             const group = groupedLog[groupKey].sort((a, b) => { // Sort entries within group by timestamp
-                const timeA = a.timestamp ? a.timestamp.toMillis() : 0;
-                const timeB = b.timestamp ? b.timestamp.toMillis() : 0;
+                const timeA = a.timestamp && typeof a.timestamp.toMillis === 'function' ? a.timestamp.toMillis() : 0;
+                const timeB = b.timestamp && typeof b.timestamp.toMillis === 'function' ? b.timestamp.toMillis() : 0;
                 return timeB - timeA;
             });
             const firstEntry = group[0];
             const timestamp = firstEntry.timestamp ? firstEntry.timestamp.toDate().toLocaleString() : 'N/A';
-            const updatedBy = firstEntry.updatedBy.split('@')[0]; // Just the name before '@'
+            const updatedBy = firstEntry.updatedBy ? firstEntry.updatedBy.split('@')[0] : 'Unknown User'; // Safely get user name
 
             let groupHeader = '';
             if (groupKey === 'no_group') {
