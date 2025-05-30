@@ -4,7 +4,7 @@
 import { db } from './firebase.js';
 import { auth } from './firebase.js'; // To log who created/received the order
 import { getSelectedLocation } from './config.js';
-import { createOrderCardHtml, createOrderFormModalBodyHtml } from './orders-template.js';
+import { createOrderCardHtml, createOrderFormModalBodyHtml, getItemOptionsHtml } from './orders-template.js'; // NEW: getItemOptionsHtml
 import { getAllUniqueStockItems } from './stock.js'; // To get item list for order form
 import { renderStockManagementPage } from './stock.js'; // To re-render stock page after receiving order
 import { getSuppliers } from './suppliers.js'; // To get supplier list for order form
@@ -15,6 +15,7 @@ const ordersPage = document.getElementById('ordersPage');
 // Caches for frequently needed data
 let allUniqueStockItemsCache = [];
 let allSuppliersCache = [];
+let filteredSupplierItemsCache = []; // NEW: Cache for items available from selected supplier
 
 /**
  * Renders the Orders page content.
@@ -129,7 +130,7 @@ async function loadOrders(container) {
 async function openOrderModal(orderData = null) {
     const isNew = !orderData || !orderData.id;
     const title = isNew ? 'Create New Order' : `Order: ${orderData.supplierName || 'Details'}`;
-    const bodyHtml = createOrderFormModalBodyHtml(orderData, allUniqueStockItemsCache, allSuppliersCache);
+    const bodyHtml = createOrderFormModalBodyHtml(orderData, allSuppliersCache); // Only pass suppliers here
     let footerHtml = '';
 
     if (isNew) {
@@ -150,18 +151,90 @@ async function openOrderModal(orderData = null) {
         return;
     }
 
-    // Attach event listeners for dynamic form elements AFTER modal is rendered
+    // --- NEW: Dynamic Item Filtering Logic ---
+    const orderSupplierSelect = document.getElementById('orderSupplierSelect');
     const orderItemsList = document.getElementById('orderItemsList');
     const addOrderItemBtn = document.getElementById('addOrderItemBtn');
+    const orderItemMessage = document.getElementById('orderItemMessage'); // Message for no items
 
-    if (addOrderItemBtn) {
-        addOrderItemBtn.addEventListener('click', () => addOrderItemRow(orderItemsList, allUniqueStockItemsCache));
+    if (isNew) {
+        // Initially disable Add Item button if no supplier selected
+        if (!orderSupplierSelect.value) {
+            addOrderItemBtn.disabled = true;
+            orderItemMessage.textContent = 'Please select a supplier to add items.';
+            orderItemMessage.style.display = 'block';
+        }
     }
-    // Add event listeners to existing remove buttons (and future ones via delegation)
+
+
+    const updateItemDropdowns = (selectedSupplierId) => {
+        const selectedSupplier = allSuppliersCache.find(s => s.id === selectedSupplierId);
+        filteredSupplierItemsCache = []; // Clear previous filtered items
+
+        if (selectedSupplier && selectedSupplier.itemsSupplied && selectedSupplier.itemsSupplied.length > 0) {
+            // Filter all unique items to only those supplied by the selected supplier
+            filteredSupplierItemsCache = allUniqueStockItemsCache.filter(item =>
+                selectedSupplier.itemsSupplied.includes(item.name)
+            );
+            orderItemMessage.style.display = 'none'; // Hide message if items found
+            addOrderItemBtn.disabled = false; // Enable add item button
+        } else {
+            orderItemMessage.textContent = 'No items configured for this supplier, or no supplier selected.';
+            orderItemMessage.style.display = 'block';
+            addOrderItemBtn.disabled = true; // Disable add item button
+        }
+
+        const itemOptionsHtml = getItemOptionsHtml(filteredSupplierItemsCache);
+
+        // Update all existing item selects and any new ones
+        orderItemsList.querySelectorAll('.order-item-select').forEach(selectElement => {
+            const currentSelectedValue = selectElement.value; // Preserve current selection if it's valid
+            selectElement.innerHTML = itemOptionsHtml;
+            if (currentSelectedValue && filteredSupplierItemsCache.some(item => item.id === currentSelectedValue)) {
+                selectElement.value = currentSelectedValue; // Restore selection if still valid
+            } else {
+                selectElement.value = ""; // Reset if old selection is no longer valid
+            }
+            selectElement.disabled = (filteredSupplierItemsCache.length === 0);
+            // Also enable/disable quantity input for this row
+            const qtyInput = selectElement.closest('.order-item-row').querySelector('.order-item-qty');
+            if (qtyInput) {
+                qtyInput.disabled = (filteredSupplierItemsCache.length === 0);
+            }
+        });
+    };
+
+    // Event listener for supplier selection change
+    orderSupplierSelect.addEventListener('change', (event) => {
+        updateItemDropdowns(event.target.value);
+    });
+
+    // If editing an existing order, pre-populate item dropdowns based on its supplier
+    if (!isNew && orderData.supplierId) {
+        updateItemDropdowns(orderData.supplierId);
+    } else if (isNew && orderData.supplierId) { // Handles case where new order might have initial supplier pre-selected (e.g. from a quick action)
+        updateItemDropdowns(orderData.supplierId);
+    }
+    // --- END: Dynamic Item Filtering Logic ---
+
+
+    // Attach event listeners for dynamic form elements AFTER modal is rendered
+    // (This part remains largely the same, but now uses filteredSupplierItemsCache)
+    const orderItemsList = document.getElementById('orderItemsList'); // Re-get it, just in case
+    const addOrderItemBtnReal = document.getElementById('addOrderItemBtn'); // Use a different name to avoid confusion
+
+    if (addOrderItemBtnReal) {
+        addOrderItemBtnReal.addEventListener('click', () => {
+            // Ensure addOrderItemRow uses filteredSupplierItemsCache
+            addOrderItemRow(orderItemsList, filteredSupplierItemsCache);
+        });
+    }
+
     orderItemsList.addEventListener('click', (event) => {
         if (event.target.classList.contains('remove-item-btn') || event.target.closest('.remove-item-btn')) {
             const rowToRemove = event.target.closest('.order-item-row');
-            if (orderItemsList.children.length > 1) { // Ensure at least one row remains
+            // Ensure at least one row remains
+            if (orderItemsList.children.length > 1) {
                 rowToRemove.remove();
             } else {
                 alert('An order must have at least one item.');
@@ -169,14 +242,22 @@ async function openOrderModal(orderData = null) {
         }
     });
 
-    // Add event listener to dynamically update unit text
     orderItemsList.addEventListener('change', (event) => {
         const target = event.target;
         if (target.classList.contains('order-item-select')) {
             const selectedOption = target.options[target.selectedIndex];
             const unitSpan = target.closest('.order-item-row').querySelector('.order-item-unit');
+            const qtyInput = target.closest('.order-item-row').querySelector('.order-item-qty');
+
             if (unitSpan) {
                 unitSpan.textContent = selectedOption.dataset.unit || 'units';
+            }
+            // Enable quantity input if an item is selected
+            if (qtyInput) {
+                qtyInput.disabled = (selectedOption.value === '');
+                if (selectedOption.value !== '' && (isNaN(parseInt(qtyInput.value)) || parseInt(qtyInput.value) < 1)) {
+                    qtyInput.value = 1; // Default to 1 if no valid qty
+                }
             }
         }
     });
@@ -197,31 +278,35 @@ async function openOrderModal(orderData = null) {
 /**
  * Adds a new item row to the order modal form.
  * @param {HTMLElement} container - The container element (e.g., #orderItemsList).
- * @param {Array<Object>} allItems - All unique stock items to populate the select.
+ * @param {Array<Object>} itemsForDropdown - Items to populate the select, typically filtered by supplier.
  * @param {Object} [initialItem={}] - Optional initial item data for pre-filling.
  */
-function addOrderItemRow(container, allItems, initialItem = {}) {
-    const itemOptions = allItems.map(item => `
-        <option value="${item.id}" data-unit="${item.unit || 'units'}" ${initialItem.itemId === item.id ? 'selected' : ''}>
-            ${item.name} (${item.unit || 'units'})
-        </option>
-    `).join('');
+function addOrderItemRow(container, itemsForDropdown, initialItem = {}) {
+    // Dynamically generate options based on itemsForDropdown
+    const itemOptions = getItemOptionsHtml(itemsForDropdown);
 
     const newRowHtml = `
         <div class="order-item-row">
-            <div class="select-wrapper">
-                <select class="order-item-select">
+            <div class="select-wrapper item-select-wrapper">
+                <select class="order-item-select" ${itemsForDropdown.length === 0 ? 'disabled' : ''}>
                     <option value="" disabled ${!initialItem.itemId ? 'selected' : ''}>Select Item</option>
                     ${itemOptions}
                 </select>
                 <i class="fas fa-chevron-down select-arrow"></i>
             </div>
-            <input type="number" class="order-item-qty auth-input modal-input" value="${initialItem.quantity || ''}" min="1" placeholder="Qty">
+            <input type="number" class="order-item-qty auth-input modal-input" value="${initialItem.quantity || ''}" min="1" placeholder="Qty" ${!initialItem.itemId ? 'disabled' : ''}>
             <span class="order-item-unit">${initialItem.unit || 'units'}</span>
             <button class="remove-item-btn secondary-btn" type="button"><i class="fas fa-times"></i></button>
         </div>
     `;
     container.insertAdjacentHTML('beforeend', newRowHtml);
+
+    // After adding a new row, ensure its quantity input is disabled if no item is selected
+    const newSelect = container.lastElementChild.querySelector('.order-item-select');
+    const newQtyInput = container.lastElementChild.querySelector('.order-item-qty');
+    if (newSelect && newQtyInput && newSelect.value === "") {
+        newQtyInput.disabled = true;
+    }
 }
 
 /**
@@ -243,6 +328,7 @@ async function handleSaveOrder(originalOrderData) {
 
     const items = [];
     let isValidOrder = true;
+    let hasAtLeastOneItem = false;
 
     orderItemsList.querySelectorAll('.order-item-row').forEach(row => {
         const itemSelect = row.querySelector('.order-item-select');
@@ -254,15 +340,29 @@ async function handleSaveOrder(originalOrderData) {
         const itemName = itemSelect.options[itemSelect.selectedIndex].text.split('(')[0].trim();
         const itemUnit = unitSpan.textContent;
 
-        if (!itemId || isNaN(quantity) || quantity <= 0) {
+        if (itemId && !isNaN(quantity) && quantity > 0) {
+            items.push({ itemId, itemName, quantity, unit: itemUnit });
+            hasAtLeastOneItem = true;
+        } else if (itemId || !isNaN(quantity) || quantity > 0) { // If either is filled but not both valid
             isValidOrder = false;
-            return;
         }
-        items.push({ itemId, itemName, quantity, unit: itemUnit });
+        // If both are empty, it's considered an empty row and ignored, but ensures at least one valid row exists.
     });
 
-    if (!supplierId || !isValidOrder || items.length === 0) {
-        modalMessage.textContent = 'Please select a supplier and add at least one item with a valid quantity.';
+    if (!supplierId) {
+        modalMessage.textContent = 'Please select a supplier.';
+        modalMessage.style.display = 'block';
+        return;
+    }
+
+    if (!isValidOrder) {
+        modalMessage.textContent = 'Please ensure all selected items have a valid quantity.';
+        modalMessage.style.display = 'block';
+        return;
+    }
+
+    if (!hasAtLeastOneItem) {
+        modalMessage.textContent = 'An order must have at least one item.';
         modalMessage.style.display = 'block';
         return;
     }
