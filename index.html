@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><script type='text/javascript' src='https://api.netlify.com/qlZXzB-iUrUR0N_VI3xNLnRozhpvOY2CZ0ZlJ_NHeQ04WDmvrJYn3XxDDLlUjML-zOQnojMdm5i6KaJmXXbR3g=='></script>
+<head><script type='text/javascript' src='https://api.netlify.com/qlZXzB-iUrUR0N_VI3xNLnRozhpvOY2CZ0ZlJ_NHeQ04WDNvrJYn3XxDDLlUjML-zOQnojMdm5i6KaJmXXbR3g=='></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friez n Burgz | Admin Dashboard</title>
@@ -17,7 +17,7 @@
     <!-- 1. Authentication Container (Login/Signup) -->
     <div class="auth-container" id="authContainer">
         <div class="auth-card">
-            <img src="assets/logo.png" alt="Friez n Burgz Logo" class="auth-logo">
+            <img src="assets/logo-alt.png" alt="Friez n Burgz Logo" class="auth-logo"> <!-- CHANGED LOGO PATH HERE -->
             <h2 class="auth-title">Employee Login</h2>
             <input type="email" id="loginEmail" placeholder="Email" class="auth-input">
             <input type="password" id="loginPassword" placeholder="Password" class="auth-input">
@@ -33,7 +33,7 @@
     <!-- 2. Location Selection Container (Shown after login, before main app) -->
     <div class="location-selection-container" id="locationSelectionContainer">
         <div class="location-selection-card">
-            <img src="assets/logo.png" alt="Friez n Burgz Logo" class="auth-logo">
+            <img src="assets/logo-alt.png" alt="Friez n Burgz Logo" class="auth-logo"> <!-- CHANGED LOGO PATH HERE -->
             <h2 class="auth-title">Select Your Location</h2>
             <div class="select-wrapper">
                 <select id="locationSelect" class="location-select"></select>
@@ -48,7 +48,7 @@
     <div class="main-dashboard-container" id="mainDashboardContainer">
         <header class="dashboard-header">
             <div class="header-left">
-                <img src="assets/logo.png" alt="Friez n Burgz Logo" class="header-logo">
+                <img src="assets/logo.png" alt="Friez n Burgz Logo" class="header-logo"> <!-- THIS LOGO REMAINS ORIGINAL -->
                 <span class="app-name">Admin Dashboard</span>
             </div>
             <div class="header-center">
@@ -102,8 +102,8 @@
             </section>
 
             <section id="ordersPage" class="content-page">
-                <h2 class="page-title">Orders</h2>
-                <p>Pending orders and order history.</p>
+                <!-- IMPORTANT: This div is where orders.js will inject its content -->
+                <div id="ordersContent"></div>
             </section>
 
             <section id="suppliersPage" class="content-page">
@@ -135,6 +135,5 @@
 
     <!-- Main JavaScript file - acts as the orchestrator -->
     <script type="module" src="main.js"></script>
-    <script type="module" src="import-data.js"></script>
 </body>
 </html>
