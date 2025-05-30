@@ -1463,7 +1463,7 @@ body {
 
 .order-status.status-pending { background-color: var(--khaki); }
 .order-status.status-received { background-color: #4CAF50; }
-.order-status.status-cancelled { background-color: #dc3545; }
+.order-status.status-cancelled { background-color: var(--salmon); }
 
 
 .order-summary-details p {
@@ -1527,7 +1527,7 @@ body {
 }
 .modal-order-form .order-info-read-only .order-status-display.status-Pending { background-color: var(--khaki); }
 .modal-order-form .order-info-read-only .order-status-display.status-Received { background-color: #4CAF50; }
-.modal-order-form .order-info-read-only .order-status-display.status-Cancelled { background-color: #dc3545; }
+.modal-order-form .order-info-read-only .order-status-display.status-Cancelled { background-color: var(--salmon); }
 
 
 .modal-order-form .order-items-list-container {
