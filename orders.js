@@ -215,10 +215,10 @@ async function openOrderModal(orderData = null) {
     }
 
     // --- Retrieve DOM elements once after modal is rendered ---
-    const orderSupplierCardsContainer = document.getElementById('orderSupplierCardsContainer'); // NEW
-    const orderSupplierIdInput = document.getElementById('orderSupplierId'); // NEW hidden input for selected supplier ID
-    const orderSupplierNameInput = document.getElementById('orderSupplierName'); // NEW hidden input for selected supplier Name
-    const supplierSelectionMessage = document.getElementById('supplierSelectionMessage'); // NEW message for supplier selection
+    const orderSupplierCardsContainer = document.getElementById('orderSupplierCardsContainer');
+    const orderSupplierIdInput = document.getElementById('orderSupplierId');
+    const orderSupplierNameInput = document.getElementById('orderSupplierName');
+    const supplierSelectionMessage = document.getElementById('supplierSelectionMessage');
 
     const orderItemsList = document.getElementById('orderItemsList');
     const addOrderItemBtn = document.getElementById('addOrderItemBtn');
@@ -247,7 +247,7 @@ async function openOrderModal(orderData = null) {
 
         // For new orders, ensure one empty item row exists and is enabled
         if (isNew) {
-            orderItemsList.innerHTML = ''; // Clear existing empty rows if any
+            orderItemsList.innerHTML = ''; // Clear existing item rows when supplier changes
             addOrderItemRow(orderItemsList, filteredSupplierItemsCache); // Add one new row
             addOrderItemBtn.disabled = false; // Enable Add Item button
         }
@@ -394,7 +394,7 @@ function addOrderItemRow(container, itemsForDropdown, initialItem = {}) {
     const newSelect = container.lastElementChild.querySelector('.order-item-select');
     const newQtyInput = container.lastElementChild.querySelector('.order-item-qty');
     if (newSelect && newQtyInput) {
-        newQtyInput.disabled = (newSelect.value === ""); // Disable if no item selected in this specific row
+        newQtyInput.disabled = (newSelect.value === "");
     }
 }
 
@@ -433,7 +433,7 @@ async function handleSaveOrder(originalOrderData) {
         if (itemId && !isNaN(quantity) && quantity > 0) {
             items.push({ itemId, itemName, quantity, unit: itemUnit });
             hasAtLeastOneItem = true;
-        } else if (itemId || !isNaN(quantity) || quantity > 0) { // If either is filled but not both valid
+        } else if (itemId || !isNaN(quantity) || quantity > 0) {
             isValidOrder = false;
         }
     });
@@ -458,7 +458,7 @@ async function handleSaveOrder(originalOrderData) {
 
     const orderToSave = {
         supplierId,
-        supplierName, // Use value from hidden input
+        supplierName,
         items,
         notes,
         locationId: selectedLocationId,
