@@ -41,12 +41,12 @@ export function createOrderCardHtml(order) {
 
 /**
  * Generates the HTML for the order form/details modal body.
+ * This template now takes a function `getItemOptionsHtml` to dynamically generate item options.
  * @param {Object} order - The order object (for editing) or null/empty (for new).
- * @param {Array<Object>} allItems - All unique stock items.
  * @param {Array<Object>} allSuppliers - All available suppliers.
  * @returns {string} The HTML string for the order modal form.
  */
-export function createOrderFormModalBodyHtml(order, allItems = [], allSuppliers = []) {
+export function createOrderFormModalBodyHtml(order, allSuppliers = []) {
     // Safely destructure properties, providing default empty values if order is null/undefined
     const {
         id,
@@ -63,7 +63,7 @@ export function createOrderFormModalBodyHtml(order, allItems = [], allSuppliers 
     const isNew = !id;
 
     // Build supplier options
-    let supplierOptions = '<option value="" disabled selected>Select Supplier</option>';
+    let supplierOptions = '<option value="" disabled selected>-- Select a Supplier --</option>';
     if (allSuppliers.length === 0) {
         supplierOptions += '<option value="" disabled>No suppliers found</option>';
     } else {
@@ -73,55 +73,29 @@ export function createOrderFormModalBodyHtml(order, allItems = [], allSuppliers 
         });
     }
 
-    // Build item options for dynamic rows
-    let itemOptions = '<option value="" disabled selected>Select Item</option>';
-    if (allItems.length === 0) {
-        itemOptions += '<option value="" disabled>No items found</option>';
-    } else {
-        const categorizedItems = allItems.reduce((acc, item) => {
-            const category = item.category || 'Uncategorized';
-            if (!acc[category]) {
-                acc[category] = [];
-            }
-            acc[category].push(item);
-            return acc;
-        }, {});
-
-        Object.keys(categorizedItems).sort().forEach(category => {
-            itemOptions += `<optgroup label="${category}">`;
-            categorizedItems[category].sort((a, b) => a.name.localeCompare(b.name)).forEach(item => {
-                itemOptions += `<option value="${item.id}" data-unit="${item.unit || 'units'}">${item.name} (${item.unit || 'units'})</option>`;
-            });
-            itemOptions += `</optgroup>`;
-        });
-    }
-
     // Generate initial item rows for existing order or one empty row for new order
+    // This part is now simplified as the item options will be generated dynamically by JS after supplier selection
     let initialItemRowsHtml = '';
     const itemsToDisplay = (items && items.length > 0) ? items : [{}]; // One empty object for new row
 
     itemsToDisplay.forEach((item, index) => {
-        const selectedItemOptionValue = item.itemId || ''; // Ensure it's not undefined
+        // For existing items, their selected value is kept, but the dropdown for NEW additions will be empty initially
+        // The actual options will be dynamically filled by JS based on supplier.
         initialItemRowsHtml += `
             <div class="order-item-row" data-item-id="${item.itemId || ''}">
-                <div class="select-wrapper">
-                    <select class="order-item-select">
-                        <option value="" disabled ${!item.itemId ? 'selected' : ''}>Select Item</option>
-                        ${allItems.map(i => `
-                            <option value="${i.id}" data-unit="${i.unit || 'units'}" ${selectedItemOptionValue === i.id ? 'selected' : ''}>
-                                ${i.name} (${i.unit || 'units'})
-                            </option>
-                        `).join('')}
+                <div class="select-wrapper item-select-wrapper">
+                    <select class="order-item-select" ${isNew && !item.itemId ? 'disabled' : ''}>
+                        <option value="" disabled selected>Select Item</option>
+                        ${item.itemId ? `<option value="${item.itemId}" selected>${item.itemName} (${item.unit || 'units'})</option>` : ''}
                     </select>
                     <i class="fas fa-chevron-down select-arrow"></i>
                 </div>
-                <input type="number" class="order-item-qty auth-input modal-input" value="${item.quantity || ''}" min="1" placeholder="Qty">
+                <input type="number" class="order-item-qty auth-input modal-input" value="${item.quantity || ''}" min="1" placeholder="Qty" ${isNew && !item.itemId ? 'disabled' : ''}>
                 <span class="order-item-unit">${item.unit || 'units'}</span>
                 <button class="remove-item-btn secondary-btn" type="button"><i class="fas fa-times"></i></button>
             </div>
         `;
     });
-
 
     // Read-only fields for existing orders
     const displayedOrderedBy = orderedBy || 'N/A';
@@ -142,7 +116,7 @@ export function createOrderFormModalBodyHtml(order, allItems = [], allSuppliers 
 
             <div class="modal-input-group">
                 <label for="orderSupplierSelect">Supplier:</label>
-                <div class="select-wrapper">
+                <div class="select-wrapper supplier-select-wrapper">
                     <select id="orderSupplierSelect" class="order-select" ${!isNew ? 'disabled' : ''}>${supplierOptions}</select>
                     <i class="fas fa-chevron-down select-arrow"></i>
                 </div>
@@ -153,7 +127,8 @@ export function createOrderFormModalBodyHtml(order, allItems = [], allSuppliers 
                 <div id="orderItemsList" class="order-items-list">
                     ${initialItemRowsHtml}
                 </div>
-                <button id="addOrderItemBtn" class="auth-button small-btn" type="button">Add Item</button>
+                <button id="addOrderItemBtn" class="auth-button small-btn" type="button" ${isNew && !supplierId ? 'disabled' : ''}>Add Item</button>
+                <p class="modal-message info-message" id="orderItemMessage" style="display:none;"></p>
             </div>
 
             <div class="modal-input-group">
@@ -162,4 +137,34 @@ export function createOrderFormModalBodyHtml(order, allItems = [], allSuppliers 
             </div>
         </div>
     `;
+}
+
+/**
+ * Generates the HTML for item options within a select dropdown, grouped by category.
+ * @param {Array<Object>} items - Array of item objects.
+ * @returns {string} HTML string for <option> and <optgroup> tags.
+ */
+export function getItemOptionsHtml(items) {
+    let itemOptions = '<option value="" disabled selected>Select Item</option>';
+    if (items.length === 0) {
+        itemOptions = '<option value="" disabled selected>No items available for this supplier</option>';
+    } else {
+        const categorizedItems = items.reduce((acc, item) => {
+            const category = item.category || 'Uncategorized';
+            if (!acc[category]) {
+                acc[category] = [];
+            }
+            acc[category].push(item);
+            return acc;
+        }, {});
+
+        Object.keys(categorizedItems).sort().forEach(category => {
+            itemOptions += `<optgroup label="${category}">`;
+            categorizedItems[category].sort((a, b) => a.name.localeCompare(b.name)).forEach(item => {
+                itemOptions += `<option value="${item.id}" data-unit="${item.unit || 'units'}">${item.name} (${item.unit || 'units'})</option>`;
+            });
+            itemOptions += `</optgroup>`;
+        });
+    }
+    return itemOptions;
 }
