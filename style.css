@@ -1568,12 +1568,40 @@ body {
     border-bottom: none;
 }
 
-.modal-order-form .order-item-select {
-    flex-grow: 1;
-    min-width: 150px;
-    padding: 8px 10px;
-    font-size: 14px;
+/* Specific styling for selects in orders modal */
+.modal-order-form select.order-select,
+.modal-order-form select.order-item-select {
+    width: 100%;
+    padding: 12px 10px;
+    border: 2px solid var(--red);
+    border-radius: 8px;
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 16px;
+    color: var(--dim-grey);
+    background-color: var(--yellow);
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
 }
+.modal-order-form select.order-select:disabled,
+.modal-order-form select.order-item-select:disabled {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}
+
+/* Arrow for custom selects */
+.modal-order-form .select-wrapper .select-arrow {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--khaki);
+    pointer-events: none;
+    font-size: 18px;
+}
+
 
 .modal-order-form .order-item-qty {
     width: 60px;
@@ -1581,7 +1609,17 @@ body {
     padding: 8px 5px;
     text-align: center;
     font-size: 14px;
+    border: 2px solid var(--salmon);
+    border-radius: 8px;
+    color: var(--dim-grey);
+    background-color: var(--yellow);
+    box-sizing: border-box;
 }
+.modal-order-form .order-item-qty:disabled {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}
+
 
 .modal-order-form .order-item-unit {
     font-family: 'Futura', Arial, sans-serif;
@@ -1613,29 +1651,136 @@ body {
     background-color: #c82333;
 }
 
+/* Adjustments for general select-wrapper in modal */
 .modal-order-form .select-wrapper {
     margin-bottom: 0;
     flex-grow: 1;
     min-width: 150px;
 }
 
-/* Styles for the supplier select specifically */
-.modal-order-form .supplier-select-wrapper {
-    width: calc(100% - 20px);
-    min-width: unset;
-}
-/* Styles for the item select specifically */
+/* Styles for the supplier select container */
+/* REMOVED .modal-order-form .supplier-select-wrapper as it's no longer a select */
+
+/* Styles for the item select container */
 .modal-order-form .item-select-wrapper {
     width: auto;
     min-width: 150px;
+}
+
+/* Add Item Button */
+.modal-order-form #addOrderItemBtn {
+    margin-top: 10px;
+    align-self: flex-start;
+    width: auto;
+    padding: 8px 20px;
+    font-size: 16px;
+}
+.modal-order-form #addOrderItemBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: var(--red);
+    color: var(--yellow);
+    border-color: var(--yellow);
+}
+
+/* NEW: Compact Supplier Cards for Order Modal */
+.order-supplier-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Compact columns */
+    gap: 15px; /* Space between cards */
+    width: 100%;
+    padding: 10px;
+    border: 1px dashed var(--salmon);
+    border-radius: 8px;
+    background-color: #fcfcfc;
+    max-height: 250px; /* Limit height for scrollability */
+    overflow-y: auto;
+}
+
+.compact-supplier-card {
+    background-color: var(--yellow);
+    border: 3px solid var(--khaki); /* Thinner border */
+    border-radius: 15px; /* Slightly less rounded */
+    padding: 15px; /* Reduced padding */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    padding-top: 35px; /* Space for compact icons */
+}
+
+.compact-supplier-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--red); /* Highlight on hover */
+}
+
+.compact-supplier-card.selected {
+    border-color: var(--red); /* Highlight selected card */
+    box-shadow: 0 0 12px rgba(231, 30, 38, 0.4); /* Stronger shadow for selected */
+    background-color: #ffeaea; /* Very light red tint for selected */
+}
+
+.compact-supplier-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 18px; /* Smaller font size */
+    color: var(--red);
+    text-transform: uppercase;
+    margin: 0 0 5px 0;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.compact-icons-container {
+    position: absolute;
+    top: 5px; /* Closer to top */
+    right: 5px; /* Closer to right */
+    display: flex;
+    gap: 3px; /* Smaller gap between icons */
+    z-index: 5;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: calc(100% - 10px); /* Adjust max-width */
+}
+
+.supplier-icon.compact-icon {
+    width: 25px; /* Smaller icon size */
+    height: 25px;
+    font-size: 14px; /* Smaller icon glyph */
+    box-shadow: none; /* No shadow for compact icons */
+}
+
+.contact-short p {
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 13px; /* Smaller font size */
+    color: var(--dim-grey);
+    margin: 2px 0;
+    text-align: center; /* Center contact info */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* Supplier selection message */
+#supplierSelectionMessage {
+    margin-top: 10px;
+    font-weight: bold;
+    color: var(--red); /* Ensure message is red */
 }
 
 
 /* Custom Tooltip Styles (for supplier icons) */
 .custom-tooltip {
     position: absolute;
-    background-color: var(--red); /* Changed to brand red */
-    color: var(--yellow); /* Yellow text */
+    background-color: var(--red);
+    color: var(--yellow);
     padding: 8px 12px;
     border-radius: 8px;
     font-family: 'Futura', Arial, sans-serif;
@@ -1649,12 +1794,10 @@ body {
     transition: opacity 0.15s ease-out;
 }
 
-/* Make tooltip visible with transition */
 .custom-tooltip.visible {
     opacity: 1;
 }
 
-/* Optional: Add a small arrow to the tooltip */
 .custom-tooltip::after {
     content: '';
     position: absolute;
@@ -1663,7 +1806,7 @@ body {
     transform: translateX(-50%);
     border-width: 5px;
     border-style: solid;
-    border-color: var(--red) transparent transparent transparent; /* Arrow pointing down, changed to brand red */
+    border-color: var(--red) transparent transparent transparent;
 }
 
 
@@ -1929,12 +2072,38 @@ body {
         width: calc(100% - 20px);
         margin: 15px auto 0;
     }
+
+    /* Compact supplier cards in order modal for mobile */
+    .order-supplier-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+    .compact-supplier-card {
+        padding: 10px;
+        padding-top: 30px;
+    }
+    .compact-supplier-name {
+        font-size: 16px;
+    }
+    .supplier-icon.compact-icon {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+    }
+    .compact-icons-container {
+        top: 3px;
+        right: 3px;
+        gap: 2px;
+    }
+    .contact-short p {
+        font-size: 12px;
+    }
 }
 
 /* Desktop-specific modal form layout for larger screens */
 @media screen and (min-width: 769px) {
     .modal-content {
-        max-width: 700px;
+        max-width: 800px;
         padding: 40px;
     }
 
@@ -1970,6 +2139,47 @@ body {
     }
 
     /* Orders modal layout for desktop */
+    .modal-order-form {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* Supplier Selection Grid */
+    .modal-order-form .modal-input-group:first-child { /* Supplier section */
+        grid-column: 1 / -1;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed var(--salmon);
+    }
+    .order-supplier-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        max-height: 200px;
+    }
+    .compact-supplier-card {
+        padding: 15px;
+        padding-top: 35px;
+    }
+    .compact-supplier-name {
+        font-size: 18px;
+    }
+    .supplier-icon.compact-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 15px;
+    }
+    .compact-icons-container {
+        top: 8px;
+        right: 8px;
+        gap: 4px;
+    }
+
+    /* Order Items and Notes sections */
+    .modal-order-form .order-items-list-container,
+    .modal-order-form .modal-input-group:last-child {
+        grid-column: 1 / -1;
+    }
+
+    /* Order Item Row Layout */
     .modal-order-form .order-item-row {
         flex-wrap: nowrap;
         justify-content: flex-start;
@@ -1977,10 +2187,9 @@ body {
         position: static;
         padding-right: 0;
     }
-    .modal-order-form .order-item-select,
-    .modal-order-form .select-wrapper {
-        width: auto;
+    .modal-order-form .item-select-wrapper {
         min-width: 200px;
+        width: auto;
     }
     .modal-order-form .order-item-qty {
         width: 80px;
@@ -1992,11 +2201,6 @@ body {
         margin-left: auto;
         order: 99;
     }
-    .modal-order-form .order-item-row {
-        position: static;
-        padding-right: 0;
-    }
-
     .modal-order-form #addOrderItemBtn {
         width: auto;
         margin: 0;
