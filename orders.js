@@ -4,7 +4,7 @@
 import { db } from './firebase.js';
 import { auth } from './firebase.js'; // To log who created/received the order
 import { getSelectedLocation } from './config.js';
-import { createOrderCardHtml, createOrderFormModalBodyHtml, getItemOptionsHtml } from './orders-template.js'; // NEW: getItemOptionsHtml
+import { createOrderCardHtml, createOrderFormModalBodyHtml, getItemOptionsHtml } from './orders-template.js';
 import { getAllUniqueStockItems } from './stock.js'; // To get item list for order form
 import { renderStockManagementPage } from './stock.js'; // To re-render stock page after receiving order
 import { getSuppliers } from './suppliers.js'; // To get supplier list for order form
@@ -151,22 +151,13 @@ async function openOrderModal(orderData = null) {
         return;
     }
 
-    // --- NEW: Dynamic Item Filtering Logic ---
+    // --- NEW: Retrieve DOM elements once after modal is rendered ---
     const orderSupplierSelect = document.getElementById('orderSupplierSelect');
     const orderItemsList = document.getElementById('orderItemsList');
     const addOrderItemBtn = document.getElementById('addOrderItemBtn');
-    const orderItemMessage = document.getElementById('orderItemMessage'); // Message for no items
+    const orderItemMessage = document.getElementById('orderItemMessage');
 
-    if (isNew) {
-        // Initially disable Add Item button if no supplier selected
-        if (!orderSupplierSelect.value) {
-            addOrderItemBtn.disabled = true;
-            orderItemMessage.textContent = 'Please select a supplier to add items.';
-            orderItemMessage.style.display = 'block';
-        }
-    }
-
-
+    // --- NEW: Dynamic Item Filtering Logic ---
     const updateItemDropdowns = (selectedSupplierId) => {
         const selectedSupplier = allSuppliersCache.find(s => s.id === selectedSupplierId);
         filteredSupplierItemsCache = []; // Clear previous filtered items
@@ -219,12 +210,8 @@ async function openOrderModal(orderData = null) {
 
 
     // Attach event listeners for dynamic form elements AFTER modal is rendered
-    // (This part remains largely the same, but now uses filteredSupplierItemsCache)
-    const orderItemsList = document.getElementById('orderItemsList'); // Re-get it, just in case
-    const addOrderItemBtnReal = document.getElementById('addOrderItemBtn'); // Use a different name to avoid confusion
-
-    if (addOrderItemBtnReal) {
-        addOrderItemBtnReal.addEventListener('click', () => {
+    if (addOrderItemBtn) {
+        addOrderItemBtn.addEventListener('click', () => {
             // Ensure addOrderItemRow uses filteredSupplierItemsCache
             addOrderItemRow(orderItemsList, filteredSupplierItemsCache);
         });
