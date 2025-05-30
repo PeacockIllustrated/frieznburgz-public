@@ -515,9 +515,9 @@ body {
 }
 
 /* Status-specific background/border colors for summary circles */
-.summary-circle.good { border-color: #4CAF50; background-color: #4CAF50; }
-.summary-circle.low { border-color: var(--khaki); background-color: var(--khaki); }
-.summary-circle.critical { border-color: var(--red); background-color: var(--red); }
+.summary-circle.good { background-color: #4CAF50; border-color: #4CAF50; }
+.summary-circle.low { background-color: var(--khaki); border-color: var(--khaki); }
+.summary-circle.critical { background-color: var(--red); border-color: var(--red); }
 
 .summary-title {
     font-family: 'Montserrat', sans-serif;
@@ -1176,7 +1176,7 @@ body {
     transition: transform 0.2s ease;
     position: relative;
     overflow: hidden;
-    padding-top: 40px; /* Make space for icons at the top */
+    padding-top: 40px;
 }
 
 .supplier-card:hover {
@@ -1462,8 +1462,8 @@ body {
 }
 
 .order-status.status-pending { background-color: var(--khaki); }
-.order-status.status-received { background-color: #4CAF50; } /* Green */
-.order-status.status-cancelled { background-color: #dc3545; } /* Red */
+.order-status.status-received { background-color: #4CAF50; }
+.order-status.status-cancelled { background-color: #dc3545; }
 
 
 .order-summary-details p {
@@ -1519,15 +1519,15 @@ body {
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
     font-size: 14px;
-    display: inline-block; /* To allow background color */
+    display: inline-block;
     padding: 3px 8px;
     border-radius: 5px;
     color: var(--yellow);
     text-transform: uppercase;
 }
-.modal-order-form .order-info-read-only .order-status-display.Pending { background-color: var(--khaki); }
-.modal-order-form .order-info-read-only .order-status-display.Received { background-color: #4CAF50; }
-.modal-order-form .order-info-read-only .order-status-display.Cancelled { background-color: #dc3545; }
+.modal-order-form .order-info-read-only .order-status-display.status-Pending { background-color: var(--khaki); }
+.modal-order-form .order-info-read-only .order-status-display.status-Received { background-color: #4CAF50; }
+.modal-order-form .order-info-read-only .order-status-display.status-Cancelled { background-color: #dc3545; }
 
 
 .modal-order-form .order-items-list-container {
@@ -1537,6 +1537,8 @@ body {
     background-color: #fcfcfc;
     max-height: 250px;
     overflow-y: auto;
+    /* NEW: Add consistent bottom margin */
+    margin-bottom: 15px;
 }
 
 .modal-order-form .order-items-list-container > label {
@@ -1546,7 +1548,7 @@ body {
     color: var(--dim-grey);
     text-transform: uppercase;
     margin-bottom: 10px;
-    display: block; /* Ensure label takes full width */
+    display: block;
 }
 
 .modal-order-form .order-items-list {
@@ -1575,7 +1577,7 @@ body {
 }
 
 .modal-order-form .order-item-qty {
-    width: 60px; /* Small fixed width */
+    width: 60px;
     flex-shrink: 0;
     padding: 8px 5px;
     text-align: center;
@@ -1591,7 +1593,7 @@ body {
 }
 
 .modal-order-form .remove-item-btn {
-    background-color: #dc3545; /* Red for remove */
+    background-color: #dc3545;
     color: white;
     border: none;
     border-radius: 50%;
@@ -1611,48 +1613,21 @@ body {
 }
 
 .modal-order-form .select-wrapper {
-    margin-bottom: 0; /* Override default margin */
+    margin-bottom: 0;
+    /* NEW: Ensure this wrapper takes appropriate width within flex container */
+    flex-grow: 1; /* Allow it to grow */
+    min-width: 150px; /* Ensure it doesn't get too small */
 }
 
-.modal-order-form .small-btn {
-    padding: 8px 15px;
-    font-size: 14px;
+/* NEW: Styles for the supplier select specifically */
+.modal-order-form .supplier-select-wrapper {
+    width: 100%; /* Make supplier select full width */
+    min-width: unset; /* Remove min-width inherited from .select-wrapper */
 }
-
-/* Custom Tooltip Styles (for supplier icons) */
-.custom-tooltip {
-    position: absolute;
-    background-color: var(--red); /* Changed to brand red */
-    color: var(--yellow); /* Yellow text */
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-family: 'Futura', Arial, sans-serif;
-    font-size: 14px;
-    white-space: nowrap; /* Prevent text wrapping */
-    z-index: 1001; /* Higher than modal overlay */
-    pointer-events: none; /* Crucial: allows mouse events to pass through to elements below */
-    display: none; /* Hidden by default */
-    opacity: 0; /* Start invisible for fade-in */
-    /* Position above and horizontally centered relative to its calculated JS position */
-    transform: translate(-50%, -100%); /* Centers horizontally, moves up by its own height */
-    transition: opacity 0.15s ease-out; /* Smooth fade-in/out */
-}
-
-/* Make tooltip visible with transition */
-.custom-tooltip.visible {
-    opacity: 1;
-}
-
-/* Optional: Add a small arrow to the tooltip */
-.custom-tooltip::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: -5px; /* Adjust based on border-radius and desired gap from tooltip box */
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: var(--red) transparent transparent transparent; /* Arrow pointing down, changed to brand red */
+/* NEW: Styles for the item select specifically */
+.modal-order-form .item-select-wrapper {
+    width: auto; /* Allow item select to size naturally within its row */
+    min-width: 150px; /* Maintain min-width for dropdown */
 }
 
 
@@ -1890,29 +1865,33 @@ body {
 
     /* Orders modal adjustments for mobile */
     .modal-order-form .order-item-row {
-        flex-wrap: wrap; /* Allow items to wrap */
+        flex-wrap: wrap;
         justify-content: center;
         text-align: center;
     }
     .modal-order-form .order-item-select,
     .modal-order-form .select-wrapper {
-        width: 100%; /* Full width for select on mobile */
+        width: 100%;
         min-width: unset;
     }
     .modal-order-form .order-item-qty {
-        width: 100px; /* Adjust qty input width */
+        width: 100px;
     }
     .modal-order-form .order-item-unit {
-        width: 100%; /* Make unit span full width under qty */
+        width: 100%;
     }
     .modal-order-form .remove-item-btn {
-        position: absolute; /* Position remove button absolutely */
+        position: absolute;
         top: 5px;
         right: 5px;
     }
     .modal-order-form .order-item-row {
-        position: relative; /* Make row relative for absolute button */
-        padding-right: 35px; /* Make space for remove button */
+        position: relative;
+        padding-right: 35px;
+    }
+    .modal-order-form .add-item-btn { /* Style for the add item button */
+        width: calc(100% - 20px); /* Adjust to content width */
+        margin: 15px auto 0; /* Center it */
     }
 }
 
@@ -1956,27 +1935,33 @@ body {
 
     /* Orders modal layout for desktop */
     .modal-order-form .order-item-row {
-        flex-wrap: nowrap; /* Prevent wrapping on desktop */
+        flex-wrap: nowrap;
         justify-content: flex-start;
         text-align: left;
     }
     .modal-order-form .order-item-select,
     .modal-order-form .select-wrapper {
-        width: auto; /* Allow auto width for select */
-        min-width: 200px; /* Give it a minimum width */
+        width: auto;
+        min-width: 200px;
     }
     .modal-order-form .order-item-qty {
-        width: 80px; /* Slightly wider for desktop */
+        width: 80px;
     }
     .modal-order-form .remove-item-btn {
-        position: static; /* Reset position */
+        position: static;
         top: auto;
         right: auto;
-        margin-left: auto; /* Push to the right */
-        order: 99; /* Ensure it's last */
+        margin-left: auto;
+        order: 99;
     }
     .modal-order-form .order-item-row {
-        position: static; /* Reset position */
+        position: static;
         padding-right: 0;
+    }
+
+    .modal-order-form #addOrderItemBtn {
+        width: auto; /* Reset to auto width for desktop */
+        margin: 0; /* Reset margin */
+        align-self: flex-start; /* Align left with other inputs */
     }
 }
