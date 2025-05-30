@@ -10,9 +10,43 @@ import { createStockItemHtml } from './stock-template.js'; // Template for indiv
 const stockManagementContent = document.getElementById('stockManagementContent'); // Main content area for stock page
 
 let currentItemsData = []; // Store current loaded items for the selected location
-// NEW: Object to track pending changes for items, structured by categoryId
-// { categoryId: { itemId: newStockValue, ... }, ... }
-let pendingStockChanges = {};
+let pendingStockChanges = {}; // { categoryId: { itemId: newStockValue, ... }, ... }
+
+// NEW: Global variable to store the last transaction group ID and its timestamp for the current user
+// This helps in grouping consecutive changes by the same user.
+let lastTransactionGroup = {
+    id: null,
+    timestamp: null,
+    userId: null // To ensure grouping is per user
+};
+const TRANSACTION_GROUP_WINDOW_MS = 10 * 60 * 1000; // 10 minutes in milliseconds
+
+/**
+ * Generates a new transaction group ID or reuses a recent one.
+ * @returns {string} The transaction group ID.
+ */
+function getOrCreateTransactionGroupId() {
+    const currentUserEmail = auth.currentUser ? auth.currentUser.email : 'anonymous';
+    const now = new Date();
+
+    // Check if the last transaction was by the same user and within the time window
+    if (lastTransactionGroup.id &&
+        lastTransactionGroup.userId === currentUserEmail &&
+        (now.getTime() - lastTransactionGroup.timestamp.getTime()) < TRANSACTION_GROUP_WINDOW_MS) {
+        lastTransactionGroup.timestamp = now; // Update timestamp to extend the window
+        return lastTransactionGroup.id;
+    } else {
+        // Create a new transaction group ID
+        const newId = `txn_${currentUserEmail.split('@')[0]}_${now.getTime()}`;
+        lastTransactionGroup = {
+            id: newId,
+            timestamp: now,
+            userId: currentUserEmail
+        };
+        return newId;
+    }
+}
+
 
 /**
  * Renders the Stock Management page content.
@@ -27,12 +61,8 @@ export async function renderStockManagementPage() {
 
     const locationDisplayName = selectedLocationId.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
-    // Check for unconfirmed changes before re-rendering the whole page
     const hasUnconfirmedChanges = Object.keys(pendingStockChanges).some(catId => Object.keys(pendingStockChanges[catId]).length > 0);
     if (hasUnconfirmedChanges) {
-        // Option: Warn user or try to restore changes.
-        // For simplicity, for now, we'll just log and proceed.
-        // A more robust solution might use a confirmation dialog here.
         console.warn('Re-rendering Stock Management page with unconfirmed changes. Changes will be lost if not committed.');
         // Clear pending changes as they will be re-fetched/overwritten from Firestore anyway
         pendingStockChanges = {};
@@ -43,9 +73,16 @@ export async function renderStockManagementPage() {
         <div id="stockItemsGrid" class="stock-items-grid">
             <!-- Dynamic category cards will be inserted here -->
         </div>
+        <div class="stock-log-section">
+            <h3 class="subsection-title">Recent Stock Activity</h3>
+            <div id="stockActivityLog" class="stock-activity-log">
+                <p>Loading recent activity...</p>
+            </div>
+        </div>
     `;
 
     const stockItemsGrid = document.getElementById('stockItemsGrid');
+    const stockActivityLog = document.getElementById('stockActivityLog'); // NEW: Stock Activity Log container
 
     try {
         const itemsRef = db.collection('locations').doc(selectedLocationId).collection('items');
@@ -54,73 +91,73 @@ export async function renderStockManagementPage() {
 
         if (currentItemsData.length === 0) {
             stockItemsGrid.innerHTML = '<p>No stock items found for this location. Please add items via settings or import script.</p>';
-            return;
-        }
+        } else {
+            // Group items by category
+            const categorizedItems = currentItemsData.reduce((acc, item) => {
+                const categoryKey = item.category || 'Uncategorized';
+                if (!acc[categoryKey]) {
+                    acc[categoryKey] = [];
+                }
+                acc[categoryKey].push(item);
+                return acc;
+            }, {});
 
-        // Group items by category
-        const categorizedItems = currentItemsData.reduce((acc, item) => {
-            const categoryKey = item.category || 'Uncategorized';
-            if (!acc[categoryKey]) {
-                acc[categoryKey] = [];
-            }
-            acc[categoryKey].push(item);
-            return acc;
-        }, {});
+            for (const categoryName of Object.keys(categorizedItems).sort()) {
+                const categoryItems = categorizedItems[categoryName];
+                const categoryId = categoryName.toLowerCase().replace(/[^a-z0-9]+/g, '_'); // Simple ID for category
 
-        for (const categoryName of Object.keys(categorizedItems).sort()) {
-            const categoryItems = categorizedItems[categoryName];
-            const categoryId = categoryName.toLowerCase().replace(/[^a-z0-9]+/g, '_'); // Simple ID for category
+                const categoryCardDiv = document.createElement('div');
+                categoryCardDiv.classList.add('category-card');
+                categoryCardDiv.dataset.categoryId = categoryId; // Store category ID
 
-            const categoryCardDiv = document.createElement('div');
-            categoryCardDiv.classList.add('category-card');
-            categoryCardDiv.dataset.categoryId = categoryId; // Store category ID
+                categoryCardDiv.innerHTML = `
+                    <div class="category-header">
+                        <h3 class="category-title">${categoryName}</h3>
+                        <i class="fas fa-edit edit-icon" title="Edit category items (future)"></i>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                    <div class="item-list" id="itemList-${categoryId}">
+                        <!-- Items will be appended here -->
+                    </div>
+                    <div class="category-footer">
+                        <button class="auth-button confirm-changes-btn" id="confirm-${categoryId}" disabled>Confirm Changes</button>
+                    </div>
+                `;
+                stockItemsGrid.appendChild(categoryCardDiv);
 
-            categoryCardDiv.innerHTML = `
-                <div class="category-header">
-                    <h3 class="category-title">${categoryName}</h3>
-                    <i class="fas fa-edit edit-icon" title="Edit category items (future)"></i>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
-                </div>
-                <div class="item-list" id="itemList-${categoryId}">
-                    <!-- Items will be appended here -->
-                </div>
-                <div class="category-footer">
-                    <button class="auth-button confirm-changes-btn" id="confirm-${categoryId}" disabled>Confirm Changes</button>
-                </div>
-            `;
-            stockItemsGrid.appendChild(categoryCardDiv);
+                const itemListContainer = categoryCardDiv.querySelector('.item-list');
 
-            const itemListContainer = categoryCardDiv.querySelector('.item-list');
+                categoryItems.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.classList.add('stock-item');
+                    itemDiv.dataset.itemId = item.id;
+                    itemDiv.dataset.categoryId = categoryId;
+                    itemDiv.innerHTML = createStockItemHtml(item);
+                    itemListContainer.appendChild(itemDiv);
 
-            categoryItems.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.classList.add('stock-item');
-                itemDiv.dataset.itemId = item.id;
-                itemDiv.dataset.categoryId = categoryId; // Store category ID on item for easier lookup
-                // Pass current stock from `currentItemsData` to template directly
-                itemDiv.innerHTML = createStockItemHtml(item);
-                itemListContainer.appendChild(itemDiv);
+                    const decrementBtn = itemDiv.querySelector('.decrement-btn');
+                    const incrementBtn = itemDiv.querySelector('.increment-btn');
+                    const stockInput = itemDiv.querySelector('.stock-input');
+                    const reorderBtn = itemDiv.querySelector('.reorder-btn');
 
-                const decrementBtn = itemDiv.querySelector('.decrement-btn');
-                const incrementBtn = itemDiv.querySelector('.increment-btn');
-                const stockInput = itemDiv.querySelector('.stock-input');
-                const reorderBtn = itemDiv.querySelector('.reorder-btn');
+                    if (decrementBtn) decrementBtn.addEventListener('click', () => updateLocalStock(item.id, categoryId, -1, stockInput, itemDiv));
+                    if (incrementBtn) incrementBtn.addEventListener('click', () => updateLocalStock(item.id, categoryId, 1, stockInput, itemDiv));
+                    if (stockInput) stockInput.addEventListener('change', () => updateLocalStock(item.id, categoryId, 0, stockInput, itemDiv));
+                    if (reorderBtn) reorderBtn.addEventListener('click', () => messageSupplier(item));
+                });
 
-                if (decrementBtn) decrementBtn.addEventListener('click', () => updateLocalStock(item.id, categoryId, -1, stockInput, itemDiv));
-                if (incrementBtn) incrementBtn.addEventListener('click', () => updateLocalStock(item.id, categoryId, 1, stockInput, itemDiv));
-                if (stockInput) stockInput.addEventListener('change', () => updateLocalStock(item.id, categoryId, 0, stockInput, itemDiv));
-                if (reorderBtn) reorderBtn.addEventListener('click', () => messageSupplier(item));
-            });
-
-            // Attach listener for the new Confirm Changes button
-            const confirmBtn = document.getElementById(`confirm-${categoryId}`);
-            if (confirmBtn) {
-                confirmBtn.addEventListener('click', () => handleConfirmCategoryChanges(categoryId, confirmBtn));
+                const confirmBtn = document.getElementById(`confirm-${categoryId}`);
+                if (confirmBtn) {
+                    confirmBtn.addEventListener('click', () => handleConfirmCategoryChanges(categoryId, confirmBtn));
+                }
             }
         }
 
         initializeStockAccordion();
         console.log(`Stock items loaded and rendered for ${selectedLocationId}.`);
+
+        // NEW: Load and display stock activity log
+        await loadStockActivityLog(stockActivityLog);
 
     } catch (error) {
         console.error('Error rendering stock management page or loading items:', error);
@@ -144,16 +181,6 @@ function initializeStockAccordion() {
     console.log('Stock accordion initialized for category headers.');
 }
 
-/**
- * Updates the stock level for a specific item in Firestore.
- * This function is now multi-location aware.
- * @param {string} itemId - The ID of the item document.
- * @param {number} change - The amount to change stock by (+1, -1) or 0 for manual input.
- * @param {HTMLInputElement} inputElement - The input field element.
- * @deprecated - Replaced by updateLocalStock for local changes before batch commit.
- */
-// async function updateStock(itemId, change, inputElement) { /* ... old function ... */ }
-
 
 /**
  * Updates the stock level for a specific item locally and tracks it for batch commit.
@@ -165,24 +192,24 @@ function initializeStockAccordion() {
  */
 async function updateLocalStock(itemId, categoryId, change, inputElement, itemDiv) {
     let newStockValue;
+    const currentItem = currentItemsData.find(item => item.id === itemId);
+    const oldStockValue = currentItem ? currentItem.currentStock : 0; // Get the original stock value
 
     if (change === 0) { // Manual input change (user typed a value)
         newStockValue = parseInt(inputElement.value, 10);
         if (isNaN(newStockValue) || newStockValue < 0) {
             alert('Please enter a valid stock quantity (non-negative number).');
             // Revert input to last known valid state (from currentItemsData or pending changes)
-            const currentItem = currentItemsData.find(item => item.id === itemId);
-            inputElement.value = pendingStockChanges[categoryId]?.[itemId] || currentItem?.currentStock || 0;
+            inputElement.value = pendingStockChanges[categoryId]?.[itemId]?.newStock || oldStockValue;
             return;
         }
     } else { // Increment/Decrement button click
         let currentLocalStock = parseInt(inputElement.value, 10);
-        if (isNaN(currentLocalStock)) { // If input is empty, start from the current Firestore value
-            const currentItem = currentItemsData.find(item => item.id === itemId);
-            currentLocalStock = currentItem ? currentItem.currentStock : 0;
+        if (isNaN(currentLocalStock)) {
+            currentLocalStock = oldStockValue; // Fallback to original if input is empty
         }
         newStockValue = currentLocalStock + change;
-        if (newStockValue < 0) newStockValue = 0; // Prevent negative stock
+        if (newStockValue < 0) newStockValue = 0;
     }
 
     inputElement.value = newStockValue; // Update UI immediately
@@ -191,7 +218,19 @@ async function updateLocalStock(itemId, categoryId, change, inputElement, itemDi
     if (!pendingStockChanges[categoryId]) {
         pendingStockChanges[categoryId] = {};
     }
-    pendingStockChanges[categoryId][itemId] = newStockValue;
+
+    // Store old and new stock for logging later
+    if (!pendingStockChanges[categoryId][itemId]) {
+        // If this is the first change for this item in this batch, record its original stock
+        pendingStockChanges[categoryId][itemId] = {
+            newStock: newStockValue,
+            oldStock: oldStockValue // Store the original stock only once per batch of changes
+        };
+    } else {
+        // If it's a subsequent change for the same item in the same batch, just update newStock
+        pendingStockChanges[categoryId][itemId].newStock = newStockValue;
+    }
+
 
     // Add visual feedback to the item
     itemDiv.classList.add('has-pending-changes');
@@ -219,51 +258,174 @@ async function handleConfirmCategoryChanges(categoryId, confirmBtn) {
     const categoryChanges = pendingStockChanges[categoryId];
     if (!categoryChanges || Object.keys(categoryChanges).length === 0) {
         console.log('No pending changes for this category.');
-        confirmBtn.disabled = true; // Ensure disabled if no changes
+        confirmBtn.disabled = true;
         return;
     }
 
     confirmBtn.textContent = 'Saving...';
-    confirmBtn.disabled = true; // Disable during saving
-    confirmBtn.classList.add('saving'); // Add saving visual feedback
+    confirmBtn.disabled = true;
+    confirmBtn.classList.add('saving');
 
     const batch = db.batch();
-    let numChanges = 0;
+    const transactionGroupId = getOrCreateTransactionGroupId(); // Get or create transaction group ID
+    const logEntries = [];
+    const changedItemIds = []; // To track items for which stock was updated
 
     for (const itemId in categoryChanges) {
         if (Object.prototype.hasOwnProperty.call(categoryChanges, itemId)) {
-            const newStockValue = categoryChanges[itemId];
+            const { newStock, oldStock } = categoryChanges[itemId];
             const itemDocRef = db.collection('locations').doc(selectedLocationId).collection('items').doc(itemId);
-            batch.update(itemDocRef, { currentStock: newStockValue });
-            numChanges++;
+            
+            // Only update if stock actually changed
+            if (newStock !== oldStock) {
+                batch.update(itemDocRef, { currentStock: newStock });
+                changedItemIds.push(itemId);
+
+                // Prepare log entry for stock_log collection
+                const itemDetails = currentItemsData.find(item => item.id === itemId);
+                logEntries.push({
+                    itemId: itemId,
+                    itemName: itemDetails ? itemDetails.name : 'Unknown Item',
+                    unit: itemDetails ? itemDetails.unit : 'units',
+                    changeAmount: newStock - oldStock, // Positive for add, negative for remove
+                    oldStock: oldStock,
+                    newStock: newStock,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: auth.currentUser ? auth.currentUser.email : 'Unknown User',
+                    locationId: selectedLocationId,
+                    transactionGroupId: transactionGroupId // Group changes
+                });
+            }
         }
     }
 
-    try {
-        await batch.commit();
-        console.log(`Successfully committed ${numChanges} changes for category ${categoryId}.`);
+    if (changedItemIds.length === 0) {
+        console.log('No actual stock changes detected for this category after all local adjustments.');
+        delete pendingStockChanges[categoryId]; // Clear even if no net change
+        await renderStockManagementPage(); // Re-render to clear highlights
+        return;
+    }
 
-        // Clear confirmed changes
-        delete pendingStockChanges[categoryId];
+    try {
+        await batch.commit(); // Commit stock updates first
+
+        // Now add log entries in a separate batch or individual writes
+        const logBatch = db.batch();
+        logEntries.forEach(logEntry => {
+            logBatch.collection('locations').doc(selectedLocationId).collection('stock_log').add(logEntry);
+        });
+        await logBatch.commit(); // Commit log entries
+
+        console.log(`Successfully committed ${changedItemIds.length} changes and logged to Firestore for category ${categoryId}.`);
+
+        delete pendingStockChanges[categoryId]; // Clear confirmed changes
 
         // Remove visual feedback from affected items by re-rendering the whole page
         // This ensures currentItemsData is perfectly in sync with Firestore
         await renderStockManagementPage();
         console.log('Stock management page re-rendered after category commit.');
 
-        // The re-render will reset button states, so no need to explicitly reset text/class here
-
     } catch (error) {
         console.error(`Error committing changes for category ${categoryId}:`, error);
         alert(`Failed to save changes for ${categoryId}. Please try again: ${error.message}`);
 
         confirmBtn.textContent = 'Confirm Changes';
-        confirmBtn.disabled = false; // Re-enable on error
-        confirmBtn.classList.remove('saving'); // Remove saving visual feedback
+        confirmBtn.disabled = false;
+        confirmBtn.classList.remove('saving');
 
-        // Restore visual feedback for items that failed
-        // For simplicity, we'll just re-render on error, which will show the old state if the save failed
+        // On error, re-render to revert to the correct state from Firestore and re-enable input
         await renderStockManagementPage();
+    }
+}
+
+/**
+ * Loads and displays recent stock activity log entries.
+ * @param {HTMLElement} container - The DOM element to append log entries to.
+ */
+async function loadStockActivityLog(container) {
+    container.innerHTML = '<p>Loading recent activity...</p>';
+    const selectedLocationId = getSelectedLocation();
+    if (!selectedLocationId) {
+        container.innerHTML = '<p>No location selected to load activity log.</p>';
+        return;
+    }
+
+    try {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const thirtyDaysAgoTimestamp = firebase.firestore.Timestamp.fromDate(thirtyDaysAgo);
+
+        const logRef = db.collection('locations').doc(selectedLocationId).collection('stock_log');
+        const querySnapshot = await logRef
+            .where('timestamp', '>=', thirtyDaysAgoTimestamp)
+            .orderBy('timestamp', 'desc')
+            .limit(20) // Display up to 20 recent activity entries
+            .get();
+
+        container.innerHTML = ''; // Clear loading message
+
+        if (querySnapshot.empty) {
+            container.innerHTML = '<p>No recent stock activity logged for this location.</p>';
+            return;
+        }
+
+        // Group log entries by transactionGroupId and then by timestamp
+        const groupedLog = {};
+        querySnapshot.forEach(doc => {
+            const entry = doc.data();
+            const groupKey = entry.transactionGroupId || 'no_group'; // Fallback for old/ungrouped entries
+            if (!groupedLog[groupKey]) {
+                groupedLog[groupKey] = [];
+            }
+            groupedLog[groupKey].push(entry);
+        });
+
+        // Sort groups by the timestamp of their first entry (most recent first)
+        const sortedGroupKeys = Object.keys(groupedLog).sort((a, b) => {
+            const timeA = groupedLog[a][0].timestamp ? groupedLog[a][0].timestamp.toMillis() : 0;
+            const timeB = groupedLog[b][0].timestamp ? groupedLog[b][0].timestamp.toMillis() : 0;
+            return timeB - timeA;
+        });
+
+        sortedGroupKeys.forEach(groupKey => {
+            const group = groupedLog[groupKey].sort((a, b) => { // Sort entries within group by timestamp
+                const timeA = a.timestamp ? a.timestamp.toMillis() : 0;
+                const timeB = b.timestamp ? b.timestamp.toMillis() : 0;
+                return timeB - timeA;
+            });
+            const firstEntry = group[0];
+            const timestamp = firstEntry.timestamp ? firstEntry.timestamp.toDate().toLocaleString() : 'N/A';
+            const updatedBy = firstEntry.updatedBy.split('@')[0]; // Just the name before '@'
+
+            let groupHeader = '';
+            if (groupKey === 'no_group') {
+                groupHeader = `<span>${timestamp} - Individual Change by ${updatedBy}</span>`;
+            } else {
+                groupHeader = `<span>${timestamp} - Batch Update by ${updatedBy}</span>`;
+            }
+
+            const groupDiv = document.createElement('div');
+            groupDiv.classList.add('stock-log-group');
+            groupDiv.innerHTML = `<h4 class="log-group-header">${groupHeader}</h4><ul></ul>`;
+            const ul = groupDiv.querySelector('ul');
+
+            group.forEach(entry => {
+                const changeSign = entry.changeAmount > 0 ? '+' : '';
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="log-item-name">${entry.itemName} (${entry.unit})</span>
+                    <span class="log-stock-change ${entry.changeAmount > 0 ? 'increase' : 'decrease'}">${changeSign}${entry.changeAmount}</span>
+                    <span class="log-stock-value">(${entry.oldStock} → ${entry.newStock})</span>
+                `;
+                ul.appendChild(li);
+            });
+            container.appendChild(groupDiv);
+        });
+        console.log('Stock activity log loaded.');
+
+    } catch (error) {
+        console.error('Error loading stock activity log:', error);
+        container.innerHTML = `<p style="color:red;">Error loading activity log: ${error.message}</p>`;
     }
 }
 
