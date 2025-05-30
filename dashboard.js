@@ -48,6 +48,10 @@ export function closeModal() {
     modalBody.innerHTML = '';
     modalFooter.textContent = ''; // Use textContent to clear buttons properly
     modalMessage.textContent = '';
+    // NEW: Ensure tooltip is hidden when the modal closes
+    if (window.mainApp && window.mainApp.hideCustomTooltip) {
+        window.mainApp.hideCustomTooltip();
+    }
 }
 
 /**
