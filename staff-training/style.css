@@ -1,4 +1,4 @@
-/* --- staff-training/style.css (Final Version - Matches Screenshot) --- */
+/* --- staff-training/style.css (Final Revised Version) --- */
 
 :root {
     --red: #e71e26;
@@ -10,115 +10,93 @@
     --success-green: #28a745;
 }
 
-/* Global Styles */
 body {
     margin: 0;
     font-family: 'Futura', Arial, sans-serif;
-    background-color: #333; /* Dark grey background as seen in screenshot */
+    background-color: #333;
     color: var(--dim-grey);
     line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
-/* Header Styles (Matches Screenshot) */
-.site-header {
+/* --- Base Layout Structure --- */
+/* This is a mobile-first approach. Desktop styles are in the media query. */
+.main-dashboard-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header Styles */
+.dashboard-header {
     background-color: var(--red);
-    padding: 10px 25px;
+    padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-.logo-title-container {
+.header-left {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
-.header-logo {
-    height: 50px;
-    width: auto;
-}
-.header-title {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    font-size: 28px;
+.header-logo { height: 40px; }
+.app-name {
+    font-family: 'Fraunces', serif; /* Use Fraunces for Staff Training title */
+    font-weight: 900;
+    font-size: 24px;
     color: var(--yellow);
     text-transform: uppercase;
-    margin: 0;
-    letter-spacing: 1px;
+    white-space: nowrap; /* Prevents line break on mobile */
 }
-.header-actions .join-team-btn {
-    background-color: var(--khaki);
-    color: white;
-    padding: 12px 25px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    text-transform: uppercase;
-    font-size: 16px;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-.header-actions .join-team-btn:hover {
-    background-color: var(--yellow);
-    color: var(--red);
-}
+.header-center { display: none; } /* Hidden by default */
+.header-right .join-team-btn { display: none; } /* Hide Join button on mobile */
 
-/* Horizontal Navigation Bar (Matches Screenshot) */
-.handbook-nav {
+/* Horizontal Navigation Bar (Mobile) */
+.dashboard-sidebar {
     background-color: var(--red);
-    padding: 0 20px;
+    padding: 0 15px;
     border-top: 2px solid var(--khaki);
     border-bottom: 2px solid var(--khaki);
     overflow-x: auto;
     white-space: nowrap;
 }
-.handbook-nav ul {
+.sidebar-nav {
     display: flex;
     list-style: none;
     margin: 0;
     padding: 0;
-    gap: 15px;
+    gap: 10px;
 }
-.nav-link {
+.nav-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 15px 10px;
+    gap: 8px;
+    padding: 12px 8px;
     color: var(--yellow);
     text-decoration: none;
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
-    text-transform: uppercase;
-    font-size: 16px;
+    font-size: 14px;
     border-bottom: 4px solid transparent;
     transition: all 0.2s ease-in-out;
 }
-.nav-link:hover {
-    color: var(--khaki);
-}
-.nav-link.active {
-    border-bottom-color: var(--khaki);
-}
-.nav-link i:first-child {
-    color: var(--khaki);
-    font-size: 20px;
-}
+.nav-item:hover { color: var(--khaki); }
+.nav-item.active { border-bottom-color: var(--khaki); }
+.nav-item i:first-child { font-size: 18px; color: var(--khaki); }
+.read-indicator { display: none; } /* Hide sidebar checkmark on mobile */
 
 /* Main Content Area */
-.handbook-content {
+.dashboard-content {
     background-color: white;
-    padding: 40px;
-    max-width: 1200px;
-    margin: 20px auto;
-    border-radius: 15px;
+    padding: 25px;
+    flex-grow: 1;
 }
-.content-section { display: none; }
-.content-section.active-page { display: block; }
+.content-page { display: none; }
+.content-page.active-page { display: block; }
 .page-title {
     font-family: 'Fraunces', serif;
     font-weight: 900;
-    font-size: 40px;
+    font-size: 32px;
     color: var(--red);
     text-transform: uppercase;
     margin: 0 0 25px 0;
@@ -128,50 +106,91 @@ body {
 h3 { font-family: 'Fraunces', serif; color: var(--red); }
 h4 { font-family: 'Montserrat', sans-serif; color: var(--dim-grey); }
 
-/* Checklist Indicator Styling */
-.read-indicator {
+/* Accordion Styles */
+.accordion-item { border-bottom: 1px solid #eee; margin-bottom: 15px; }
+.accordion-header { display: flex; align-items: center; padding: 15px; cursor: pointer; background-color: #f9f9f9; border-radius: 8px; }
+.accordion-header h3 { font-size: 18px; margin: 0; flex-grow: 1; }
+.accordion-header:hover { background-color: #f1f1f1; }
+.accordion-item.active .accordion-header { background-color: var(--salmon); color: white; }
+.accordion-item.active .accordion-header h3,
+.accordion-item.active .accordion-icon { color: white; }
+.accordion-icon { font-size: 16px; transition: transform 0.3s ease; margin-left: auto; padding-left: 10px; }
+.accordion-item.active .accordion-icon { transform: rotate(45deg); }
+.accordion-content { max-height: 0; overflow: hidden; padding: 0 20px; transition: all 0.4s ease-out; }
+.accordion-item.active .accordion-content { max-height: 2000px; padding: 20px; border: 1px solid #eee; border-top: none; }
+
+/* Accordion Checkmark Indicator */
+.accordion-read-indicator {
     color: var(--success-green);
     opacity: 0;
     transition: opacity 0.3s ease;
-    font-size: 1em;
-    margin-left: auto;
+    margin-left: auto; /* Push it to the right of the title */
+    padding: 0 10px;
 }
-.nav-link.is-read .read-indicator,
-.accordion-header.is-read > h3 > .read-indicator {
-    opacity: 1;
-}
-.accordion-header .read-indicator { display: none; } /* Hide in accordion title */
-.accordion-header.is-read > h3 { text-decoration: line-through; text-decoration-color: var(--salmon); opacity: 0.7; }
-
-/* Accordion Styles */
-.accordion-item { border-bottom: 1px solid #eee; margin-bottom: 15px; }
-.accordion-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; background-color: #f9f9f9; border-radius: 8px; transition: background-color 0.2s ease; }
-.accordion-header h3 { font-size: 22px; margin: 0; flex-grow: 1; }
-.accordion-header:hover { background-color: #f1f1f1; }
-.accordion-item.active .accordion-header { background-color: var(--salmon); color: white; }
-.accordion-item.active .accordion-header h3 { color: white; text-decoration: none; opacity: 1; }
-.accordion-icon { font-size: 16px; transition: transform 0.3s ease; }
-.accordion-item.active .accordion-icon { transform: rotate(45deg); }
-.accordion-content { max-height: 0; overflow: hidden; padding: 0 20px; background-color: white; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
-.accordion-item.active .accordion-content { max-height: 2000px; padding: 20px; border: 1px solid #eee; border-top: none; border-radius: 0 0 8px 8px; }
+.accordion-header.is-read .accordion-read-indicator { opacity: 1; }
+.accordion-header.is-read h3 { color: #888; } /* Gray out title when read */
 
 /* "Mark as Read" Button */
-.mark-as-read-btn { display: block; margin: 20px 0 0 auto; background-color: var(--red); color: var(--yellow); border: none; border-radius: 8px; padding: 10px 20px; font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease; }
+.mark-as-read-btn { display: block; margin: 20px 0 0 auto; background-color: var(--red); color: var(--yellow); border: none; border-radius: 8px; padding: 10px 20px; font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 .mark-as-read-btn:hover { background-color: var(--khaki); color: var(--red); }
 .mark-as-read-btn.completed { background-color: var(--success-green); cursor: default; }
 
-/* Other UI element styles */
-.emphasis-text { font-family: 'Montserrat', sans-serif; font-weight: 800; color: var(--red); text-align: center; }
-.important-box, .sales-script-box { background-color: #fffbeb; border-left: 5px solid var(--khaki); padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
-.task-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-.task-table th, .task-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+.important-box, .sales-script-box { background-color: #fffbeb; border-left: 5px solid var(--khaki); padding: 20px; margin: 25px 0; }
+.task-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+.task-table th, .task-table td { border: 1px solid #ddd; padding: 8px; }
 .task-table th { background-color: var(--red); color: white; }
 .task-table td:nth-child(2), .task-table td:nth-child(3) { text-align: center; }
-.task-table .fa-check { color: var(--success-green); font-size: 20px; }
+.task-table .fa-check { color: var(--success-green); }
 
-/* Responsive Design */
-@media screen and (max-width: 768px) {
-    .site-header { flex-direction: column; gap: 15px; }
-    .handbook-content { padding: 20px; }
-    .page-title { font-size: 30px; }
+
+/* --- Desktop Layout (Matches Admin Dashboard) --- */
+@media screen and (min-width: 769px) {
+    body { background-color: var(--light-grey); }
+    .main-dashboard-container {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        grid-template-rows: 70px 1fr;
+    }
+    .dashboard-header {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        padding: 0 20px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    .header-center { display: flex; } /* Show center on desktop */
+    .header-right .join-team-btn { display: inline-block; } /* Show Join button on desktop */
+    .dashboard-sidebar {
+        grid-column: 1;
+        grid-row: 2;
+        padding: 20px 0;
+        border-top: none;
+        border-bottom: none;
+        overflow-y: auto;
+        position: sticky;
+        top: 70px;
+        height: calc(100vh - 70px);
+    }
+    .sidebar-nav { flex-direction: column; gap: 10px; }
+    .nav-item {
+        padding: 15px 25px;
+        font-size: 16px;
+        border-bottom: none;
+    }
+    .nav-item.active {
+        background-color: var(--yellow);
+        color: var(--red);
+        border-left: 5px solid var(--khaki);
+        padding-left: 20px;
+        border-bottom: none;
+    }
+    .nav-item.active i:first-child { color: var(--red); }
+    .read-indicator { display: inline-block; } /* Show sidebar checkmark on desktop */
+    .dashboard-content {
+        grid-column: 2;
+        grid-row: 2;
+        padding: 40px;
+        background-color: white; /* Reset from transparent */
+    }
 }
