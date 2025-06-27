@@ -1,0 +1,276 @@
+/* --- staff-training/style.css --- */
+
+/* Replicating root variables from your main style.css for brand consistency */
+:root {
+    --red: #e71e26;
+    --yellow: white;
+    --dim-grey: #2f2f2f;
+    --khaki: #fbae29;
+    --salmon: #ff9686;
+    --dark-slate-grey: #050505;
+}
+
+/* Global Styles */
+body {
+    margin: 0;
+    font-family: 'Futura', Arial, sans-serif;
+    background-color: var(--red);
+    color: var(--dim-grey);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Header Styles */
+.site-header {
+    background-color: white;
+    padding: 10px 40px;
+    border-bottom: 5px solid var(--khaki);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header-logo {
+    height: 50px;
+    width: auto;
+}
+
+.header-nav a {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--red);
+    margin-left: 30px;
+    font-size: 16px;
+    transition: color 0.2s ease;
+}
+
+.header-nav a:hover {
+    color: var(--khaki);
+}
+
+.join-team-btn {
+    background-color: var(--khaki);
+    color: white !important;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.join-team-btn:hover {
+    background-color: var(--red);
+    color: white !important;
+}
+
+/* Main Training Container Layout */
+.training-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 40px auto;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    min-height: 80vh;
+}
+
+/* Handbook Navigation Sidebar */
+.handbook-nav {
+    flex: 0 0 280px; /* Fixed width sidebar */
+    background-color: var(--red);
+    padding: 25px;
+    color: white;
+}
+
+.handbook-nav h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 24px;
+    color: var(--yellow);
+    text-transform: uppercase;
+    margin: 0 0 20px 0;
+    border-bottom: 2px solid var(--khaki);
+    padding-bottom: 10px;
+}
+
+.handbook-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.handbook-nav .nav-link {
+    display: block;
+    padding: 12px 15px;
+    color: var(--yellow);
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+.handbook-nav .nav-link:hover {
+    background-color: var(--khaki);
+    color: var(--red);
+}
+
+.handbook-nav .nav-link.active {
+    background-color: var(--yellow);
+    color: var(--red);
+}
+
+/* Handbook Content Area */
+.handbook-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.content-section {
+    display: none; /* Hidden by default, JS handles visibility */
+}
+
+.handbook-content h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 36px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-top: 0;
+    border-bottom: 2px solid var(--salmon);
+    padding-bottom: 10px;
+}
+
+.handbook-content h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 26px;
+    color: var(--dim-grey);
+    margin-top: 30px;
+}
+
+.handbook-content h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--red);
+    margin-top: 25px;
+}
+
+.handbook-content p, .handbook-content li {
+    font-size: 16px;
+    color: var(--dim-grey);
+}
+
+.handbook-content ul, .handbook-content ol {
+    padding-left: 25px;
+}
+
+.handbook-content hr {
+    border: 0;
+    height: 1px;
+    background-color: var(--salmon);
+    margin: 30px 0;
+}
+
+.emphasis-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: var(--red);
+    font-size: 18px;
+    text-align: center;
+}
+
+/* Special Box Styles */
+.important-box, .sales-script-box {
+    background-color: #fffbeb;
+    border-left: 5px solid var(--khaki);
+    padding: 20px;
+    margin: 25px 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.sales-script-box h4 {
+    margin-top: 0;
+    color: var(--red);
+}
+
+/* Task Table Styling */
+.task-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.task-table th, .task-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+.task-table th {
+    background-color: var(--red);
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+}
+
+.task-table td:nth-child(2), .task-table td:nth-child(3) {
+    text-align: center;
+}
+
+.task-table .fa-check {
+    color: #4CAF50;
+    font-size: 20px;
+}
+
+.final-image {
+    display: block;
+    max-width: 300px;
+    margin: 40px auto 0;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+    .training-container {
+        flex-direction: column;
+        margin: 20px;
+    }
+    .handbook-nav {
+        flex: 1;
+        border-bottom: 5px solid var(--khaki);
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .header-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin-left: 0;
+    }
+    .header-nav a {
+        margin-left: 0;
+    }
+    .handbook-content {
+        padding: 25px;
+    }
+    .handbook-content h2 {
+        font-size: 28px;
+    }
+}
