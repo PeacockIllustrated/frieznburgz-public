@@ -1,4 +1,4 @@
-// --- staff-training/script.js (Final Fix Version) ---
+// --- staff-training/script.js (Final Polished Version) ---
 
 import { db } from './firebase-config.js';
 
@@ -51,11 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!progressDocRef) return;
         try {
             const docSnap = await progressDocRef.get();
-            if (docSnap.exists) {
+            if (docSnap.exists()) {
                 trainingProgress = docSnap.data();
+                 if (!trainingProgress.readSections) trainingProgress.readSections = [];
+                 if (!trainingProgress.quizHistory) trainingProgress.quizHistory = [];
             } else {
                 await progressDocRef.set({ readSections: [], quizHistory: [] });
-                trainingProgress = { readSections: [], quizHistory: [] }; // Initialize local state
+                trainingProgress = { readSections: [], quizHistory: [] };
             }
         } catch (error) {
             console.error("Error loading progress from Firebase:", error);
@@ -74,9 +76,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- UI RENDERING & LOGIC ---
-    function buildNav() { /* ... same as before ... */ }
-    function renderSectionContent(pageId) { /* ... same as before ... */ }
-    function updateMainSectionChecks() { /* ... same as before ... */ }
+    function buildNav() {
+        navContainer.innerHTML = '';
+        for (const sectionId in handbookData) {
+            const section = handbookData[sectionId];
+            const navLink = document.createElement('a');
+            navLink.href = '#';
+            navLink.className = 'nav-item';
+            navLink.dataset.page = sectionId;
+            navLink.innerHTML = `<i class="fas ${section.icon}"></i> ${section.title}<i class="fas fa-check-circle read-indicator"></i>`;
+            navContainer.appendChild(navLink);
+        }
+    }
+
+    function renderSectionContent(pageId) {
+        mainContentContainer.innerHTML = '';
+        const sectionData = handbookData[pageId];
+        if (!sectionData) return;
+        let contentHtml = `<h2 class="page-title">${sectionData.title}</h2>`;
+        const readSections = trainingProgress.readSections || [];
+        for (const accordionId in sectionData.accordions) {
+            const accordion = sectionData.accordions[accordionId];
+            const isRead = readSections.includes(accordionId);
+            contentHtml += `<div class="accordion-item" data-accordion-id="${accordionId}"><div class="accordion-header ${isRead ? 'is-read' : ''}"><h3>${accordion.title}</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div><div class="accordion-content">${accordion.content}${!isRead ? `<button class="mark-as-read-btn" data-accordion-id="${accordionId}">Mark as Read</button>` : `<button class="mark-as-read-btn completed" disabled>Completed ✔</button>`}</div></div>`;
+        }
+        mainContentContainer.innerHTML = contentHtml;
+    }
+
+    function updateMainSectionChecks() {
+        document.querySelectorAll('.nav-item').forEach(navLink => {
+            const sectionId = navLink.dataset.page;
+            const sectionData = handbookData[sectionId];
+            if (!sectionData || !sectionData.accordions) return;
+            const accordionIds = Object.keys(sectionData.accordions);
+            const allRead = trainingProgress.readSections && accordionIds.every(id => trainingProgress.readSections.includes(id));
+            navLink.classList.toggle('is-read', allRead);
+        });
+    }
 
     // --- APP INITIALIZATION ---
     async function initializeApp() {
@@ -86,18 +122,23 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadProgressFromFirebase();
         updateMainSectionChecks();
 
-        navContainer.addEventListener('click', (event) => { /* ... same as before ... */ });
+        navContainer.addEventListener('click', (event) => {
+            const clickedLink = event.target.closest('a.nav-item');
+            if (clickedLink) {
+                event.preventDefault();
+                const targetId = clickedLink.dataset.page;
+                document.querySelectorAll('.nav-item').forEach(link => link.classList.remove('active'));
+                clickedLink.classList.add('active');
+                renderSectionContent(targetId);
+            }
+        });
 
         mainContentContainer.addEventListener('click', async (event) => {
             const target = event.target;
-            
-            // Accordion Header Click
             if (target.matches('.accordion-header, .accordion-header *')) {
                 const accordionItem = target.closest('.accordion-item');
                 if (accordionItem) accordionItem.classList.toggle('active');
             }
-            
-            // "Mark as Read" Button Click
             if (target.matches('.mark-as-read-btn') && !target.disabled) {
                 const accordionId = target.dataset.accordionId;
                 await saveProgressToFirebase(accordionId);
@@ -110,16 +151,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 target.closest('.accordion-item').querySelector('.accordion-header').classList.add('is-read');
                 updateMainSectionChecks();
             }
-
-            // *** FIX IS HERE ***
-            // "Take the Quiz" Button Click
             if (target.matches('.quiz-link-btn')) {
-                event.preventDefault(); // Prevent default link behavior
-                window.location.href = 'quiz.html'; // Navigate programmatically
+                event.preventDefault();
+                window.location.href = 'quiz.html';
             }
         });
         
-        document.querySelector('.nav-item').click();
+        // *** FIX IS HERE: Replaced the brittle .click() with direct function calls ***
+        const firstNavLink = document.querySelector('.nav-item');
+        if (firstNavLink) {
+            const firstPageId = firstNavLink.dataset.page;
+            // Directly set the state for the first item
+            firstNavLink.classList.add('active');
+            renderSectionContent(firstPageId);
+        }
     }
 
     // --- ENTRY POINT ---
