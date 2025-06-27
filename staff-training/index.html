@@ -4,80 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friez n Burgz | Staff Training</title>
-    <!-- Google Fonts & Font Awesome from your main project -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@800;900&family=Futura:wght@400&family=Montserrat:wght@800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <!-- Local Stylesheet & Script -->
     <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
 </head>
 <body>
 
-    <!-- Main container uses the admin dashboard grid layout -->
-    <div class="main-dashboard-container">
-        <!-- Header (for mobile view) and Desktop Header (re-purposed) -->
-        <header class="dashboard-header">
-            <div class="header-left">
-                <img src="assets/logo.png" alt="Friez n Burgz Logo" class="header-logo">
-                <!-- Title is now styled correctly to match screenshot -->
-                <span class="app-name">Staff Training</span>
-            </div>
-            <div class="header-center">
-                <span class="current-location-display">Front Staff Handbook</span>
-            </div>
-            <div class="header-right">
-                <!-- This button is now hidden on mobile via CSS -->
-                <a href="#" class="join-team-btn">Join The Team!</a>
-            </div>
-        </header>
-
-        <!-- Sidebar for Desktop, repurposed as horizontal nav for mobile -->
-        <aside class="dashboard-sidebar">
-            <nav class="sidebar-nav">
-                <a href="#" class="nav-item" data-page="introduction"><i class="fas fa-book-open"></i> Introduction<i class="fas fa-check-circle read-indicator"></i></a>
-                <a href="#" class="nav-item" data-page="preparation"><i class="fas fa-clipboard-list"></i> Preparation<i class="fas fa-check-circle read-indicator"></i></a>
-                <a href="#" class="nav-item" data-page="task-distribution"><i class="fas fa-users"></i> Task Distribution<i class="fas fa-check-circle read-indicator"></i></a>
-                <a href="#" class="nav-item" data-page="service"><i class="fas fa-concierge-bell"></i> Service<i class="fas fa-check-circle read-indicator"></i></a>
-                <a href="#" class="nav-item" data-page="sop-visuals"><i class="fas fa-camera-retro"></i> SOP Visuals<i class="fas fa-check-circle read-indicator"></i></a>
-                <a href="#" class="nav-item" data-page="everyday-rules"><i class="fas fa-gavel"></i> Everyday Rules<i class="fas fa-check-circle read-indicator"></i></a>
-                <a href="#" class="nav-item" data-page="performance-eval"><i class="fas fa-chart-bar"></i> Performance<i class="fas fa-check-circle read-indicator"></i></a>
-                <a href="#" class="nav-item" data-page="disciplinary-actions"><i class="fas fa-exclamation-triangle"></i> Disciplinary<i class="fas fa-check-circle read-indicator"></i></a>
-                <a href="#" class="nav-item" data-page="final-words"><i class="fas fa-award"></i> Final Words<i class="fas fa-check-circle read-indicator"></i></a>
-            </nav>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="dashboard-content">
-            <section id="introduction" class="content-page">
-                <h2 class="page-title">Introduction</h2>
-                <div class="accordion-item" data-accordion-id="intro-welcome">
-                    <div class="accordion-header"><h3>Welcome to Friez&Burgz!</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div>
-                    <div class="accordion-content">
-                        <p>As a front staff member, you are the face of our restaurant, ensuring that every customer receives outstanding service. Your role is essential in creating a smooth and enjoyable customer experience.</p>
-                        <button class="mark-as-read-btn" data-accordion-id="intro-welcome">Mark as Read</button>
-                    </div>
-                </div>
-                <div class="accordion-item" data-accordion-id="intro-overview">
-                    <div class="accordion-header"><h3>Handbook Overview</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div>
-                    <div class="accordion-content">
-                        <p>This handbook is designed to help you work effectively. By following these instructions, you will contribute to maintaining the high standards of Friez&Burgz.</p>
-                        <p class="emphasis-text">Let's work together to deliver fast, friendly, and flawless service every day!</p>
-                        <button class="mark-as-read-btn" data-accordion-id="intro-overview">Mark as Read</button>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- All other sections remain the same, just with the new checkmark icon in the header -->
-            <section id="preparation" class="content-page"><h2 class="page-title">Preparation</h2><div class="accordion-item" data-accordion-id="prep-morning"><div class="accordion-header"><h3>Morning Duties (Opening)</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div><div class="accordion-content"><h4>1. Store Environment</h4><ul><li>Remove chairs, open shutters, turn on TVs, and clean glass.</li></ul><h4>2. Music & Till</h4><ul><li>Play House Chill Music, then Dance House. Ensure cash float is £150.</li></ul><button class="mark-as-read-btn" data-accordion-id="prep-morning">Mark as Read</button></div></div><div class="accordion-item" data-accordion-id="prep-night"><div class="accordion-header"><h3>Night Time Duties (Closing)</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div><div class="accordion-content"><h4>1. Cleaning</h4><ul><li>Wipe surfaces, sweep/mop floor, empty bins.</li></ul><h4>2. Restocking</h4><ul><li>Refill all sauce fridges using FIFO.</li></ul><button class="mark-as-read-btn" data-accordion-id="prep-night">Mark as Read</button></div></div></section>
-            <section id="task-distribution" class="content-page"><h2 class="page-title">Task Distribution</h2><div class="accordion-item" data-accordion-id="task-morning"><div class="accordion-header"><h3>Two-Person Morning Shift</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div><div class="accordion-content"><p>Fair distribution of tasks between Main Cashier and Cashier.</p><table class="task-table"><thead><tr><th>Task</th><th>Main Cashier</th><th>Cashier</th></tr></thead><tbody><tr><td>Verify till and cash float (£150)</td><td><i class="fas fa-check"></i></td><td></td></tr><tr><td>Ensure machines are on</td><td><i class="fas fa-check"></i></td><td></td></tr><tr><td>Check card machines, temps, allergens</td><td><i class="fas fa-check"></i></td><td></td></tr><tr><td>Remove chairs & Open shutters</td><td></td><td><i class="fas fa-check"></i></td></tr><tr><td>Prepare fresh mixes for milkshakes</td><td></td><td><i class="fas fa-check"></i></td></tr></tbody></table><button class="mark-as-read-btn" data-accordion-id="task-morning">Mark as Read</button></div></div></section>
-            <section id="service" class="content-page"><h2 class="page-title">Service</h2><div class="accordion-item" data-accordion-id="service-customer"><div class="accordion-header"><h3>Customer Service</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div><div class="accordion-content"><p>Ensure every customer feels welcomed, valued, and satisfied.</p><div class="important-box"><strong>GOAL:</strong> Every customer should leave feeling like they had a great experience and want to come back!</div><button class="mark-as-read-btn" data-accordion-id="service-customer">Mark as Read</button></div></div><div class="accordion-item" data-accordion-id="service-upselling"><div class="accordion-header"><h3>Upselling Techniques</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div><div class="accordion-content"><div class="sales-script-box"><h4>Sales Script</h4><p><strong>Greeting:</strong> “Hello! Welcome to Friez&Burgz.”</p><p><strong>Extras:</strong> “Would you like to add bacon or pastrami?”</p></div><button class="mark-as-read-btn" data-accordion-id="service-upselling">Mark as Read</button></div></div></section>
-            <section id="sop-visuals" class="content-page"><h2 class="page-title">SOP Visuals</h2><div class="accordion-item" data-accordion-id="sop-info"><div class="accordion-header"><h3>Visual Guide Information</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div><div class="accordion-content"><p>The original PDF handbook contains images for key procedures. Please refer to it for visual context.</p><button class="mark-as-read-btn" data-accordion-id="sop-info">Mark as Read</button></div></div></section>
-            <section id="everyday-rules" class="content-page"><h2 class="page-title">Everyday Rules</h2><div class="accordion-item" data-accordion-id="rules-all"><div class="accordion-header"><h3>Key Everyday Rules</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div><div class="accordion-content"><h4>Mobile Phone Policy:</h4><p>No phones during work hours except on your designated 20-minute break.</p><h4>Staff Meals Policy:</h4><p>One free meal and pop per shift. Premium items not included.</p><button class="mark-as-read-btn" data-accordion-id="rules-all">Mark as Read</button></div></div></section>
-            <section id="performance-eval" class="content-page"><h2 class="page-title">Performance Evaluation</h2><div class="accordion-item" data-accordion-id="eval-system"><div class="accordion-header"><h3>Evaluation System</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div><div class="accordion-content"><ul><li><strong>90-100 pts:</strong> Excellent</li><li><strong>80-89 pts:</strong> Good</li><li><strong>70-79 pts:</strong> Needs Improvement</li><li><strong>Below 70 pts:</strong> Unsatisfactory</li></ul><button class="mark-as-read-btn" data-accordion-id="eval-system">Mark as Read</button></div></div></section>
-            <section id="disciplinary-actions" class="content-page"><h2 class="page-title">Disciplinary Actions</h2><div class="accordion-item" data-accordion-id="disc-process"><div class="accordion-header"><h3>Disciplinary Process</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div><div class="accordion-content"><ol><li><strong>Step 1:</strong> Verbal Warning</li><li><strong>Step 2:</strong> Written Warning</li><li><strong>Step 3:</strong> Final Written Warning</li><li><strong>Step 4:</strong> Termination</li></ol><button class="mark-as-read-btn" data-accordion-id="disc-process">Mark as Read</button></div></div></section>
-            <section id="final-words" class="content-page"><h2 class="page-title">Final Words</h2><div class="accordion-item" data-accordion-id="final-commit"><div class="accordion-header"><h3>Commitment to Excellence</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div><div class="accordion-content"><p><strong>CONGRATULATIONS!</strong> Your role is crucial to our success.</p><p class="emphasis-text">Let's continue building a strong, professional, and customer-friendly team together.</p><button class="mark-as-read-btn" data-accordion-id="final-commit">Mark as Read</button></div></div></section>
-        </main>
+    <!-- Loading Spinner - Shown initially -->
+    <div id="loading-spinner" class="loading-container">
+        <div class="spinner"></div>
     </div>
+
+    <!-- Login Prompt - Shown if user is not logged in -->
+    <div id="login-prompt" class="login-prompt-container" style="display: none;">
+        <div class="login-card">
+            <img src="assets/logo-alt.png" alt="Friez n Burgz Logo" class="login-logo">
+            <h2 class="login-title">Staff Training Portal</h2>
+            <p>You must be logged in to access this content.</p>
+            <a href="/index.html" class="login-button">Proceed to Login</a>
+        </div>
+    </div>
+    
+    <!-- Main Content Wrapper - Shown only if user is logged in -->
+    <div id="main-content-wrapper" style="display: none;">
+        <div class="main-dashboard-container">
+            <header class="dashboard-header">
+                <div class="header-left"><img src="assets/logo.png" alt="Friez n Burgz Logo" class="header-logo"><span class="app-name">Staff Training</span></div>
+                <div class="header-center"><span class="current-location-display">Front Staff Handbook</span></div>
+                <div class="header-right"><a href="quiz.html" class="join-team-btn">Take The Quiz</a></div>
+            </header>
+
+            <aside class="dashboard-sidebar">
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item" data-page="introduction"><i class="fas fa-book-open"></i> Introduction<i class="fas fa-check-circle read-indicator"></i></a>
+                    <a href="#" class="nav-item" data-page="preparation"><i class="fas fa-clipboard-list"></i> Preparation<i class="fas fa-check-circle read-indicator"></i></a>
+                    <a href="#" class="nav-item" data-page="task-distribution"><i class="fas fa-users"></i> Task Distribution<i class="fas fa-check-circle read-indicator"></i></a>
+                    <a href="#" class="nav-item" data-page="service"><i class="fas fa-concierge-bell"></i> Service<i class="fas fa-check-circle read-indicator"></i></a>
+                    <a href="#" class="nav-item" data-page="sop-visuals"><i class="fas fa-camera-retro"></i> SOP Visuals<i class="fas fa-check-circle read-indicator"></i></a>
+                    <a href="#" class="nav-item" data-page="everyday-rules"><i class="fas fa-gavel"></i> Everyday Rules<i class="fas fa-check-circle read-indicator"></i></a>
+                    <a href="#" class="nav-item" data-page="performance-eval"><i class="fas fa-chart-bar"></i> Performance<i class="fas fa-check-circle read-indicator"></i></a>
+                    <a href="#" class="nav-item" data-page="disciplinary-actions"><i class="fas fa-exclamation-triangle"></i> Disciplinary<i class="fas fa-check-circle read-indicator"></i></a>
+                    <a href="#" class="nav-item" data-page="final-words"><i class="fas fa-award"></i> Final Words<i class="fas fa-check-circle read-indicator"></i></a>
+                </nav>
+            </aside>
+
+            <main class="dashboard-content">
+                <!-- Content sections will be managed by script.js -->
+                <section id="introduction" class="content-page"></section>
+                <section id="preparation" class="content-page"></section>
+                <section id="task-distribution" class="content-page"></section>
+                <section id="service" class="content-page"></section>
+                <section id="sop-visuals" class="content-page"></section>
+                <section id="everyday-rules" class="content-page"></section>
+                <section id="performance-eval" class="content-page"></section>
+                <section id="disciplinary-actions" class="content-page"></section>
+                <section id="final-words" class="content-page"></section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="training-auth.js"></script>
+    <script type="module" src="script.js"></script>
 
 </body>
 </html>
