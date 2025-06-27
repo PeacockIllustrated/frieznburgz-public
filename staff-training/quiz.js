@@ -43,8 +43,18 @@ document.addEventListener('DOMContentLoaded', () => {
             <div id="quiz-overview-container" class="quiz-view">
                 <h2 class="page-title">My Progress Overview</h2>
                 <div class="overview-grid">
-                    <div class="overview-card"><h3>Handbook Completion</h3><div class="progress-bar-container"><div class="progress-bar-fill" style="width: ${percentage}%;"></div></div><p id="handbook-progress-text">${Math.round(percentage)}% Complete (${readSections.length} / ${TOTAL_HANDBOOK_SECTIONS} sections)</p></div>
-                    <div class="overview-card"><h3>Quiz Attempts</h3><p class="quiz-attempts-count">${history.length}</p><p>quizzes taken</p></div>
+                    <div class="overview-card">
+                        <h3>Handbook Completion</h3>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: ${percentage}%;"></div>
+                        </div>
+                        <p id="handbook-progress-text">${Math.round(percentage)}% Complete (${readSections.length} / ${TOTAL_HANDBOOK_SECTIONS} sections read)</p>
+                    </div>
+                    <div class="overview-card">
+                        <h3>Quiz Attempts</h3>
+                        <p class="quiz-attempts-count">${history.length}</p>
+                        <p>quizzes taken</p>
+                    </div>
                 </div>
                 <div class="quiz-actions"><button id="start-quiz-btn" class="quiz-start-button">Start The Quiz</button></div>
                 <div class="quiz-log-container"><h3>Quiz History</h3><ul id="quiz-log-list">${logHtml}</ul></div>
@@ -131,33 +141,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function finishQuiz() {
-        const newResult = { score, total: QUIZ_LENGTH, timestamp: new Date().toISOString() };
+        const newResult = { score: score, total: QUIZ_LENGTH, timestamp: new Date().toISOString() };
         if (progressDocRef) {
-            await progressDocRef.update({ quizHistory: firebase.firestore.FieldValue.arrayUnion(newResult) });
+            try {
+                 await progressDocRef.update({
+                    quizHistory: firebase.firestore.FieldValue.arrayUnion(newResult)
+                });
+            } catch(error) {
+                console.error("Error saving quiz result:", error);
+            }
         }
         quizContainer.innerHTML = renderResultsHTML(score);
     }
-
+    
     // --- EVENT LISTENERS & INITIALIZATION ---
-    // Use event delegation on the main container
     quizContainer.addEventListener('click', (event) => {
         const target = event.target;
         if (target.id === 'start-quiz-btn') {
             startQuiz();
-        }
-        if (target.classList.contains('quiz-option-btn')) {
+        } else if (target.classList.contains('quiz-option-btn')) {
             selectAnswer(target);
-        }
-        if (target.id === 'next-question-btn') {
+        } else if (target.id === 'next-question-btn') {
             nextQuestion();
-        }
-        if (target.id === 'return-to-overview-btn') {
+        } else if (target.id === 'return-to-overview-btn') {
             showOverview();
         }
     });
     
     document.addEventListener('userAuthenticated', (event) => {
         currentUser = event.detail.user;
+        // Corrected, single source of truth for the document path
         progressDocRef = db.collection('users').doc(currentUser.uid);
         showOverview();
     });
