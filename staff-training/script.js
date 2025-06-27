@@ -1,18 +1,18 @@
-// --- staff-training/script.js (Final Corrected Version) ---
+// --- staff-training/script.js (Definitive Final Version) ---
 
 import { db } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- DOM ELEMENT SELECTION ---
+    // DOM ELEMENTS
     const navContainer = document.querySelector('.sidebar-nav');
     const mainContentContainer = document.getElementById('handbook-content-main');
 
-    // --- STATE MANAGEMENT ---
+    // STATE
     let currentUser = null;
     let progressDocRef = null;
-    let trainingProgress = { readSections: [], quizHistory: [] }; // Default state
+    let trainingProgress = { readSections: [], quizHistory: [] };
 
-    // --- CENTRALIZED HANDBOOK DATA ---
+    // DATA
     const handbookData = {
         introduction: { title: "Introduction", icon: "fa-book-open", accordions: {
             "intro-welcome": { title: "Welcome to Friez&Burgz!", content: "<p>As a front staff member, you are the face of our restaurant, ensuring that every customer receives outstanding service. Your role is essential in creating a smooth and enjoyable customer experience.</p>" },
@@ -51,11 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!progressDocRef) return;
         try {
             const docSnap = await progressDocRef.get();
-            if (docSnap.exists()) {
+            // *** THE FIX IS HERE ***
+            // Use the robust check that works with the compat library.
+            if (docSnap && docSnap.exists) {
                 trainingProgress = docSnap.data();
                  if (!trainingProgress.readSections) trainingProgress.readSections = [];
                  if (!trainingProgress.quizHistory) trainingProgress.quizHistory = [];
             } else {
+                // If the document doesn't exist, create it.
                 await progressDocRef.set({ readSections: [], quizHistory: [] });
                 trainingProgress = { readSections: [], quizHistory: [] };
             }
@@ -121,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
         buildNav();
         updateMainSectionChecks();
 
-        // Set up event listeners using delegation
         navContainer.addEventListener('click', (event) => {
             const clickedLink = event.target.closest('a.nav-item');
             if (clickedLink) {
@@ -157,7 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // Initial page render - robust version
         const firstNavLink = document.querySelector('.nav-item');
         if (firstNavLink) {
             const firstPageId = firstNavLink.dataset.page;
@@ -169,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ENTRY POINT ---
     document.addEventListener('userAuthenticated', async (event) => {
         currentUser = event.detail.user;
-        // Corrected, single source of truth for the document path
         progressDocRef = db.collection('users').doc(currentUser.uid);
         
         await loadProgressFromFirebase();
