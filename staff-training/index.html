@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Friez n Burgz | Interactive Staff Training</title>
+    <title>Friez n Burgz | Staff Training</title>
     <!-- Google Fonts & Font Awesome from your main project -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@800;900&family=Futura:wght@400&family=Montserrat:wght@800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -13,157 +13,125 @@
 </head>
 <body>
 
-    <header class="site-header">
-        <div class="header-content">
-            <a href="#" class="header-logo-link">
+    <!-- Structure now matches the main admin dashboard's layout -->
+    <div class="main-dashboard-container">
+        <header class="dashboard-header">
+            <div class="header-left">
                 <img src="assets/logo.png" alt="Friez n Burgz Logo" class="header-logo">
-            </a>
-            <nav class="header-nav">
-                <a href="#">Home</a>
-                <a href="#">Allergens</a>
-                <a href="#">Our Links</a>
-                <a href="#" class="join-team-btn">Join The Team!</a>
-            </nav>
-        </div>
-    </header>
+                <span class="app-name">Staff Training</span>
+            </div>
+            <div class="header-center">
+                <span class="current-location-display">Front Staff Handbook</span>
+            </div>
+            <div class="header-right">
+                <!-- Links adapted for a public-facing training portal -->
+                <a href="#" class="header-button-link">Home</a>
+                <a href="#" class="header-button-link">Allergens</a>
+                <a href="#" class="header-button-link join-team-btn">Join The Team!</a>
+            </div>
+        </header>
 
-    <main class="training-container">
-        <aside class="handbook-nav">
-            <h2>Handbook Sections</h2>
-            <ul id="main-nav-list">
-                <!-- Links will be dynamically checked by JS -->
-                <li><a href="#" class="nav-link" data-target="introduction">
-                    <i class="fas fa-check-circle read-indicator"></i> Introduction
-                </a></li>
-                <li><a href="#" class="nav-link" data-target="preparation">
-                    <i class="fas fa-check-circle read-indicator"></i> Preparation
-                </a></li>
-                <li><a href="#" class="nav-link" data-target="task-distribution">
-                    <i class="fas fa-check-circle read-indicator"></i> Task Distribution
-                </a></li>
-                <li><a href="#" class="nav-link" data-target="service">
-                    <i class="fas fa-check-circle read-indicator"></i> Service
-                </a></li>
-                <li><a href="#" class="nav-link" data-target="sop-visuals">
-                    <i class="fas fa-check-circle read-indicator"></i> SOP Visuals
-                </a></li>
-                <li><a href="#" class="nav-link" data-target="everyday-rules">
-                    <i class="fas fa-check-circle read-indicator"></i> Everyday Rules
-                </a></li>
-                <li><a href="#" class="nav-link" data-target="performance-eval">
-                    <i class="fas fa-check-circle read-indicator"></i> Store & Staff Performance
-                </a></li>
-                <li><a href="#" class="nav-link" data-target="disciplinary-actions">
-                    <i class="fas fa-check-circle read-indicator"></i> Disciplinary Actions
-                </a></li>
-                <li><a href="#" class="nav-link" data-target="final-words">
-                    <i class="fas fa-check-circle read-indicator"></i> Final Words
-                </a></li>
-            </ul>
+        <aside class="dashboard-sidebar">
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item" data-page="introduction">
+                    <i class="fas fa-book-open"></i> Introduction
+                    <i class="fas fa-check-circle read-indicator"></i>
+                </a>
+                <a href="#" class="nav-item" data-page="preparation">
+                    <i class="fas fa-clipboard-list"></i> Preparation
+                    <i class="fas fa-check-circle read-indicator"></i>
+                </a>
+                <a href="#" class="nav-item" data-page="task-distribution">
+                    <i class="fas fa-users"></i> Task Distribution
+                    <i class="fas fa-check-circle read-indicator"></i>
+                </a>
+                <a href="#" class="nav-item" data-page="service">
+                    <i class="fas fa-concierge-bell"></i> Service
+                    <i class="fas fa-check-circle read-indicator"></i>
+                </a>
+                <a href="#" class="nav-item" data-page="sop-visuals">
+                    <i class="fas fa-camera-retro"></i> SOP Visuals
+                    <i class="fas fa-check-circle read-indicator"></i>
+                </a>
+                <a href="#" class="nav-item" data-page="everyday-rules">
+                    <i class="fas fa-gavel"></i> Everyday Rules
+                    <i class="fas fa-check-circle read-indicator"></i>
+                </a>
+                <a href="#" class="nav-item" data-page="performance-eval">
+                    <i class="fas fa-chart-bar"></i> Performance
+                    <i class="fas fa-check-circle read-indicator"></i>
+                </a>
+                <a href="#" class="nav-item" data-page="disciplinary-actions">
+                    <i class="fas fa-exclamation-triangle"></i> Disciplinary
+                    <i class="fas fa-check-circle read-indicator"></i>
+                </a>
+                <a href="#" class="nav-item" data-page="final-words">
+                    <i class="fas fa-award"></i> Final Words
+                    <i class="fas fa-check-circle read-indicator"></i>
+                </a>
+            </nav>
         </aside>
 
-        <article class="handbook-content">
-            <!-- Each main section from the sidebar -->
-            <section id="introduction" class="content-section">
-                <!-- Accordions will be placed here -->
+        <main class="dashboard-content">
+            <!-- Content sections remain the same, they will be placed inside the new grid layout -->
+            <section id="introduction" class="content-page">
+                <h2 class="page-title">Introduction</h2>
                 <div class="accordion-item" data-accordion-id="intro-welcome">
-                    <div class="accordion-header">
-                        <h3><i class="fas fa-check-circle read-indicator"></i> Welcome to Friez&Burgz!</h3>
-                        <i class="fas fa-plus accordion-icon"></i>
-                    </div>
+                    <div class="accordion-header"><h3><i class="fas fa-check-circle read-indicator"></i> Welcome to Friez&Burgz!</h3><i class="fas fa-plus accordion-icon"></i></div>
                     <div class="accordion-content">
-                        <p>As a front staff member, you are the face of our restaurant, ensuring that every customer receives outstanding service. Whether you are taking orders, preparing drinks, handling payments, or maintaining cleanliness, your role is essential in creating a smooth and enjoyable customer experience.</p>
-                        <p>This handbook is designed to provide you with clear instructions and structured guidelines for all aspects of your daily work. It outlines the expectations, responsibilities, and best practices that will help you perform efficiently and confidently.</p>
+                        <p>As a front staff member, you are the face of our restaurant, ensuring that every customer receives outstanding service. Your role is essential in creating a smooth and enjoyable customer experience.</p>
+                        <p>This handbook is designed to provide you with clear instructions and structured guidelines for all aspects of your daily work.</p>
                         <button class="mark-as-read-btn" data-accordion-id="intro-welcome">Mark as Read</button>
                     </div>
                 </div>
                 <div class="accordion-item" data-accordion-id="intro-overview">
-                    <div class="accordion-header">
-                        <h3><i class="fas fa-check-circle read-indicator"></i> Handbook Overview</h3>
-                        <i class="fas fa-plus accordion-icon"></i>
-                    </div>
+                    <div class="accordion-header"><h3><i class="fas fa-check-circle read-indicator"></i> Handbook Overview</h3><i class="fas fa-plus accordion-icon"></i></div>
                     <div class="accordion-content">
-                         <h4>The handbook is divided into nine key sections:</h4>
-                        <ol>
-                            <li><strong>Introduction:</strong> An overview of your role, the purpose of this handbook, and how it will help you provide excellent service.</li>
-                            <li><strong>Preparation:</strong> Tasks that must be completed before opening and during shift transitions.</li>
-                            <li><strong>Task Distribution for Two-Person Shifts:</strong> A clear breakdown of responsibilities.</li>
-                            <li><strong>Service:</strong> Step-by-step instructions on customer interactions, order management, and more.</li>
-                            <li><strong>SOP Visual Guidelines:</strong> A visual guide demonstrating the correct execution of key tasks.</li>
-                            <li><strong>Everyday Rules:</strong> Essential daily policies covering shift schedules, phone usage, etc.</li>
-                            <li><strong>Store & Staff Performance Evaluation:</strong> A structured system for evaluating performance.</li>
-                            <li><strong>Disciplinary Actions & Accountability:</strong> Policies regarding performance expectations.</li>
-                            <li><strong>Final Words: Commitment to Excellence:</strong> A closing message on professionalism.</li>
-                        </ol>
+                        <p>This handbook is designed to help you work effectively. By following these instructions, you will contribute to maintaining the high standards of Friez&Burgz.</p>
                         <p class="emphasis-text">Let's work together to deliver fast, friendly, and flawless service every day!</p>
                         <button class="mark-as-read-btn" data-accordion-id="intro-overview">Mark as Read</button>
                     </div>
                 </div>
             </section>
 
-            <section id="preparation" class="content-section">
+            <section id="preparation" class="content-page">
+                 <h2 class="page-title">Preparation</h2>
                  <div class="accordion-item" data-accordion-id="prep-morning">
-                    <div class="accordion-header">
-                        <h3><i class="fas fa-check-circle read-indicator"></i> Morning Duties (Opening)</h3>
-                        <i class="fas fa-plus accordion-icon"></i>
-                    </div>
+                    <div class="accordion-header"><h3><i class="fas fa-check-circle read-indicator"></i> Morning Duties (Opening)</h3><i class="fas fa-plus accordion-icon"></i></div>
                     <div class="accordion-content">
-                        <h4>1. Preparing the Seating and Store Environment</h4>
-                        <ul>
-                            <li>Remove chairs from tables (since floors were cleaned the night before).</li>
-                            <li>Open all window shutters and front shutters to allow natural light inside.</li>
-                            <li>Turn on all TVs in the store so they are ready for customers. (See pg 30).</li>
-                            <li>Clean all glass surfaces, including windows, the entrance door, and the door handle. (See pg 30).</li>
-                        </ul>
-                        <h4>2. Set up the Music</h4>
-                        <ul>
-                            <li>From 8:00 AM to 5:00 PM (breakfast) or 12:00 PM to 5:00 PM (regular): play House Chill Music.</li>
-                            <li>After 5:00 PM, when the busy period starts, switch to Dance House Music.</li>
-                        </ul>
+                        <h4>1. Store Environment</h4>
+                        <ul><li>Remove chairs from tables, open shutters, turn on TVs, and clean all glass surfaces.</li></ul>
+                        <h4>2. Music & Till</h4>
+                        <ul><li>Play House Chill Music until 5 PM, then switch to Dance House. Ensure cash float is £150.</li></ul>
                         <button class="mark-as-read-btn" data-accordion-id="prep-morning">Mark as Read</button>
                     </div>
                 </div>
                  <div class="accordion-item" data-accordion-id="prep-night">
-                    <div class="accordion-header">
-                        <h3><i class="fas fa-check-circle read-indicator"></i> Night Time Duties (Closing)</h3>
-                        <i class="fas fa-plus accordion-icon"></i>
-                    </div>
+                    <div class="accordion-header"><h3><i class="fas fa-check-circle read-indicator"></i> Night Time Duties (Closing)</h3><i class="fas fa-plus accordion-icon"></i></div>
                     <div class="accordion-content">
-                        <h4>1. Cleaning and Sanitizing the Work Area</h4>
-                        <ul>
-                            <li>Wipe down all surfaces, including tills, countertops, card machines, and order screens.</li>
-                            <li>Sweep and mop the entire front area floor. Put chairs on top of tables to make mopping easier.</li>
-                            <li>Empty all bins and replace garbage bags if full.</li>
-                        </ul>
-                        <h4>2. Restocking the Sauce Fridges</h4>
-                        <ul>
-                            <li>There are three sauce fridges: Front Small Fridge, Backup Small Fridge, and Large Back Fridge.</li>
-                            <li><strong>Closing Staff Responsibilities:</strong> Refill the front small fridge from the backup, then refill the backup from the large back fridge. Organize using the FIFO method.</li>
-                        </ul>
+                        <h4>1. Cleaning</h4>
+                        <ul><li>Wipe down all surfaces, sweep and mop the floor, and empty all bins.</li></ul>
+                        <h4>2. Restocking</h4>
+                        <ul><li>Refill all three sauce fridges (Front, Backup, Large Back) using the FIFO method.</li></ul>
                         <button class="mark-as-read-btn" data-accordion-id="prep-night">Mark as Read</button>
                     </div>
                 </div>
             </section>
 
-             <section id="task-distribution" class="content-section">
+             <section id="task-distribution" class="content-page">
+                 <h2 class="page-title">Task Distribution</h2>
                  <div class="accordion-item" data-accordion-id="task-morning">
-                    <div class="accordion-header">
-                        <h3><i class="fas fa-check-circle read-indicator"></i> Morning Shift Tasks</h3>
-                        <i class="fas fa-plus accordion-icon"></i>
-                    </div>
+                    <div class="accordion-header"><h3><i class="fas fa-check-circle read-indicator"></i> Two-Person Morning Shift</h3><i class="fas fa-plus accordion-icon"></i></div>
                     <div class="accordion-content">
-                        <p>This table outlines the fair distribution of tasks between the Main Cashier and the Cashier when two front staff members are on shift.</p>
+                        <p>This table outlines the fair distribution of tasks between the Main Cashier and the Cashier.</p>
                         <table class="task-table">
                             <thead><tr><th>Task</th><th>Main Cashier</th><th>Cashier</th></tr></thead>
                             <tbody>
                                 <tr><td>Verify till and cash float (£150)</td><td><i class="fas fa-check"></i></td><td></td></tr>
                                 <tr><td>Ensure machines are on and functional</td><td><i class="fas fa-check"></i></td><td></td></tr>
-                                <tr><td>Check card machines, verify fridge temp, check/fill allergen sheets</td><td><i class="fas fa-check"></i></td><td></td></tr>
-                                <tr><td>Turn on TVs and music</td><td><i class="fas fa-check"></i></td><td></td></tr>
-                                <tr><td>Remove chairs from tables</td><td></td><td><i class="fas fa-check"></i></td></tr>
-                                <tr><td>Open shutters</td><td></td><td><i class="fas fa-check"></i></td></tr>
+                                <tr><td>Check card machines, verify fridge temp, fill allergen sheets</td><td><i class="fas fa-check"></i></td><td></td></tr>
+                                <tr><td>Remove chairs from tables & Open shutters</td><td></td><td><i class="fas fa-check"></i></td></tr>
                                 <tr><td>Prepare fresh mixes for milkshakes</td><td></td><td><i class="fas fa-check"></i></td></tr>
-                                <tr><td>Wipe down all windows, entrance door, and door handle</td><td></td><td><i class="fas fa-check"></i></td></tr>
                             </tbody>
                         </table>
                         <button class="mark-as-read-btn" data-accordion-id="task-morning">Mark as Read</button>
@@ -171,137 +139,102 @@
                 </div>
             </section>
 
-            <!-- Other sections follow the same accordion structure -->
-            <section id="service" class="content-section">
-                <!-- ... Accordions for Customer Service, Upselling, etc. ... -->
+            <section id="service" class="content-page">
+                <h2 class="page-title">Service</h2>
                 <div class="accordion-item" data-accordion-id="service-customer">
-                    <div class="accordion-header">
-                        <h3><i class="fas fa-check-circle read-indicator"></i> Customer Service</h3>
-                        <i class="fas fa-plus accordion-icon"></i>
-                    </div>
+                    <div class="accordion-header"><h3><i class="fas fa-check-circle read-indicator"></i> Customer Service</h3><i class="fas fa-plus accordion-icon"></i></div>
                     <div class="accordion-content">
-                        <p>Front staff must ensure that every customer feels welcomed, valued, and satisfied. Use a warm and friendly tone, smile, and maintain eye contact.</p>
+                        <p>Ensure every customer feels welcomed, valued, and satisfied. Always smile, maintain eye contact, and use a warm, friendly tone.</p>
                         <div class="important-box"><strong>GOAL:</strong> Every customer should leave feeling like they had a great experience and want to come back!</div>
                         <button class="mark-as-read-btn" data-accordion-id="service-customer">Mark as Read</button>
                     </div>
                 </div>
                 <div class="accordion-item" data-accordion-id="service-upselling">
-                    <div class="accordion-header">
-                        <h3><i class="fas fa-check-circle read-indicator"></i> Upselling Techniques</h3>
-                        <i class="fas fa-plus accordion-icon"></i>
-                    </div>
+                    <div class="accordion-header"><h3><i class="fas fa-check-circle read-indicator"></i> Upselling Techniques</h3><i class="fas fa-plus accordion-icon"></i></div>
                     <div class="accordion-content">
-                        <p>Upselling helps increase sales and ensures customers get the best experience. Every cashier must use the Sales Script naturally and friendly.</p>
                         <div class="sales-script-box">
                             <h4>Sales Script</h4>
                             <p><strong>Greeting:</strong> “Hello! Welcome to Friez&Burgz. How's your day going?”</p>
                             <p><strong>Offering Extras:</strong> “Would you like to add some bacon or pastrami to your burger?”</p>
-                            <p><strong>Suggesting Sides:</strong> “Would you like any sides with your meal? We have fillets, fries, and corn bites.”</p>
                         </div>
                          <button class="mark-as-read-btn" data-accordion-id="service-upselling">Mark as Read</button>
                     </div>
                 </div>
             </section>
             
-            <section id="sop-visuals" class="content-section">
+            <section id="sop-visuals" class="content-page">
+                 <h2 class="page-title">SOP Visuals</h2>
                  <div class="accordion-item" data-accordion-id="sop-info">
-                    <div class="accordion-header">
-                        <h3><i class="fas fa-check-circle read-indicator"></i> SOP Visual Guide Information</h3>
-                        <i class="fas fa-plus accordion-icon"></i>
-                    </div>
+                    <div class="accordion-header"><h3><i class="fas fa-check-circle read-indicator"></i> Visual Guide Information</h3><i class="fas fa-plus accordion-icon"></i></div>
                     <div class="accordion-content">
-                        <p>This section provides visual instructions for key operational procedures. The following points refer to images in the original PDF handbook which demonstrate the correct procedures.</p>
+                        <p>This section provides visual instructions. The original PDF handbook contains images for the following procedures:</p>
                         <ul>
-                            <li><strong>End-of-Day Cash Float:</strong> Refer to pg. 7 for the correct closing envelope format.</li>
-                            <li><strong>Allergen Documentation:</strong> Part of Final Morning Checks on pg. 4.</li>
-                            <li><strong>Turning on Menu Screens:</strong> An opening duty detailed on pg. 3.</li>
-                            <li><strong>Milkshake Preparation:</strong> Visuals for blended mixes are on pg. 17.</li>
+                            <li>End-of-Day Cash Float Procedure (pg. 7)</li>
+                            <li>Allergen Documentation (pg. 4)</li>
+                            <li>Turning on Menu Screens (pg. 3)</li>
                         </ul>
                          <button class="mark-as-read-btn" data-accordion-id="sop-info">Mark as Read</button>
                     </div>
                 </div>
             </section>
             
-            <section id="everyday-rules" class="content-section">
+            <section id="everyday-rules" class="content-page">
+                 <h2 class="page-title">Everyday Rules</h2>
                  <div class="accordion-item" data-accordion-id="rules-all">
-                    <div class="accordion-header">
-                        <h3><i class="fas fa-check-circle read-indicator"></i> Key Everyday Rules</h3>
-                        <i class="fas fa-plus accordion-icon"></i>
-                    </div>
+                    <div class="accordion-header"><h3><i class="fas fa-check-circle read-indicator"></i> Key Everyday Rules</h3><i class="fas fa-plus accordion-icon"></i></div>
                     <div class="accordion-content">
-                        <h4>Mobile Phone Policy</h4>
-                        <p>Phones must not be used during work hours except during your designated 20-minute break. Usage is monitored.</p>
-                        <h4>Staff Meals Policy</h4>
-                        <p>One free meal and a can of pop per shift. Cheesecakes and milkshakes are not included.</p>
-                        <h4>Break Policy</h4>
-                        <p>Full-day shifts get one 20-minute break. Half-day shifts get a 5-minute break in quiet periods. No leaving post without approval.</p>
+                        <h4>Mobile Phone Policy:</h4> <p>No phones during work hours except on your designated 20-minute break.</p>
+                        <h4>Staff Meals Policy:</h4> <p>One free meal and a can of pop per shift. Premium items are not included.</p>
                          <button class="mark-as-read-btn" data-accordion-id="rules-all">Mark as Read</button>
                     </div>
                 </div>
             </section>
             
-             <section id="performance-eval" class="content-section">
+             <section id="performance-eval" class="content-page">
+                <h2 class="page-title">Performance Evaluation</h2>
                  <div class="accordion-item" data-accordion-id="eval-system">
-                    <div class="accordion-header">
-                        <h3><i class="fas fa-check-circle read-indicator"></i> Evaluation System & Scoring</h3>
-                        <i class="fas fa-plus accordion-icon"></i>
-                    </div>
+                    <div class="accordion-header"><h3><i class="fas fa-check-circle read-indicator"></i> Evaluation System</h3><i class="fas fa-plus accordion-icon"></i></div>
                     <div class="accordion-content">
-                        <h3>Evaluation System</h3>
                         <ul>
-                            <li>Each store starts with 100 points.</li>
-                            <li>Perfect execution = 0 points deducted.</li>
-                            <li>Standard not met = 2 points deducted.</li>
-                            <li>Repeated issue = Deduction doubles (2 -> 4 -> 8).</li>
-                        </ul>
-                        <h3>Final Score Interpretation:</h3>
-                        <ul>
-                            <li><strong>90-100:</strong> Excellent (Eligible for bonuses)</li>
-                            <li><strong>80-89:</strong> Good (Minor issues)</li>
-                            <li><strong>70-79:</strong> Needs Improvement</li>
-                            <li><strong>Below 70:</strong> Unsatisfactory</li>
+                            <li><strong>90-100 pts:</strong> Excellent (Eligible for bonuses)</li>
+                            <li><strong>80-89 pts:</strong> Good (Minor issues)</li>
+                            <li><strong>70-79 pts:</strong> Needs Improvement</li>
+                            <li><strong>Below 70 pts:</strong> Unsatisfactory (Immediate corrective actions)</li>
                         </ul>
                          <button class="mark-as-read-btn" data-accordion-id="eval-system">Mark as Read</button>
                     </div>
                 </div>
             </section>
             
-             <section id="disciplinary-actions" class="content-section">
+             <section id="disciplinary-actions" class="content-page">
+                <h2 class="page-title">Disciplinary Actions</h2>
                  <div class="accordion-item" data-accordion-id="disc-process">
-                    <div class="accordion-header">
-                        <h3><i class="fas fa-check-circle read-indicator"></i> Disciplinary Process</h3>
-                        <i class="fas fa-plus accordion-icon"></i>
-                    </div>
+                    <div class="accordion-header"><h3><i class="fas fa-check-circle read-indicator"></i> Disciplinary Process</h3><i class="fas fa-plus accordion-icon"></i></div>
                     <div class="accordion-content">
-                        <h3>Disciplinary Action Process:</h3>
                         <ol>
-                            <li><strong>Step 1: Verbal Warning</strong> - For minor infractions.</li>
-                            <li><strong>Step 2: Written Warning</strong> - If the issue continues or for a more serious violation.</li>
-                            <li><strong>Step 3: Final Written Warning</strong> - If no improvement is seen after a monitoring period.</li>
-                            <li><strong>Step 4: Termination</strong> - For repeated offenses or serious misconduct.</li>
+                            <li><strong>Step 1:</strong> Verbal Warning</li>
+                            <li><strong>Step 2:</strong> Written Warning</li>
+                            <li><strong>Step 3:</strong> Final Written Warning</li>
+                            <li><strong>Step 4:</strong> Termination</li>
                         </ol>
                          <button class="mark-as-read-btn" data-accordion-id="disc-process">Mark as Read</button>
                     </div>
                 </div>
             </section>
             
-             <section id="final-words" class="content-section">
+             <section id="final-words" class="content-page">
+                <h2 class="page-title">Final Words</h2>
                  <div class="accordion-item" data-accordion-id="final-commit">
-                    <div class="accordion-header">
-                        <h3><i class="fas fa-check-circle read-indicator"></i> Commitment to Excellence</h3>
-                        <i class="fas fa-plus accordion-icon"></i>
-                    </div>
+                    <div class="accordion-header"><h3><i class="fas fa-check-circle read-indicator"></i> Commitment to Excellence</h3><i class="fas fa-plus accordion-icon"></i></div>
                     <div class="accordion-content">
-                        <p><strong>CONGRATULATIONS!</strong> You have now gone through the Friez&Burgz Front Staff Handbook. This is your guide to providing the best possible customer experience.</p>
-                        <p>Your role is crucial, and by following these guidelines, you help create a welcoming environment that keeps customers returning. Always strive for improvement, pay attention to details, and support your teammates.</p>
+                        <p><strong>CONGRATULATIONS!</strong> Your role is crucial to our success. By following these guidelines, you help create a welcoming environment that keeps customers returning.</p>
                         <p class="emphasis-text">We appreciate your hard work. Let's continue building a strong, professional, and customer-friendly team together.</p>
                         <button class="mark-as-read-btn" data-accordion-id="final-commit">Mark as Read</button>
                     </div>
                 </div>
             </section>
-
-        </article>
-    </main>
+        </main>
+    </div>
 
 </body>
 </html>
