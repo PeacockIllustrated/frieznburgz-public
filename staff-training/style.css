@@ -1,20 +1,20 @@
 /* --- staff-training/style.css --- */
 
-/* Replicating root variables from your main style.css for brand consistency */
 :root {
     --red: #e71e26;
     --yellow: white;
     --dim-grey: #2f2f2f;
     --khaki: #fbae29;
     --salmon: #ff9686;
-    --dark-slate-grey: #050505;
+    --light-grey: #f4f4f4;
+    --success-green: #28a745;
 }
 
 /* Global Styles */
 body {
     margin: 0;
     font-family: 'Futura', Arial, sans-serif;
-    background-color: var(--red);
+    background-color: var(--light-grey);
     color: var(--dim-grey);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -26,7 +26,7 @@ body {
     background-color: white;
     padding: 10px 40px;
     border-bottom: 5px solid var(--khaki);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .header-content {
@@ -37,11 +37,7 @@ body {
     margin: 0 auto;
 }
 
-.header-logo {
-    height: 50px;
-    width: auto;
-}
-
+.header-logo { height: 50px; width: auto; }
 .header-nav a {
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
@@ -52,11 +48,7 @@ body {
     font-size: 16px;
     transition: color 0.2s ease;
 }
-
-.header-nav a:hover {
-    color: var(--khaki);
-}
-
+.header-nav a:hover { color: var(--khaki); }
 .join-team-btn {
     background-color: var(--khaki);
     color: white !important;
@@ -64,32 +56,28 @@ body {
     border-radius: 8px;
     transition: background-color 0.2s ease;
 }
-
-.join-team-btn:hover {
-    background-color: var(--red);
-    color: white !important;
-}
+.join-team-btn:hover { background-color: var(--red); color: white !important; }
 
 /* Main Training Container Layout */
 .training-container {
     display: flex;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 40px auto;
     background-color: white;
-    border-radius: 20px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     min-height: 80vh;
 }
 
 /* Handbook Navigation Sidebar */
 .handbook-nav {
-    flex: 0 0 280px; /* Fixed width sidebar */
+    flex: 0 0 300px;
     background-color: var(--red);
     padding: 25px;
     color: white;
+    overflow-y: auto;
 }
-
 .handbook-nav h2 {
     font-family: 'Fraunces', serif;
     font-weight: 900;
@@ -100,15 +88,11 @@ body {
     border-bottom: 2px solid var(--khaki);
     padding-bottom: 10px;
 }
-
-.handbook-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
+.handbook-nav ul { list-style: none; padding: 0; margin: 0; }
 .handbook-nav .nav-link {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     padding: 12px 15px;
     color: var(--yellow);
     text-decoration: none;
@@ -118,15 +102,18 @@ body {
     margin-bottom: 5px;
     transition: all 0.2s ease-in-out;
 }
+.handbook-nav .nav-link:hover { background-color: var(--khaki); color: var(--red); }
+.handbook-nav .nav-link.active { background-color: var(--yellow); color: var(--red); }
 
-.handbook-nav .nav-link:hover {
-    background-color: var(--khaki);
-    color: var(--red);
+/* Checklist Indicator Styling */
+.read-indicator {
+    color: var(--success-green);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-size: 1.1em;
 }
-
-.handbook-nav .nav-link.active {
-    background-color: var(--yellow);
-    color: var(--red);
+li.is-read .read-indicator, .accordion-header.is-read .read-indicator {
+    opacity: 1;
 }
 
 /* Handbook Content Area */
@@ -135,142 +122,100 @@ body {
     padding: 40px;
     overflow-y: auto;
 }
-
-.content-section {
-    display: none; /* Hidden by default, JS handles visibility */
-}
-
-.handbook-content h2 {
+.content-section { display: none; }
+.handbook-content h2, .handbook-content h3 {
     font-family: 'Fraunces', serif;
     font-weight: 900;
-    font-size: 36px;
     color: var(--red);
     text-transform: uppercase;
     margin-top: 0;
-    border-bottom: 2px solid var(--salmon);
-    padding-bottom: 10px;
 }
+.handbook-content h2 { font-size: 36px; border-bottom: 2px solid var(--salmon); padding-bottom: 10px; }
+.handbook-content h3 { font-size: 22px; margin: 0; flex-grow: 1; display: flex; align-items: center; gap: 10px;}
+.handbook-content h4 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 18px; color: var(--red); margin-top: 25px; }
+.handbook-content p, .handbook-content li { font-size: 16px; color: var(--dim-grey); }
+.handbook-content ul, .handbook-content ol { padding-left: 25px; }
+.emphasis-text { font-family: 'Montserrat', sans-serif; font-weight: 800; color: var(--red); font-size: 18px; text-align: center; }
 
-.handbook-content h3 {
-    font-family: 'Fraunces', serif;
-    font-weight: 800;
-    font-size: 26px;
-    color: var(--dim-grey);
-    margin-top: 30px;
+/* Accordion Styles */
+.accordion-item {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
 }
-
-.handbook-content h4 {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    font-size: 18px;
-    color: var(--red);
-    margin-top: 25px;
+.accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    border-radius: 8px 8px 0 0;
+    transition: background-color 0.2s ease;
 }
-
-.handbook-content p, .handbook-content li {
+.accordion-header:hover { background-color: #f1f1f1; }
+.accordion-item.active .accordion-header { background-color: var(--salmon); }
+.accordion-item.active .accordion-header h3 { color: white; }
+.accordion-icon {
     font-size: 16px;
+    transition: transform 0.3s ease;
     color: var(--dim-grey);
 }
-
-.handbook-content ul, .handbook-content ol {
-    padding-left: 25px;
+.accordion-item.active .accordion-icon { transform: rotate(45deg); color: white;}
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 20px;
+    background-color: white;
+    transition: max-height 0.4s ease-out, padding 0.4s ease-out;
 }
-
-.handbook-content hr {
-    border: 0;
-    height: 1px;
-    background-color: var(--salmon);
-    margin: 30px 0;
-}
-
-.emphasis-text {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    color: var(--red);
-    font-size: 18px;
-    text-align: center;
-}
-
-/* Special Box Styles */
-.important-box, .sales-script-box {
-    background-color: #fffbeb;
-    border-left: 5px solid var(--khaki);
+.accordion-item.active .accordion-content {
+    max-height: 2000px; /* Adjust if content is very long */
     padding: 20px;
-    margin: 25px 0;
-    border-radius: 0 8px 8px 0;
+    border: 1px solid #eee;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
 }
 
-.sales-script-box h4 {
-    margin-top: 0;
-    color: var(--red);
-}
-
-/* Task Table Styling */
-.task-table {
-    width: 100%;
-    border-collapse: collapse;
+/* "Mark as Read" Button */
+.mark-as-read-btn {
+    display: block;
     margin-top: 20px;
-}
-
-.task-table th, .task-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: left;
-}
-
-.task-table th {
+    margin-left: auto;
     background-color: var(--red);
-    color: white;
+    color: var(--yellow);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.mark-as-read-btn:hover { background-color: var(--khaki); color: var(--red); }
+.mark-as-read-btn.completed {
+    background-color: var(--success-green);
+    cursor: default;
 }
 
-.task-table td:nth-child(2), .task-table td:nth-child(3) {
-    text-align: center;
-}
-
-.task-table .fa-check {
-    color: #4CAF50;
-    font-size: 20px;
-}
-
-.final-image {
-    display: block;
-    max-width: 300px;
-    margin: 40px auto 0;
-}
+/* Other UI element styles */
+.important-box, .sales-script-box { background-color: #fffbeb; border-left: 5px solid var(--khaki); padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+.task-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+.task-table th, .task-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+.task-table th { background-color: var(--red); color: white; font-family: 'Montserrat', sans-serif; }
+.task-table td:nth-child(2), .task-table td:nth-child(3) { text-align: center; }
+.task-table .fa-check { color: var(--success-green); font-size: 20px; }
 
 /* Responsive Design */
-@media (max-width: 900px) {
-    .training-container {
-        flex-direction: column;
-        margin: 20px;
-    }
-    .handbook-nav {
-        flex: 1;
-        border-bottom: 5px solid var(--khaki);
-    }
+@media (max-width: 1200px) {
+    .training-container { flex-direction: column; margin: 20px; }
+    .handbook-nav { flex: 1; border-bottom: 5px solid var(--khaki); max-height: 300px;}
 }
-
 @media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        gap: 15px;
-    }
-    .header-nav {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 15px;
-        margin-left: 0;
-    }
-    .header-nav a {
-        margin-left: 0;
-    }
-    .handbook-content {
-        padding: 25px;
-    }
-    .handbook-content h2 {
-        font-size: 28px;
-    }
+    .header-content { flex-direction: column; gap: 15px; }
+    .header-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-left: 0; }
+    .header-nav a { margin-left: 0; }
+    .handbook-content { padding: 25px; }
+    .handbook-content h2 { font-size: 28px; }
+    .handbook-content h3 { font-size: 18px; }
 }
