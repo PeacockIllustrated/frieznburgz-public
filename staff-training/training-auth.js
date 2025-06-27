@@ -1,4 +1,4 @@
-// --- staff-training/training-auth.js ---
+// --- staff-training/training-auth.js (Final Update) ---
 // Handles user authentication for the training portal and controls content visibility.
 
 import { auth } from './firebase-config.js';
@@ -23,18 +23,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (loginPrompt) loginPrompt.style.display = 'none';
             
             // Dispatch a custom event to notify other scripts that the user is ready.
-            // We pass the user object in the event's detail property.
             document.dispatchEvent(new CustomEvent('userAuthenticated', {
                 detail: { user }
             }));
 
         } else {
             // User is signed out.
-            console.log('No user authenticated. Showing login prompt.');
+            console.log('No user authenticated. Redirecting to training login page.');
             
-            // Show the login prompt and hide the main content.
-            if (mainContent) mainContent.style.display = 'none';
-            if (loginPrompt) loginPrompt.style.display = 'flex'; // Use flex to center the card
+            // *** THE ONLY CHANGE IS HERE ***
+            // Redirect the user to the new dedicated training login page.
+            window.location.href = 'login.html'; 
         }
     });
 });
