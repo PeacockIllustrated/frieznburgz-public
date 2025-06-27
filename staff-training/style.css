@@ -1,4 +1,4 @@
-/* --- staff-training/style.css --- */
+/* --- staff-training/style.css (Final Version) --- */
 
 :root {
     --red: #e71e26;
@@ -21,89 +21,135 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Header Styles */
-.site-header {
-    background-color: white;
-    padding: 10px 40px;
-    border-bottom: 5px solid var(--khaki);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+/* --- Main Admin Dashboard Layout --- */
+.main-dashboard-container {
+    display: grid;
+    grid-template-columns: 280px 1fr; /* Sidebar width + Main content area */
+    grid-template-rows: 70px 1fr; /* Header height + Remaining height */
+    min-height: 100vh;
 }
 
-.header-content {
+/* Header Section (Matches Admin Dashboard) */
+.dashboard-header {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    background-color: var(--red);
+    border-bottom: 5px solid var(--yellow);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
+    padding: 0 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    color: var(--yellow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-.header-logo { height: 50px; width: auto; }
-.header-nav a {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    text-transform: uppercase;
-    text-decoration: none;
-    color: var(--red);
-    margin-left: 30px;
-    font-size: 16px;
-    transition: color 0.2s ease;
-}
-.header-nav a:hover { color: var(--khaki); }
-.join-team-btn {
-    background-color: var(--khaki);
-    color: white !important;
-    padding: 10px 20px;
-    border-radius: 8px;
-    transition: background-color 0.2s ease;
-}
-.join-team-btn:hover { background-color: var(--red); color: white !important; }
-
-/* Main Training Container Layout */
-.training-container {
+.header-left, .header-right, .header-center {
     display: flex;
-    max-width: 1400px;
-    margin: 40px auto;
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    min-height: 80vh;
+    align-items: center;
+    gap: 15px;
 }
-
-/* Handbook Navigation Sidebar */
-.handbook-nav {
-    flex: 0 0 300px;
-    background-color: var(--red);
-    padding: 25px;
-    color: white;
-    overflow-y: auto;
-}
-.handbook-nav h2 {
+.header-logo { max-height: 45px; width: auto; }
+.app-name {
     font-family: 'Fraunces', serif;
     font-weight: 900;
     font-size: 24px;
+    text-transform: uppercase;
+    color: var(--yellow);
+}
+.current-location-display {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
     color: var(--yellow);
     text-transform: uppercase;
-    margin: 0 0 20px 0;
-    border-bottom: 2px solid var(--khaki);
-    padding-bottom: 10px;
+    text-align: center;
+    flex-grow: 1;
 }
-.handbook-nav ul { list-style: none; padding: 0; margin: 0; }
-.handbook-nav .nav-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 15px;
-    color: var(--yellow);
+.header-right a {
     text-decoration: none;
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
-    border-radius: 8px;
-    margin-bottom: 5px;
-    transition: all 0.2s ease-in-out;
+    font-size: 14px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    background-color: transparent;
+    color: var(--yellow);
+    padding: 8px 0;
 }
-.handbook-nav .nav-link:hover { background-color: var(--khaki); color: var(--red); }
-.handbook-nav .nav-link.active { background-color: var(--yellow); color: var(--red); }
+.header-right a:hover { color: var(--khaki); }
+.join-team-btn {
+    background-color: var(--khaki) !important;
+    color: var(--yellow) !important;
+    border-radius: 5px;
+    padding: 8px 15px !important;
+}
+.join-team-btn:hover { background-color: var(--yellow) !important; color: var(--red) !important; }
+
+/* Sidebar Navigation (Matches Admin Dashboard) */
+.dashboard-sidebar {
+    grid-column: 1;
+    grid-row: 2;
+    background-color: var(--red);
+    padding: 20px 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 70px; /* Stick below the header */
+    height: calc(100vh - 70px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 99;
+}
+.sidebar-nav { display: flex; flex-direction: column; gap: 10px; }
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 25px;
+    text-decoration: none;
+    color: var(--yellow);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.nav-item i:first-child { font-size: 20px; color: var(--khaki); transition: color 0.2s ease; }
+.nav-item:hover { background-color: var(--khaki); color: var(--red); }
+.nav-item:hover i:first-child { color: var(--red); }
+.nav-item.active {
+    background-color: var(--yellow);
+    color: var(--red);
+    border-left: 5px solid var(--khaki);
+    padding-left: 20px;
+}
+.nav-item.active i:first-child { color: var(--red); }
+
+/* Main Content Area */
+.dashboard-content {
+    grid-column: 2;
+    grid-row: 2;
+    background-color: white;
+    padding: 40px;
+    overflow-y: auto;
+}
+.content-page { display: none; }
+.content-page.active-page { display: block; }
+.page-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 40px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    border-bottom: 2px solid var(--salmon);
+    padding-bottom: 10px;
+}
 
 /* Checklist Indicator Styling */
 .read-indicator {
@@ -111,92 +157,39 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease;
     font-size: 1.1em;
+    margin-left: auto; /* Pushes check to the right */
 }
-li.is-read .read-indicator, .accordion-header.is-read .read-indicator {
+.nav-item.is-read .read-indicator,
+.accordion-header.is-read > h3 > .read-indicator {
     opacity: 1;
 }
-
-/* Handbook Content Area */
-.handbook-content {
-    flex: 1;
-    padding: 40px;
-    overflow-y: auto;
+/* Hide check in main title, only show in sidebar */
+.accordion-header .read-indicator {
+    display: none;
 }
-.content-section { display: none; }
-.handbook-content h2, .handbook-content h3 {
-    font-family: 'Fraunces', serif;
-    font-weight: 900;
-    color: var(--red);
-    text-transform: uppercase;
-    margin-top: 0;
+.accordion-header.is-read > h3 {
+    text-decoration: line-through;
+    text-decoration-color: var(--salmon);
+    opacity: 0.7;
 }
-.handbook-content h2 { font-size: 36px; border-bottom: 2px solid var(--salmon); padding-bottom: 10px; }
-.handbook-content h3 { font-size: 22px; margin: 0; flex-grow: 1; display: flex; align-items: center; gap: 10px;}
-.handbook-content h4 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 18px; color: var(--red); margin-top: 25px; }
-.handbook-content p, .handbook-content li { font-size: 16px; color: var(--dim-grey); }
-.handbook-content ul, .handbook-content ol { padding-left: 25px; }
-.emphasis-text { font-family: 'Montserrat', sans-serif; font-weight: 800; color: var(--red); font-size: 18px; text-align: center; }
 
 /* Accordion Styles */
-.accordion-item {
-    border-bottom: 1px solid #eee;
-    margin-bottom: 15px;
-}
-.accordion-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    cursor: pointer;
-    background-color: #f9f9f9;
-    border-radius: 8px 8px 0 0;
-    transition: background-color 0.2s ease;
-}
+.accordion-item { border-bottom: 1px solid #eee; margin-bottom: 15px; }
+.accordion-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; background-color: #f9f9f9; border-radius: 8px; transition: background-color 0.2s ease; }
 .accordion-header:hover { background-color: #f1f1f1; }
 .accordion-item.active .accordion-header { background-color: var(--salmon); }
-.accordion-item.active .accordion-header h3 { color: white; }
-.accordion-icon {
-    font-size: 16px;
-    transition: transform 0.3s ease;
-    color: var(--dim-grey);
-}
-.accordion-item.active .accordion-icon { transform: rotate(45deg); color: white;}
-.accordion-content {
-    max-height: 0;
-    overflow: hidden;
-    padding: 0 20px;
-    background-color: white;
-    transition: max-height 0.4s ease-out, padding 0.4s ease-out;
-}
-.accordion-item.active .accordion-content {
-    max-height: 2000px; /* Adjust if content is very long */
-    padding: 20px;
-    border: 1px solid #eee;
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-}
+.accordion-item.active .accordion-header h3,
+.accordion-item.active .accordion-icon { color: white; text-decoration: none; opacity: 1; }
+.accordion-header h3 { font-size: 22px; margin: 0; flex-grow: 1; display: flex; align-items: center; gap: 10px; }
+.accordion-icon { font-size: 16px; transition: transform 0.3s ease; color: var(--dim-grey); }
+.accordion-item.active .accordion-icon { transform: rotate(45deg); }
+.accordion-content { max-height: 0; overflow: hidden; padding: 0 20px; background-color: white; transition: max-height 0.4s ease-out, padding 0.4s ease-out; }
+.accordion-item.active .accordion-content { max-height: 2000px; padding: 20px; border: 1px solid #eee; border-top: none; border-radius: 0 0 8px 8px; }
 
 /* "Mark as Read" Button */
-.mark-as-read-btn {
-    display: block;
-    margin-top: 20px;
-    margin-left: auto;
-    background-color: var(--red);
-    color: var(--yellow);
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
+.mark-as-read-btn { display: block; margin-top: 20px; margin-left: auto; background-color: var(--red); color: var(--yellow); border: none; border-radius: 8px; padding: 10px 20px; font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease; }
 .mark-as-read-btn:hover { background-color: var(--khaki); color: var(--red); }
-.mark-as-read-btn.completed {
-    background-color: var(--success-green);
-    cursor: default;
-}
+.mark-as-read-btn.completed { background-color: var(--success-green); cursor: default; }
 
 /* Other UI element styles */
 .important-box, .sales-script-box { background-color: #fffbeb; border-left: 5px solid var(--khaki); padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
@@ -206,16 +199,34 @@ li.is-read .read-indicator, .accordion-header.is-read .read-indicator {
 .task-table td:nth-child(2), .task-table td:nth-child(3) { text-align: center; }
 .task-table .fa-check { color: var(--success-green); font-size: 20px; }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-    .training-container { flex-direction: column; margin: 20px; }
-    .handbook-nav { flex: 1; border-bottom: 5px solid var(--khaki); max-height: 300px;}
-}
-@media (max-width: 768px) {
-    .header-content { flex-direction: column; gap: 15px; }
-    .header-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-left: 0; }
-    .header-nav a { margin-left: 0; }
-    .handbook-content { padding: 25px; }
-    .handbook-content h2 { font-size: 28px; }
-    .handbook-content h3 { font-size: 18px; }
+/* --- Responsive Design (Matches Admin Dashboard) --- */
+@media screen and (max-width: 768px) {
+    .dashboard-header {
+        position: static;
+        flex-direction: column;
+        align-items: flex-start;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        height: auto;
+    }
+    .header-left, .header-right { width: 100%; justify-content: space-between; margin-bottom: 10px; }
+    .header-center { display: none; }
+    .main-dashboard-container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; }
+    .dashboard-sidebar {
+        position: static;
+        height: auto;
+        overflow-y: visible;
+        grid-column: 1;
+        grid-row: 2;
+        border-right: none;
+        border-bottom: 5px solid var(--yellow);
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 10px 0;
+    }
+    .sidebar-nav { flex-direction: row; width: max-content; gap: 5px; }
+    .nav-item { flex-shrink: 0; padding: 10px 15px; }
+    .nav-item.active { border-left: none; border-bottom: 3px solid var(--khaki); padding-left: 15px; }
+    .dashboard-content { grid-column: 1; grid-row: 3; padding: 20px; }
+    .page-title { font-size: 30px; }
 }
