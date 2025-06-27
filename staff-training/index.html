@@ -10,12 +10,8 @@
 </head>
 <body>
 
-    <!-- Loading Spinner - Shown initially -->
-    <div id="loading-spinner" class="loading-container">
-        <div class="spinner"></div>
-    </div>
+    <div id="loading-spinner" class="loading-container"><div class="spinner"></div></div>
 
-    <!-- Login Prompt - Shown if user is not logged in -->
     <div id="login-prompt" class="login-prompt-container" style="display: none;">
         <div class="login-card">
             <img src="assets/logo-alt.png" alt="Friez n Burgz Logo" class="login-logo">
@@ -25,7 +21,6 @@
         </div>
     </div>
     
-    <!-- Main Content Wrapper - Shown only if user is logged in -->
     <div id="main-content-wrapper" style="display: none;">
         <div class="main-dashboard-container">
             <header class="dashboard-header">
@@ -48,17 +43,8 @@
                 </nav>
             </aside>
 
-            <main class="dashboard-content">
-                <!-- Content sections will be managed by script.js -->
-                <section id="introduction" class="content-page"></section>
-                <section id="preparation" class="content-page"></section>
-                <section id="task-distribution" class="content-page"></section>
-                <section id="service" class="content-page"></section>
-                <section id="sop-visuals" class="content-page"></section>
-                <section id="everyday-rules" class="content-page"></section>
-                <section id="performance-eval" class="content-page"></section>
-                <section id="disciplinary-actions" class="content-page"></section>
-                <section id="final-words" class="content-page"></section>
+            <main id="handbook-content-main" class="dashboard-content">
+                <!-- Content will be dynamically inserted by script.js -->
             </main>
         </div>
     </div>
