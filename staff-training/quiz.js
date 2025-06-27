@@ -1,4 +1,4 @@
-// --- staff-training/quiz.js (Stage 3: Full Firebase Integration) ---
+// --- staff-training/quiz.js (Final Version with Firebase Fix) ---
 
 import { db } from './firebase-config.js';
 
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { section: "Service", question: "What must be updated daily when a new special item is launched?", options: ["The menu board", "The allergen sheets", "The price list", "The staff rota"], answer: "The allergen sheets" },
     ];
     const QUIZ_LENGTH = 8;
-    const TOTAL_HANDBOOK_SECTIONS = 18; // Total number of accordions across all handbook pages
+    const TOTAL_HANDBOOK_SECTIONS = 18;
 
     // --- DOM ELEMENT & STATE ---
     const quizContainer = document.getElementById('quiz-container');
@@ -65,14 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderQuizHTML = () => `
         <div id="quiz-active-container" class="quiz-view">
-            <div class="quiz-header">
-                <h2 class="page-title">Friez & Burgz Quiz</h2>
-                <div id="quiz-progress-indicator"></div>
-            </div>
-            <div class="question-container">
-                <h3 id="question-text"></h3>
-                <div class="quiz-options" id="quiz-options-container"></div>
-            </div>
+            <div class="quiz-header"><h2 class="page-title">Friez & Burgz Quiz</h2><div id="quiz-progress-indicator"></div></div>
+            <div class="question-container"><h3 id="question-text"></h3><div class="quiz-options" id="quiz-options-container"></div></div>
             <button id="next-question-btn" style="display: none;">Next Question</button>
         </div>`;
 
@@ -90,11 +84,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- MAIN LOGIC ---
     
     async function showOverview() {
-        if (!progressDocRef) return;
-        const docSnap = await progressDocRef.get();
-        const progressData = docSnap.exists() ? docSnap.data() : { readSections: [], quizHistory: [] };
-        quizContainer.innerHTML = renderOverviewHTML(progressData);
-        document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+        if (!progressDocRef) {
+            console.error("progressDocRef is not set. Cannot show overview.");
+            return;
+        }
+
+        try {
+            const docSnap = await progressDocRef.get();
+            let progressData = { readSections: [], quizHistory: [] }; // Default empty state
+
+            // *** FIX IS HERE ***
+            // Instead of docSnap.exists(), we check if docSnap exists AND has data.
+            // If it doesn't exist, we create it.
+            if (docSnap && docSnap.exists) {
+                progressData = docSnap.data();
+            } else {
+                console.log("No progress document found for user, creating one.");
+                await progressDocRef.set({ readSections: [], quizHistory: [] });
+            }
+
+            quizContainer.innerHTML = renderOverviewHTML(progressData);
+            document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+        } catch (error) {
+            console.error("Error fetching or creating user progress:", error);
+            quizContainer.innerHTML = `<p style="color:red;">Could not load user progress. Please try again later.</p>`;
+        }
     }
 
     function startQuiz() {
@@ -159,9 +173,13 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         if (progressDocRef) {
-            await progressDocRef.update({
-                quizHistory: firebase.firestore.FieldValue.arrayUnion(newResult)
-            });
+            try {
+                await progressDocRef.update({
+                    quizHistory: firebase.firestore.FieldValue.arrayUnion(newResult)
+                });
+            } catch (error) {
+                console.error("Error saving quiz result to Firebase:", error);
+            }
         }
         
         quizContainer.innerHTML = renderResultsHTML(score);
