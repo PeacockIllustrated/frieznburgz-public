@@ -115,11 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- APP INITIALIZATION ---
-    function initializeApp() {
+    async function initializeApp() {
         if (!currentUser) return;
         
-        buildNav(); // Build nav structure first
-        updateMainSectionChecks(); // THEN apply the 'is-read' status from loaded data
+        buildNav();
+        updateMainSectionChecks();
 
         // Set up event listeners using delegation
         navContainer.addEventListener('click', (event) => {
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // Initial page render
+        // Initial page render - robust version
         const firstNavLink = document.querySelector('.nav-item');
         if (firstNavLink) {
             const firstPageId = firstNavLink.dataset.page;
@@ -167,15 +167,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- ENTRY POINT ---
-    // *** FIX IS HERE: The event listener is now async and we AWAIT data loading BEFORE initializing the app ***
     document.addEventListener('userAuthenticated', async (event) => {
         currentUser = event.detail.user;
+        // Corrected, single source of truth for the document path
         progressDocRef = db.collection('users').doc(currentUser.uid);
         
-        // Ensure progress data is loaded BEFORE any UI is built or checked
         await loadProgressFromFirebase();
-        
-        // Now that data is loaded, initialize the application
         initializeApp();
     });
 });
