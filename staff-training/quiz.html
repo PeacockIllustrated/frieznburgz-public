@@ -4,102 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friez n Burgz | Training Quiz</title>
-    <!-- Fonts and Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@800;900&family=Futura:wght@400&family=Montserrat:wght@800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <!-- Local Stylesheets -->
-    <link rel="stylesheet" href="style.css"> <!-- Re-uses the base training styles -->
-    <link rel="stylesheet" href="quiz.css"> <!-- Adds quiz-specific styles -->
-    <!-- Local Script -->
-    <script src="quiz.js" defer></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="quiz.css">
 </head>
 <body>
 
-    <div class="main-dashboard-container">
-        <header class="dashboard-header">
-            <div class="header-left">
-                <img src="assets/logo.png" alt="Friez n Burgz Logo" class="header-logo">
-                <span class="app-name">Quiz & Overview</span>
-            </div>
-            <div class="header-center">
-                <span class="current-location-display">Test Your Knowledge</span>
-            </div>
-            <div class="header-right">
-                <a href="index.html" class="join-team-btn">Return to Training</a>
-            </div>
-        </header>
+    <div id="loading-spinner" class="loading-container"><div class="spinner"></div></div>
 
-        <aside class="dashboard-sidebar">
-            <nav class="sidebar-nav">
-                <!-- Links now point back to the main training page sections -->
-                <a href="index.html" class="nav-item"><i class="fas fa-book-open"></i> Return to Handbook</a>
-            </nav>
-        </aside>
-
-        <main class="dashboard-content">
-
-            <!-- View 1: Quiz Overview (Default View) -->
-            <div id="quiz-overview-container" class="quiz-view">
-                <h2 class="page-title">My Progress Overview</h2>
-                
-                <div class="overview-grid">
-                    <div class="overview-card">
-                        <h3>Handbook Completion</h3>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar-fill" id="handbook-progress-bar"></div>
-                        </div>
-                        <p id="handbook-progress-text">Calculating...</p>
-                    </div>
-
-                    <div class="overview-card">
-                        <h3>Quiz Attempts</h3>
-                        <p class="quiz-attempts-count" id="quiz-attempts-count">0</p>
-                        <p>quizzes taken</p>
-                    </div>
-                </div>
-
-                <div class="quiz-actions">
-                    <button id="start-quiz-btn" class="quiz-start-button">Start The Quiz</button>
-                </div>
-                
-                <div class="quiz-log-container">
-                    <h3>Quiz History</h3>
-                    <ul id="quiz-log-list">
-                        <!-- Log items will be dynamically inserted here -->
-                        <li>No quiz history found.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- View 2: Quiz Active -->
-            <div id="quiz-active-container" class="quiz-view" style="display: none;">
-                <div class="quiz-header">
-                    <h2 class="page-title">Friez & Burgz Quiz</h2>
-                    <div id="quiz-progress-indicator">Question 1 of 8</div>
-                </div>
-                <div class="question-container">
-                    <h3 id="question-text">What is the first step in the morning preparation?</h3>
-                    <div class="quiz-options" id="quiz-options-container">
-                        <!-- Options will be dynamically inserted here -->
-                    </div>
-                </div>
-                <div class="quiz-feedback" id="quiz-feedback-text"></div>
-                <button id="next-question-btn" style="display: none;">Next Question</button>
-            </div>
-
-            <!-- View 3: Quiz Results -->
-            <div id="quiz-results-container" class="quiz-view" style="display: none;">
-                <h2 class="page-title">Quiz Complete!</h2>
-                <div class="results-summary">
-                    <p>Your Score:</p>
-                    <h3 id="final-score-text">7 / 8</h3>
-                    <p id="results-message">Great job! You know your stuff.</p>
-                </div>
-                <button id="return-to-overview-btn">Return to Overview</button>
-            </div>
-
-        </main>
+    <div id="login-prompt" class="login-prompt-container" style="display: none;">
+        <div class="login-card">
+            <img src="assets/logo-alt.png" alt="Friez n Burgz Logo" class="login-logo">
+            <h2 class="login-title">Training Quiz</h2>
+            <p>You must be logged in to view your progress and take the quiz.</p>
+            <a href="/index.html" class="login-button">Proceed to Login</a>
+        </div>
     </div>
 
+    <div id="main-content-wrapper" style="display: none;">
+        <div class="main-dashboard-container">
+            <header class="dashboard-header">
+                <div class="header-left"><img src="assets/logo.png" alt="Friez n Burgz Logo" class="header-logo"><span class="app-name">Quiz & Overview</span></div>
+                <div class="header-center"><span class="current-location-display">Test Your Knowledge</span></div>
+                <div class="header-right"><a href="index.html" class="join-team-btn">Return to Handbook</a></div>
+            </header>
+            <aside class="dashboard-sidebar">
+                <nav class="sidebar-nav"><a href="index.html" class="nav-item"><i class="fas fa-book-open"></i> Return to Handbook</a></nav>
+            </aside>
+            <main class="dashboard-content">
+                <!-- All content is now dynamically generated by quiz.js -->
+                <div id="quiz-container"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="training-auth.js"></script>
+    <script type="module" src="quiz.js"></script>
+    
 </body>
 </html>
