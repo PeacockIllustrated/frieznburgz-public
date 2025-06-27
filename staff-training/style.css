@@ -155,3 +155,25 @@ h4 { font-family: 'Montserrat', sans-serif; color: var(--dim-grey); }
     .read-indicator { display: inline-block; }
     .dashboard-content { grid-column: 2; grid-row: 2; padding: 40px; }
 }
+
+/* *** NEW STYLE FOR THE QUIZ LINK BUTTON *** */
+.quiz-link-btn {
+    display: inline-block;
+    margin-top: 20px;
+    background-color: var(--success-green);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+.quiz-link-btn:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.important-box,.sales-script-box{background-color:#fffbeb;border-left:5px solid var(--khaki);padding:20px;margin:25px 0}.task-table{width:100%;border-collapse:collapse;margin-top:20px;font-size:14px}.task-table th,.task-table td{border:1px solid #ddd;padding:8px}.task-table th{background-color:var(--red);color:var(--yellow)}.task-table .fa-check{color:var(--success-green)}@media screen and (min-width:769px){body{background-color:var(--light-grey)}.main-dashboard-container{display:grid;grid-template-columns:280px 1fr;grid-template-rows:70px 1fr}.dashboard-header{grid-column:1 / -1;grid-row:1;padding:0 20px;position:sticky;top:0;z-index:100}.header-center{display:flex}.header-right .join-team-btn{display:inline-block}.dashboard-sidebar{grid-column:1;grid-row:2;padding:20px 0;border-top:none;border-bottom:none;overflow-y:auto;position:sticky;top:70px;height:calc(100vh - 70px)}.sidebar-nav{flex-direction:column;gap:10px}.nav-item{padding:15px 25px;font-size:16px;border-bottom:none}.nav-item.active{background-color:var(--yellow);color:var(--red);border-left:5px solid var(--khaki);padding-left:20px;border-bottom:none}.nav-item.active i:first-child{color:var(--red)}.read-indicator{display:inline-block}.dashboard-content{grid-column:2;grid-row:2;padding:40px}}
