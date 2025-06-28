@@ -1,32 +1,54 @@
+// --- functions/index.js ---
+
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+
+// Initialize the Firebase Admin SDK
+admin.initializeApp();
+
 /**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ * A callable Cloud Function to grant a user admin privileges.
+ * This function can only be called by an already existing admin,
+ * except for the very first time it's run to bootstrap the first admin.
  */
+exports.addAdminRole = functions.https.onCall(async (data, context) => {
+  // --- Security Check (IMPORTANT) ---
+  // For production, you would uncomment this block to ensure only admins can create other admins.
+  // For the very first run, you MUST keep this commented out to create the first admin.
+  /*
+  if (context.auth.token.admin !== true) {
+    console.log("Request from non-admin user:", context.auth.uid);
+    throw new functions.https.HttpsError(
+      'permission-denied', 
+      'Only admins can add other admins.'
+    );
+  }
+  */
 
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
+  const email = data.email;
+  if (!email || !(typeof email === 'string') || email.length === 0) {
+    throw new functions.https.HttpsError(
+      'invalid-argument', 
+      'The function must be called with a valid "email" argument.'
+    );
+  }
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
-
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
-
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+  try {
+    // Get the user account by email address
+    const user = await admin.auth().getUserByEmail(email);
+    
+    // Set the custom user claim { admin: true } on that user's token
+    await admin.auth().setCustomUserClaims(user.uid, { admin: true });
+    
+    console.log(`Successfully made ${email} (UID: ${user.uid}) an admin.`);
+    return {
+      message: `Success! ${email} has been made an admin. They must log out and log back in for the changes to take effect.`,
+    };
+  } catch (err) {
+    console.error("Error in addAdminRole function:", err);
+    throw new functions.https.HttpsError(
+      'unknown', 
+      `An error occurred while trying to make the user an admin: ${err.message}`
+    );
+  }
+});
