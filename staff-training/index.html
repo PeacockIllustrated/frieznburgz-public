@@ -24,9 +24,16 @@
     <div id="main-content-wrapper" style="display: none;">
         <div class="main-dashboard-container">
             <header class="dashboard-header">
-                <div class="header-left"><img src="../assets/logo.png" alt="Friez n Burgz Logo" class="header-logo"><span class="app-name">Staff Training</span></div>
-                <div class="header-center"><span class="current-location-display">Front Staff Handbook</span></div>
-                <div class="header-right"><a href="quiz.html" class="join-team-btn">Take The Quiz</a></div>
+                <div class="header-left">
+                    <img src="../assets/logo.png" alt="Friez n Burgz Logo" class="header-logo">
+                    <span class="app-name">Staff Training</span>
+                </div>
+                <div class="header-center">
+                    <span class="current-location-display">Front Staff Handbook</span>
+                </div>
+                <div class="header-right">
+                    <a href="quiz.html" class="header-button">Take The Quiz</a>
+                </div>
             </header>
             <aside class="dashboard-sidebar">
                 <nav class="sidebar-nav"></nav>
@@ -35,10 +42,17 @@
         </div>
     </div>
 
+    <!-- NEW: Mobile Bottom Bar -->
+    <div class="mobile-bottom-bar">
+        <a href="quiz.html" class="mobile-quiz-link">
+            <i class="fas fa-vial"></i>
+            <span>Take The Quiz</span>
+        </a>
+    </div>
+
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <!-- FIX: ADDED THE MISSING FIRESTORE SCRIPT -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     
     <script type="module" src="firebase-config.js"></script>
