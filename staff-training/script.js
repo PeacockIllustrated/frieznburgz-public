@@ -51,14 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!progressDocRef) return;
         try {
             const docSnap = await progressDocRef.get();
-            // *** THE FIX IS HERE ***
-            // Use the robust check that works with the compat library.
             if (docSnap && docSnap.exists) {
                 trainingProgress = docSnap.data();
                  if (!trainingProgress.readSections) trainingProgress.readSections = [];
                  if (!trainingProgress.quizHistory) trainingProgress.quizHistory = [];
             } else {
-                // If the document doesn't exist, create it.
                 await progressDocRef.set({ readSections: [], quizHistory: [] });
                 trainingProgress = { readSections: [], quizHistory: [] };
             }
@@ -96,12 +93,31 @@ document.addEventListener('DOMContentLoaded', () => {
         mainContentContainer.innerHTML = '';
         const sectionData = handbookData[pageId];
         if (!sectionData) return;
+
         let contentHtml = `<h2 class="page-title">${sectionData.title}</h2>`;
         const readSections = trainingProgress.readSections || [];
+
         for (const accordionId in sectionData.accordions) {
             const accordion = sectionData.accordions[accordionId];
             const isRead = readSections.includes(accordionId);
-            contentHtml += `<div class="accordion-item" data-accordion-id="${accordionId}"><div class="accordion-header ${isRead ? 'is-read' : ''}"><h3>${accordion.title}</h3><i class="fas fa-check-circle accordion-read-indicator"></i><i class="fas fa-plus accordion-icon"></i></div><div class="accordion-content">${accordion.content}${!isRead ? `<button class="mark-as-read-btn" data-accordion-id="${accordionId}">Mark as Read</button>` : `<button class="mark-as-read-btn completed" disabled>Completed ✔</button>`}</div></div>`;
+            const buttonHtml = !isRead 
+                ? `<button class="mark-as-read-btn" data-accordion-id="${accordionId}">Mark as Read</button>` 
+                : `<button class="mark-as-read-btn completed" disabled>Completed ✔</button>`;
+            
+            // UPDATED STRUCTURE: Added .accordion-body wrapper
+            contentHtml += `
+                <div class="accordion-item" data-accordion-id="${accordionId}">
+                    <div class="accordion-header ${isRead ? 'is-read' : ''}">
+                        <h3>${accordion.title}</h3>
+                        <i class="fas fa-check-circle accordion-read-indicator"></i>
+                        <i class="fas fa-plus accordion-icon"></i>
+                    </div>
+                    <div class="accordion-body">
+                        <div class="accordion-content">${accordion.content}</div>
+                        ${buttonHtml}
+                    </div>
+                </div>
+            `;
         }
         mainContentContainer.innerHTML = contentHtml;
     }
@@ -137,8 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mainContentContainer.addEventListener('click', async (event) => {
             const target = event.target;
-            if (target.matches('.accordion-header, .accordion-header *')) {
-                const accordionItem = target.closest('.accordion-item');
+            const accordionItem = target.closest('.accordion-item');
+
+            if (target.closest('.accordion-header')) {
                 if (accordionItem) accordionItem.classList.toggle('active');
             }
             if (target.matches('.mark-as-read-btn') && !target.disabled) {
@@ -150,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 target.classList.add('completed');
                 target.textContent = 'Completed ✔';
                 target.disabled = true;
-                target.closest('.accordion-item').querySelector('.accordion-header').classList.add('is-read');
+                if(accordionItem) accordionItem.querySelector('.accordion-header').classList.add('is-read');
                 updateMainSectionChecks();
             }
             if (target.matches('.quiz-link-btn')) {
