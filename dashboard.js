@@ -1,4 +1,4 @@
-// --- dashboard.js (Final, Complete Version with Staff Summary) ---
+// --- dashboard.js (Final, Complete & Corrected Version) ---
 
 import { db, auth } from './firebase.js';
 import { getSelectedLocation, getLocationDisplayName } from './config.js';
@@ -54,13 +54,13 @@ export async function renderDashboardOverviewPage() {
     }
     const locationName = getLocationDisplayName(selectedLocationId);
 
-    // Render the grid structure, including a placeholder for the new staff card
+    // FIX: Modified grid layout to better handle 5 cards.
     dashboardPage.innerHTML = `
         <h2 class="page-title">Dashboard Overview</h2>
         <p>Welcome to your Friez n Burgz Admin Dashboard for ${locationName}!</p>
         <div class="dashboard-summary-grid">
             <div id="stockOverviewCard" class="dashboard-card"><h3 class="card-title">Stock Overview</h3><div id="stockSummary"><p>Loading...</p></div></div>
-            <div id="criticalStockCard" class="dashboard-card"><h3 class="card-title">Critical Stock Alerts</h3><div id="criticalStockList"><p>Loading...</p></div></div>
+            <div id="criticalStockCard" class="dashboard-card"><h3 class="card-title">Critical Stock Alerts</h3><div id="criticalStockList" class="item-list"><p>Loading...</p></div></div>
             <div id="staffSummaryCard" class="dashboard-card"><h3 class="card-title">Staff Training Summary</h3><div id="staffSummaryContent"><p>Loading...</p></div></div>
             <div id="wastageLogCard" class="dashboard-card"><h3 class="card-title">Recent Wastage Log</h3><ul id="recentWastageList"><p>Loading...</p></ul></div>
             <div id="quickActionsCard" class="dashboard-card quick-actions-card">
@@ -74,7 +74,6 @@ export async function renderDashboardOverviewPage() {
         </div>
     `;
 
-    // Attach event listeners for Quick Actions
     document.getElementById('quickAddStockBtn').addEventListener('click', () => showQuickAdjustmentModal('add'));
     document.getElementById('quickLogWasteBtn').addEventListener('click', () => showQuickAdjustmentModal('waste'));
 
@@ -86,42 +85,28 @@ export async function renderDashboardOverviewPage() {
     ]);
 }
 
-/**
- * Fetches and renders the stock summary cards and critical alerts.
- */
 async function renderStockSummary() {
     const stockSummary = document.getElementById('stockSummary');
     const criticalStockList = document.getElementById('criticalStockList');
     const selectedLocationId = getSelectedLocation();
     try {
         const itemsRef = db.collection('locations').doc(selectedLocationId).collection('items');
-        const querySnapshot = await itemsRef.get();
+        const querySnapshot = await itemsRef.orderBy('category').orderBy('name').get();
         const allItems = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         const criticalItems = allItems.filter(item => item.currentStock <= item.reorderPoint / 2);
         const lowItems = allItems.filter(item => item.currentStock > item.reorderPoint / 2 && item.currentStock <= item.reorderPoint);
         const goodItems = allItems.filter(item => item.currentStock > item.reorderPoint);
 
-        stockSummary.innerHTML = `
-            <div class="summary-top-row">
-                ${createDashboardCardHtml('good', goodItems.length, 'Good Stock')}
-                ${createDashboardCardHtml('low', lowItems.length, 'Low Stock')}
-            </div>
-            <div class="summary-bottom-row">
-                ${createDashboardCardHtml('critical', criticalItems.length, 'Critical Stock')}
-            </div>
-        `;
-        criticalStockList.innerHTML = criticalItems.length > 0 ? criticalItems.map(createCriticalItemHtml).join('') : '<p>No critical stock alerts. Good job!</p>';
+        stockSummary.innerHTML = `<div class="summary-top-row">${createDashboardCardHtml('good', goodItems.length, 'Good Stock')}${createDashboardCardHtml('low', lowItems.length, 'Low Stock')}</div><div class="summary-bottom-row">${createDashboardCardHtml('critical', criticalItems.length, 'Critical Stock')}</div>`;
+        criticalStockList.innerHTML = criticalItems.length > 0 ? criticalItems.sort((a,b) => a.currentStock - b.currentStock).map(createCriticalItemHtml).join('') : '<p>No critical stock alerts. Good job!</p>';
     } catch (error) {
         console.error('Error loading stock summary:', error);
-        stockSummary.innerHTML = `<p style="color:red;">Error loading stock data.</p>`;
-        criticalStockList.innerHTML = `<p style="color:red;">Error loading stock alerts.</p>`;
+        stockSummary.innerHTML = `<p style="color:red;">Error loading data.</p>`;
+        criticalStockList.innerHTML = `<p style="color:red;">Error loading data.</p>`;
     }
 }
 
-/**
- * Fetches and renders the recent wastage log summary.
- */
 async function renderWastageSummary() {
     const recentWastageList = document.getElementById('recentWastageList');
     const selectedLocationId = getSelectedLocation();
@@ -133,39 +118,35 @@ async function renderWastageSummary() {
             .orderBy('timestamp', 'desc')
             .limit(3)
             .get();
-            
         if (wasteQuerySnapshot.empty) {
             recentWastageList.innerHTML = '<li>No waste logged in the last 7 days.</li>';
         } else {
             recentWastageList.innerHTML = wasteQuerySnapshot.docs.map(doc => createRecentWasteItemHtml(doc.data())).join('');
+            recentWastageList.insertAdjacentHTML('beforeend', `<li class="view-all-link"><button class="auth-button quick-action-btn small-btn" id="viewAllWastageBtn">View All Wastage</button></li>`);
+            document.getElementById('viewAllWastageBtn').addEventListener('click', () => {
+                if (window.mainApp) window.mainApp.handleNavigationClick('wastage-log');
+            });
         }
     } catch (error) {
         console.error('Error loading wastage summary:', error);
-        recentWastageList.innerHTML = '<li>Error loading waste log.</li>';
+        recentWastageList.innerHTML = '<li>Error loading log.</li>';
     }
 }
 
-/**
- * Fetches staff and progress data to render the staff summary card.
- */
 async function renderStaffSummary() {
     const staffSummaryContent = document.getElementById('staffSummaryContent');
     const TOTAL_HANDBOOK_SECTIONS = 12;
-
     try {
         const [staffSnapshot, usersSnapshot] = await Promise.all([
             db.collection('staff').get(),
             db.collection('users').get()
         ]);
-
         const staffData = staffSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
         const progressData = {};
         usersSnapshot.forEach(doc => { progressData[doc.id] = doc.data(); });
-
         const totalEmployees = staffData.length;
         let upToDateCount = 0;
         const locationScores = {};
-
         staffData.forEach(staff => {
             const userProgress = progressData[staff.uid] || { readSections: [], quizHistory: [] };
             const location = staff.locationId || 'Unassigned';
@@ -182,29 +163,22 @@ async function renderStaffSummary() {
                 });
             }
         });
-
         const locationAverages = Object.keys(locationScores).map(locId => {
             const data = locationScores[locId];
             const average = data.quizCount > 0 ? (data.totalScore / data.quizCount) * 100 : 0;
             return { name: getLocationDisplayName(locId), score: Math.round(average) };
         });
-
         staffSummaryContent.innerHTML = createStaffSummaryCardHtml({
             totalEmployees,
             upToDateCount,
             locationAverages
         });
-
     } catch (error) {
         console.error("Error rendering staff summary:", error);
         staffSummaryContent.innerHTML = `<p style="color:red;">Error loading staff data.</p>`;
     }
 }
 
-/**
- * Shows the quick stock adjustment modal.
- * @param {'add'|'waste'} type - The type of adjustment.
- */
 export async function showQuickAdjustmentModal(type) {
     const selectedLocationId = getSelectedLocation();
     if (!selectedLocationId) {
@@ -249,10 +223,6 @@ export async function showQuickAdjustmentModal(type) {
     }
 }
 
-/**
- * Handles the stock adjustment from the modal.
- * @param {'add'|'waste'} type - The type of adjustment.
- */
 async function handleModalAdjustment(type) {
     const selectedLocationId = getSelectedLocation();
     const itemSelect = document.getElementById('modalItemSelect');
