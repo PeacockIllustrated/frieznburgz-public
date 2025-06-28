@@ -188,6 +188,7 @@ window.mainApp = {
     showQuickAdjustmentModal: showQuickAdjustmentModal,
     openModal: openModal,
     closeModal: closeModal,
+    importAdminUser: importAdminUser,
     getAllUniqueStockItems: getAllUniqueStockItems,
     getLocations: () => locations
 };
