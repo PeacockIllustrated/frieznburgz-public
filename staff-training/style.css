@@ -383,6 +383,12 @@ h4 { font-family: 'Montserrat', sans-serif; color: var(--dim-grey); }
     }
     .header-center { display: none; }
     .header-right { margin-left: auto; }
+    
+    /* --- THIS IS THE REQUESTED CHANGE --- */
+    .header-right .header-button {
+        display: none;
+    }
+    
     .dashboard-sidebar {
         position: static;
         top: auto;
