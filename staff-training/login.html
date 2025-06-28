@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friez n Burgz | Staff Training Login</title>
+    <!-- We will use the main project's style.css for consistency -->
     <link rel="stylesheet" href="../style.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@800;900&family=Futura:wght@400&family=Montserrat:wght@800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -14,31 +15,34 @@
         <div class="auth-card">
             <img src="../assets/logo-alt.png" alt="Friez n Burgz Logo" class="auth-logo">
             <h2 class="auth-title">Staff Training Login</h2>
+            
             <p class="form-intro" style="font-size: 16px; color: var(--dim-grey); margin-bottom: 20px;">Please sign in with your employee account.</p>
+
             <input type="email" id="loginEmail" placeholder="Email" class="auth-input">
             <input type="password" id="loginPassword" placeholder="Password" class="auth-input">
             <button id="loginBtn" class="auth-button email-login-btn">Login</button>
             <div class="divider">OR</div>
-            <button id="googleLoginBtn" class="auth-button google-login-btn"><i class="fab fa-google"></i> Sign in with Google</button>
+            <button id="googleLoginBtn" class="auth-button google-login-btn">
+                <i class="fab fa-google"></i> Sign in with Google
+            </button>
             <p id="authMessage" class="auth-message"></p>
             <hr style="border: 0; border-top: 1px solid var(--salmon); margin: 20px 0;">
             <p class="form-hint" style="text-align:center; font-size: 12px; color: var(--salmon); font-style: italic;">First time logging in? Your account will be created automatically.</p>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     
+    <!-- Embedded script for login page logic -->
     <script type="module">
-        import { firebaseConfig } from './firebase-config.js';
+        // FIX: We only need to import the 'auth' service from the config file,
+        // which already handles the initialization.
+        import { auth } from './firebase-config.js';
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
-
+        // DOM Elements
         const loginEmail = document.getElementById('loginEmail');
         const loginPassword = document.getElementById('loginPassword');
         const loginBtn = document.getElementById('loginBtn');
@@ -46,6 +50,8 @@
         const authMessage = document.getElementById('authMessage');
 
         const onLoginSuccess = () => {
+            // After login, always go to the main handbook.
+            // The auth script there will handle redirection if a profile needs to be created.
             window.location.href = 'index.html'; 
         };
 
@@ -79,12 +85,6 @@
         loginBtn.addEventListener('click', handleEmailLogin);
         googleLoginBtn.addEventListener('click', handleGoogleLogin);
 
-        // This simply hides the loading spinner from other pages if a user logs out and lands here.
-        // It no longer contains complex redirection logic.
-        const loadingSpinner = document.getElementById('loading-spinner');
-        if (loadingSpinner) {
-            loadingSpinner.style.display = 'none';
-        }
     </script>
 </body>
 </html>
