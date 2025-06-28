@@ -1,6 +1,7 @@
-// --- staff-training/register-profile.js (Final Version) ---
+// --- staff-training/register-profile.js (Final Corrected Version) ---
 
 import { db, auth } from './firebase-config.js';
+// We need the locations array to populate the dropdown.
 import { locations } from '../config.js'; 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,11 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const formMessage = document.getElementById('form-message');
     const submitBtn = document.getElementById('submitProfileBtn');
 
-    // Populate location dropdown
+    // Populate the location dropdown
     if (locations && locationSelect) {
         locationSelect.innerHTML = '<option value="" disabled selected>-- Select your store --</option>';
         locations.forEach(loc => {
-            if(loc.id !== 'all_locations') {
+            // Don't allow new staff to select "all locations" or other special cases
+            if(loc.id !== 'all_locations') { 
                  const option = document.createElement('option');
                  option.value = loc.id;
                  option.textContent = loc.name;
@@ -31,20 +33,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Get all data from the form
         const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim(); // Get password
+        const password = document.getElementById('password').value.trim();
         const staffData = {
             name: document.getElementById('fullName').value.trim(),
             email: email,
             phone: document.getElementById('phone').value.trim(),
             locationId: document.getElementById('location').value,
             startDate: document.getElementById('startDate').value.trim(),
-            role: "Employee"
+            role: "Employee" // Default role for new sign-ups
         };
 
         if (!staffData.name || !email || !password || !staffData.phone || !staffData.locationId || !staffData.startDate) {
             formMessage.textContent = 'Please fill out all fields, including email and password.';
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Save My Profile';
+            submitBtn.textContent = 'Create My Profile';
+            return;
+        }
+
+        if (password.length < 6) {
+            formMessage.textContent = 'Password must be at least 6 characters long.';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create My Profile';
             return;
         }
 
@@ -58,7 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
             await staffDocRef.set(staffData);
 
             const progressDocRef = db.collection('users').doc(user.uid);
-            await progressDocRef.set({ readSections: [], quizHistory: [] });
+            await progressDocRef.set({
+                readSections: [],
+                quizHistory: []
+            });
 
             formMessage.style.color = 'var(--success-green)';
             formMessage.textContent = 'Profile created! Please log in to continue.';
@@ -71,9 +83,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Error creating profile:", error);
             formMessage.style.color = 'var(--red)';
-            formMessage.textContent = `Could not create profile: ${error.message}`;
+            // Provide a more user-friendly error message
+            if (error.code === 'auth/email-already-in-use') {
+                formMessage.textContent = 'This email address is already registered. Please log in instead.';
+            } else {
+                formMessage.textContent = 'Could not create profile. Please check your details and try again.';
+            }
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Save My Profile';
+            submitBtn.textContent = 'Create My Profile';
         }
     });
 });
