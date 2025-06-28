@@ -1,5 +1,4 @@
-// --- firebase.js ---
-// Initializes Firebase and exports auth and firestore instances.
+// --- firebase.js (in ROOT directory) ---
 
 import { firebaseConfig } from './config.js'; // Import your Firebase config
 
@@ -12,4 +11,4 @@ if (!firebase.apps.length) {
 export const auth = firebase.auth();
 export const db = firebase.firestore();
 
-console.log('Firebase initialized and services exported.');
+console.log('Firebase initialized and services exported for ADMIN DASHBOARD.');
