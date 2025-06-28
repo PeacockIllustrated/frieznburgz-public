@@ -5,7 +5,7 @@ import { db } from './firebase.js';
 import { createStaffCardHtml } from './staff-template.js';
 import { getLocationDisplayName } from './config.js';
 
-const TOTAL_HANDBOOK_SECTIONS = 18; // Define this constant, as it's needed for calculations
+const TOTAL_HANDBOOK_SECTIONS = 12; // Define this constant, as it's needed for calculations
 
 /**
  * Renders the Staff Management page.
