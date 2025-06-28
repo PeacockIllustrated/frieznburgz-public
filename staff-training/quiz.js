@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { section: "Service", question: "What must be updated daily when a new special item is launched?", options: ["The menu board", "The allergen sheets", "The price list", "The staff rota"], answer: "The allergen sheets" },
     ];
     const QUIZ_LENGTH = 8;
-    const TOTAL_HANDBOOK_SECTIONS = 18;
+    const TOTAL_HANDBOOK_SECTIONS = 12;
 
     // --- DOM ELEMENT & STATE ---
     const quizContainer = document.getElementById('quiz-container');
