@@ -4,52 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friez n Burgz | Staff Profile Setup</title>
-    <!-- Re-using main styles for consistency -->
     <link rel="stylesheet" href="../style.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@800;900&family=Futura:wght@400&family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
 <body>
+
+    <div id="loading-spinner" class="loading-container" style="display: flex;"><div class="spinner"></div></div>
     
-    <div class="auth-container" style="display: flex;">
+    <div class="auth-container" id="authContainer" style="display: none;">
         <div class="auth-card">
-            <img src="assets/logo-alt.png" alt="Friez n Burgz Logo" class="auth-logo">
+            <img src="../assets/logo-alt.png" alt="Friez n Burgz Logo" class="auth-logo">
             <h2 class="auth-title">Welcome to the Team!</h2>
             <p class="form-intro">Let's set up your staff profile. Please fill out the information below.</p>
             
             <form id="profile-form">
-                <div class="form-group">
-                    <label for="fullName">Full Name</label>
-                    <input type="text" id="fullName" class="auth-input" required>
-                    <p class="form-hint">Please enter your first and last name.</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Login Email</label>
-                    <input type="email" id="email" class="auth-input" readonly>
-                    <p class="form-hint">This is linked to your account and cannot be changed.</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" class="auth-input" required>
-                    <p class="form-hint">We'll use this for urgent shift communications.</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="location">Primary Store Location</label>
-                    <div class="select-wrapper">
-                         <select id="location" class="location-select" required></select>
-                         <i class="fas fa-chevron-down select-arrow"></i>
-                    </div>
-                    <p class="form-hint">Select the main store you will be working at.</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="startDate">Start Date</label>
-                    <input type="text" id="startDate" class="auth-input" placeholder="e.g., October 2023" required>
-                    <p class="form-hint">The month and year you began working with us.</p>
-                </div>
-
+                <div class="form-group"><label for="fullName">Full Name</label><input type="text" id="fullName" class="auth-input" required><p class="form-hint">Please enter your first and last name.</p></div>
+                <div class="form-group"><label for="email">Login Email</label><input type="email" id="email" class="auth-input" readonly><p class="form-hint">Linked to your account and cannot be changed.</p></div>
+                <div class="form-group"><label for="phone">Phone Number</label><input type="tel" id="phone" class="auth-input" required><p class="form-hint">For urgent shift communications.</p></div>
+                <div class="form-group"><label for="location">Primary Store Location</label><div class="select-wrapper"><select id="location" class="location-select" required></select><i class="fas fa-chevron-down select-arrow"></i></div><p class="form-hint">Select the main store you will work at.</p></div>
+                <div class="form-group"><label for="startDate">Start Date</label><input type="text" id="startDate" class="auth-input" placeholder="e.g., October 2023" required><p class="form-hint">The month and year you began working.</p></div>
                 <button type="submit" id="submitProfileBtn" class="auth-button">Save My Profile</button>
                 <p id="form-message" class="auth-message"></p>
             </form>
@@ -59,6 +33,7 @@
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <!-- FIX: ADDED THE MISSING FIRESTORE SCRIPT -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     
     <script type="module" src="firebase-config.js"></script>
