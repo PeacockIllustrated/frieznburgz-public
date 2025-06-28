@@ -1,5 +1,5 @@
 // --- main.js (Stage 2 Update - Complete File) ---
-
+import { importAdminUser } from './import-admin.js';
 // Import Firebase authentication instance
 import { auth } from './firebase.js';
 
