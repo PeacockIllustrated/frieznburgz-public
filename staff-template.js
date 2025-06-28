@@ -1,4 +1,4 @@
-// --- staff-template.js ---
+// --- staff-template.js (Final Corrected Version) ---
 // Provides HTML templating for the Staff Management page components.
 
 /**
@@ -7,7 +7,8 @@
  * @returns {string} The HTML string for a staff card.
  */
 export function createStaffCardHtml(staff) {
-    const isTrainingComplete = staff.handbookCompletion === 100;
+    // FIX IS HERE: Determine if the training is 100% complete to add the class
+    const isTrainingComplete = staff.handbookCompletion >= 100;
     
     return `
         <div class="staff-card">
