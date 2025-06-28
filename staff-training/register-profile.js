@@ -1,28 +1,19 @@
-// --- staff-training/register-profile.js (Final Corrected Version) ---
+// --- staff-training/register-profile.js (Final Version) ---
 
 import { db, auth } from './firebase-config.js';
-// We need the locations array to populate the dropdown.
-// Assuming it's exported from the main project's config.js
 import { locations } from '../config.js'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     const profileForm = document.getElementById('profile-form');
-    const emailInput = document.getElementById('email');
     const locationSelect = document.getElementById('location');
     const formMessage = document.getElementById('form-message');
     const submitBtn = document.getElementById('submitProfileBtn');
-    const loadingSpinner = document.getElementById('loading-spinner'); // Get spinner
-    const formWrapper = document.querySelector('.auth-card'); // Get form wrapper
 
-    // Hide spinner and show form once the page is ready
-    if(loadingSpinner) loadingSpinner.style.display = 'none';
-    if(formWrapper) formWrapper.style.display = 'block';
-
-    // Populate the location dropdown
+    // Populate location dropdown
     if (locations && locationSelect) {
         locationSelect.innerHTML = '<option value="" disabled selected>-- Select your store --</option>';
         locations.forEach(loc => {
-            if(loc.id !== 'all_locations') { // Don't let new staff select "all locations"
+            if(loc.id !== 'all_locations') {
                  const option = document.createElement('option');
                  option.value = loc.id;
                  option.textContent = loc.name;
@@ -31,41 +22,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // This page's logic is only accessible to a logged-in user.
-    const user = auth.currentUser;
-    if (user) {
-        emailInput.value = user.email;
-    } else {
-        // This is a fallback, but the auth script should prevent this state.
-        console.error("No user found. Redirecting to login.");
-        window.location.href = 'login.html';
-        return;
-    }
-
     // Handle form submission
     profileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Saving...';
+        submitBtn.textContent = 'Creating Account...';
         formMessage.textContent = '';
 
+        // Get all data from the form
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim(); // Get password
         const staffData = {
             name: document.getElementById('fullName').value.trim(),
-            email: user.email,
+            email: email,
             phone: document.getElementById('phone').value.trim(),
             locationId: document.getElementById('location').value,
             startDate: document.getElementById('startDate').value.trim(),
-            role: "Employee" // Default role
+            role: "Employee"
         };
 
-        if (!staffData.name || !staffData.phone || !staffData.locationId || !staffData.startDate) {
-            formMessage.textContent = 'Please fill out all fields.';
+        if (!staffData.name || !email || !password || !staffData.phone || !staffData.locationId || !staffData.startDate) {
+            formMessage.textContent = 'Please fill out all fields, including email and password.';
             submitBtn.disabled = false;
             submitBtn.textContent = 'Save My Profile';
             return;
         }
 
         try {
+            // Step 1: Create the user in Firebase Authentication
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            // Step 2: Use the new user's UID to create their documents in Firestore
             const staffDocRef = db.collection('staff').doc(user.uid);
             await staffDocRef.set(staffData);
 
@@ -73,16 +61,17 @@ document.addEventListener('DOMContentLoaded', () => {
             await progressDocRef.set({ readSections: [], quizHistory: [] });
 
             formMessage.style.color = 'var(--success-green)';
-            formMessage.textContent = 'Profile saved! Redirecting to training...';
+            formMessage.textContent = 'Profile created! Please log in to continue.';
 
+            // Redirect to the login page after a short delay
             setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
+                window.location.href = 'login.html';
+            }, 2000);
 
         } catch (error) {
-            console.error("Error saving profile:", error);
+            console.error("Error creating profile:", error);
             formMessage.style.color = 'var(--red)';
-            formMessage.textContent = 'Could not save profile. Please try again.';
+            formMessage.textContent = `Could not create profile: ${error.message}`;
             submitBtn.disabled = false;
             submitBtn.textContent = 'Save My Profile';
         }
