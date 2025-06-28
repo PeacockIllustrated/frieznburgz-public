@@ -11,15 +11,14 @@
 </head>
 <body>
     
-    <!-- Spinner shown while checking auth state -->
     <div id="loading-spinner" class="loading-container" style="display: flex;">
         <div class="spinner"></div>
     </div>
 
-    <!-- The login form, hidden until auth state is confirmed to be "logged out" -->
     <div class="auth-container" id="authContainer" style="display: none;">
         <div class="auth-card">
-            <img src="assets/logo-alt.png" alt="Friez n Burgz Logo" class="auth-logo">
+            <!-- FIX: Path corrected to use the logo that exists -->
+            <img src="../assets/logo-alt.png" alt="Friez n Burgz Logo" class="auth-logo">
             <h2 class="auth-title">Staff Training Login</h2>
             
             <p class="form-intro" style="font-size: 16px; color: var(--dim-grey); margin-bottom: 20px;">Please sign in with your employee account.</p>
@@ -43,13 +42,8 @@
     
     <!-- Embedded script for login page logic -->
     <script type="module">
-        import { firebaseConfig } from './firebase-config.js';
-
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
+        // FIX: Only import the 'auth' service, which IS exported.
+        import { auth } from './firebase-config.js';
 
         // DOM Elements
         const loginEmail = document.getElementById('loginEmail');
@@ -60,14 +54,10 @@
         const loadingSpinner = document.getElementById('loading-spinner');
         const authContainer = document.getElementById('authContainer');
 
-        // Function to handle successful login
         const onLoginSuccess = () => {
-            // After login, always go to the main handbook.
-            // The auth script there will handle redirection if a profile needs to be created.
             window.location.href = 'index.html'; 
         };
 
-        // Email/Password Login Handler
         const handleEmailLogin = async () => {
             const email = loginEmail.value;
             const password = loginPassword.value;
@@ -84,7 +74,6 @@
             }
         };
 
-        // Google Sign-In Handler
         const handleGoogleLogin = async () => {
             const provider = new firebase.auth.GoogleAuthProvider();
             try {
@@ -96,18 +85,13 @@
             }
         };
         
-        // Attach Event Listeners
         loginBtn.addEventListener('click', handleEmailLogin);
         googleLoginBtn.addEventListener('click', handleGoogleLogin);
 
-        // Check auth state to decide whether to show login or redirect
         auth.onAuthStateChanged(user => {
             if (user) {
-                // If a user session already exists, redirect them immediately.
-                console.log("User already signed in, redirecting to training...");
                 onLoginSuccess();
             } else {
-                // If no user is signed in, hide the spinner and show the login form.
                 loadingSpinner.style.display = 'none';
                 authContainer.style.display = 'flex';
             }
