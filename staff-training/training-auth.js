@@ -1,13 +1,17 @@
-// --- staff-training/training-auth.js (Final Corrected Version) ---
+// --- staff-training/training-auth.js (Definitive Final Version) ---
 
 import { auth, db } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // This script should NOT run on the login page itself to avoid loops.
+    if (window.location.pathname.endsWith('login.html')) {
+        return;
+    }
+    
     const mainContent = document.getElementById('main-content-wrapper');
     const loginPrompt = document.getElementById('login-prompt');
     const loadingSpinner = document.getElementById('loading-spinner');
 
-    // Hide spinner once initial check starts
     if(loadingSpinner) loadingSpinner.style.display = 'flex';
 
     auth.onAuthStateChanged(async (user) => {
@@ -17,7 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const staffDocRef = db.collection('staff').doc(user.uid);
                 const docSnap = await staffDocRef.get();
 
-                if (docSnap.exists()) {
+                // *** THE FIX IS HERE ***
+                // The 'compat' library returns a snapshot object that has the .exists property as a boolean, not a function.
+                if (docSnap && docSnap.exists) {
                     // --- Case 1: Existing Employee ---
                     // Their profile exists, so show them the content.
                     if (loadingSpinner) loadingSpinner.style.display = 'none';
@@ -36,6 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                          // They are already on the correct registration page, so just show it.
                         if (loadingSpinner) loadingSpinner.style.display = 'none';
+                        const formWrapper = document.querySelector('.auth-card');
+                        if (formWrapper) formWrapper.style.display = 'block';
                     }
                 }
             } catch (error) {
@@ -45,14 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             // --- Case 3: No User Logged In ---
-            // If they are on any page other than the login page, redirect them to login.
-            if (!window.location.pathname.endsWith('login.html')) {
-                console.log('No user session found. Redirecting to login page.');
-                window.location.href = 'login.html';
-            } else {
-                // If they are already on the login page, just hide the spinner.
-                if (loadingSpinner) loadingSpinner.style.display = 'none';
-            }
+            // Redirect to the login page.
+            console.log('No user session found. Redirecting to login page.');
+            window.location.href = 'login.html';
         }
     });
 });
