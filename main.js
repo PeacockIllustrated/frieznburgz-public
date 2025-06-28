@@ -1,12 +1,10 @@
-// --- main.js ---
-// This is the main orchestrator for the Friez n Burgz Admin Dashboard.
-// It imports other modules and manages the overall application flow.
+// --- main.js (Stage 2 Update - Complete File) ---
 
 // Import Firebase authentication instance
 import { auth } from './firebase.js';
 
 // Import configuration values and location management functions
-import { getSelectedLocation, clearSelectedLocation, getLocationDisplayName, locations } from './config.js'; // Added 'locations' import
+import { getSelectedLocation, clearSelectedLocation, getLocationDisplayName, locations } from './config.js';
 
 // Import authentication UI and logic functions
 import { initAuth, showAuth, hideAuth } from './auth.js';
@@ -22,7 +20,8 @@ import { renderStockManagementPage, getAllUniqueStockItems } from './stock.js';
 import { renderWastageLogPage } from './wastage.js';
 import { renderDashboardOverviewPage, showQuickAdjustmentModal, openModal, closeModal } from './dashboard.js';
 import { renderSuppliersPage } from './suppliers.js';
-import { renderOrdersPage } from './orders.js'; // NEW IMPORT
+import { renderOrdersPage } from './orders.js';
+import { renderStaffPage } from './staff.js'; // NEW IMPORT
 
 
 // --- DOM Elements (centralized for main.js's direct use) ---
@@ -43,7 +42,7 @@ function initializeApp() {
     initLocationSelection();
 
     // Initialize sidebar navigation from ui.js, passing the content rendering callback
-    initSidebarNav(handleNavigationClick); // Ensure ui.js is correctly setup to receive and use this callback
+    initSidebarNav(handleNavigationClick);
 
     // Set up general event listeners for main dashboard controls
     logoutBtn.addEventListener('click', handleLogout);
@@ -154,28 +153,26 @@ async function renderPageContent(pageId) {
     // Use a switch statement to call the appropriate rendering function
     switch (pageId) {
         case 'dashboard':
-            await renderDashboardOverviewPage(); // CALL NEW FUNCTION HERE
-            console.log('Rendering Dashboard Overview...');
+            await renderDashboardOverviewPage();
             break;
         case 'stock-management':
-            await renderStockManagementPage(); // Call function from stock.js
-            console.log('Rendering Stock Management page...');
+            await renderStockManagementPage();
+            break;
+        // NEW: Case for the staff page
+        case 'staff':
+            await renderStaffPage();
             break;
         case 'wastage-log':
-            await renderWastageLogPage(); // Call function from wastage.js
-            console.log('Rendering Wastage Log page...');
+            await renderWastageLogPage();
             break;
         case 'orders':
-            await renderOrdersPage(); // CALL NEW FUNCTION HERE for orders
-            console.log('Rendering Orders page...');
+            await renderOrdersPage();
             break;
         case 'suppliers':
-            await renderSuppliersPage(); // CALL NEW FUNCTION HERE for suppliers
-            console.log('Rendering Suppliers page...');
+            await renderSuppliersPage();
             break;
         case 'settings':
             document.getElementById('settingsPage').innerHTML = `<h2 class="page-title">Settings</h2><p>App settings and user management (coming soon).</p>`;
-            console.log('Rendering Settings page...');
             break;
         default:
             console.warn(`No rendering function defined for page: ${pageId}`);
@@ -184,16 +181,15 @@ async function renderPageContent(pageId) {
 }
 
 
-// Expose showDashboard to the window object so location.js can call it
-// Also expose handleNavigationClick for the quick action buttons on the dashboard
+// Expose functions to the window object so other modules can call them
 window.mainApp = {
     showDashboard: showDashboard,
-    handleNavigationClick: handleNavigationClick, // EXPOSE FOR QUICK ACTIONS
-    showQuickAdjustmentModal: showQuickAdjustmentModal, // EXPOSE FOR WASTAGE PAGE
-    openModal: openModal, // EXPOSE openModal from dashboard.js
-    closeModal: closeModal, // EXPOSE closeModal from dashboard.js
-    getAllUniqueStockItems: getAllUniqueStockItems, // EXPOSE for Suppliers page to get all items
-    getLocations: () => locations // Expose the full locations array
+    handleNavigationClick: handleNavigationClick,
+    showQuickAdjustmentModal: showQuickAdjustmentModal,
+    openModal: openModal,
+    closeModal: closeModal,
+    getAllUniqueStockItems: getAllUniqueStockItems,
+    getLocations: () => locations
 };
 
 
