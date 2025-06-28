@@ -6,7 +6,8 @@
     <title>Friez n Burgz | Training Quiz</title>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@800;900&family=Futura:wght@400&family=Montserrat:wght@800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <!-- Note: Using ../style.css to keep header/sidebar consistent with admin panel -->
+    <link rel="stylesheet" href="style.css"> 
     <link rel="stylesheet" href="quiz.css">
 </head>
 <body>
@@ -15,28 +16,48 @@
 
     <div id="login-prompt" class="login-prompt-container" style="display: none;">
         <div class="login-card">
-            <!-- FIX: Changed src from logo-alt.png to logo.png -->
-            <img src="assets/logo.png" alt="Friez n Burgz Logo" class="login-logo">
+            <img src="../assets/logo.png" alt="Friez n Burgz Logo" class="login-logo">
             <h2 class="login-title">Training Quiz</h2>
             <p>You must be logged in to view your progress and take the quiz.</p>
-            <a href="/index.html" class="login-button">Proceed to Login</a>
+            <a href="login.html" class="login-button">Proceed to Login</a>
         </div>
     </div>
 
     <div id="main-content-wrapper" style="display: none;">
         <div class="main-dashboard-container">
             <header class="dashboard-header">
-                <div class="header-left"><img src="assets/logo.png" alt="Friez n Burgz Logo" class="header-logo"><span class="app-name">Quiz & Overview</span></div>
-                <div class="header-center"><span class="current-location-display">Test Your Knowledge</span></div>
-                <div class="header-right"><a href="index.html" class="join-team-btn">Return to Handbook</a></div>
+                <div class="header-left">
+                    <img src="../assets/logo.png" alt="Friez n Burgz Logo" class="header-logo">
+                    <span class="app-name">Quiz & Overview</span>
+                </div>
+                <div class="header-center">
+                    <span class="current-location-display">Test Your Knowledge</span>
+                </div>
+                <div class="header-right">
+                    <a href="index.html" class="header-button">Return to Handbook</a>
+                </div>
             </header>
             <aside class="dashboard-sidebar">
-                <nav class="sidebar-nav"><a href="index.html" class="nav-item"><i class="fas fa-book-open"></i> Return to Handbook</a></nav>
+                <nav class="sidebar-nav">
+                    <a href="index.html" class="nav-item">
+                        <i class="fas fa-book-open"></i> Return to Handbook
+                    </a>
+                </nav>
             </aside>
             <main class="dashboard-content">
-                <div id="quiz-container"></div>
+                <div id="quiz-container">
+                    <!-- Quiz content will be injected here by quiz.js -->
+                </div>
             </main>
         </div>
+    </div>
+    
+    <!-- NEW: Mobile Bottom Bar -->
+    <div class="mobile-bottom-bar">
+        <a href="index.html" class="mobile-quiz-link">
+            <i class="fas fa-book-open"></i>
+            <span>Return to Handbook</span>
+        </a>
     </div>
 
     <!-- Scripts -->
