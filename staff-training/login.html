@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friez n Burgz | Staff Training Login</title>
-    <!-- We will use the main project's style.css for consistency -->
+    <!-- Re-using main styles for consistency -->
     <link rel="stylesheet" href="../style.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@800;900&family=Futura:wght@400&family=Montserrat:wght@800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -25,21 +25,23 @@
             <button id="googleLoginBtn" class="auth-button google-login-btn">
                 <i class="fab fa-google"></i> Sign in with Google
             </button>
+            
             <p id="authMessage" class="auth-message"></p>
-            <hr style="border: 0; border-top: 1px solid var(--salmon); margin: 20px 0;">
-            <p class="form-hint" style="text-align:center; font-size: 12px; color: var(--salmon); font-style: italic;">First time logging in? Your account will be created automatically.</p>
+            
+            <hr style="border: 0; border-top: 1px solid var(--salmon); margin: 25px 0;">
+            
+            <p class="form-hint" style="text-align:center; font-size: 14px; color: var(--dim-grey); margin-bottom: 10px;">New to the team?</p>
+            <a href="register-profile.html" id="registerBtn" class="auth-button secondary-btn">Create Your Profile</a>
+
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
+    <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     
-    <!-- Embedded script for login page logic -->
     <script type="module">
-        // FIX: We only need to import the 'auth' service from the config file,
-        // which already handles the initialization.
         import { auth } from './firebase-config.js';
 
         // DOM Elements
@@ -49,12 +51,14 @@
         const googleLoginBtn = document.getElementById('googleLoginBtn');
         const authMessage = document.getElementById('authMessage');
 
+        // Function to handle successful login
         const onLoginSuccess = () => {
-            // After login, always go to the main handbook.
-            // The auth script there will handle redirection if a profile needs to be created.
+            // After a successful login, always redirect to the main handbook page.
+            // The auth script on that page will handle routing them correctly.
             window.location.href = 'index.html'; 
         };
 
+        // Email/Password Login Handler
         const handleEmailLogin = async () => {
             const email = loginEmail.value;
             const password = loginPassword.value;
@@ -63,7 +67,7 @@
                 return;
             }
             try {
-                authMessage.textContent = '';
+                authMessage.textContent = ''; // Clear previous messages
                 await auth.signInWithEmailAndPassword(email, password);
                 onLoginSuccess();
             } catch (error) {
@@ -71,10 +75,11 @@
             }
         };
 
+        // Google Sign-In Handler
         const handleGoogleLogin = async () => {
             const provider = new firebase.auth.GoogleAuthProvider();
             try {
-                authMessage.textContent = '';
+                authMessage.textContent = ''; // Clear previous messages
                 await auth.signInWithPopup(provider);
                 onLoginSuccess();
             } catch (error) {
@@ -82,8 +87,16 @@
             }
         };
         
+        // Attach Event Listeners
         loginBtn.addEventListener('click', handleEmailLogin);
         googleLoginBtn.addEventListener('click', handleGoogleLogin);
+        
+        // Also allow login by pressing Enter in the password field
+        loginPassword.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                handleEmailLogin();
+            }
+        });
 
     </script>
 </body>
