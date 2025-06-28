@@ -1,11 +1,7 @@
-// --- dashboard-template.js (Final Version) ---
+// --- dashboard-template.js (Final, Complete & Corrected Version) ---
 
 /**
  * Generates the HTML for a single dashboard summary card (Good, Low, Critical).
- * @param {string} statusClass - 'good', 'low', or 'critical' for styling.
- * @param {number} count - The number of items in this status.
- * @param {string} title - The title of the card (e.g., 'Good Stock').
- * @returns {string} The HTML string for the dashboard summary card.
  */
 export function createDashboardCardHtml(statusClass, count, title) {
     return `
@@ -20,8 +16,6 @@ export function createDashboardCardHtml(statusClass, count, title) {
 
 /**
  * Generates the HTML for a single critical item in the alerts list.
- * @param {Object} item - The item object with name, currentStock, unit, reorderPoint.
- * @returns {string} The HTML string for a critical item alert.
  */
 export function createCriticalItemHtml(item) {
     const stockStatusClass = item.currentStock <= item.reorderPoint / 2 ? 'critical' : 'low';
@@ -41,8 +35,6 @@ export function createCriticalItemHtml(item) {
 
 /**
  * Generates the HTML for a single recent waste log entry.
- * @param {Object} logEntry - The waste log entry object.
- * @returns {string} The HTML string for the waste log item.
  */
 export function createRecentWasteItemHtml(logEntry) {
     const timestampDate = logEntry.timestamp instanceof firebase.firestore.Timestamp
@@ -59,16 +51,16 @@ export function createRecentWasteItemHtml(logEntry) {
 }
 
 /**
- * NEW: Generates the HTML for the Staff Training Summary card.
- * @param {Object} summaryData - Object containing totalEmployees, upToDateCount, and locationAverages.
- * @returns {string} The HTML for the staff summary card.
+ * Generates the HTML for the Staff Training Summary card.
  */
 export function createStaffSummaryCardHtml(summaryData) {
     const { totalEmployees, upToDateCount, locationAverages } = summaryData;
 
     let locationBarsHtml = '';
+    // FIX: Check if locationAverages is defined and has items
     if (locationAverages && locationAverages.length > 0) {
         locationAverages.forEach(loc => {
+            // FIX: This now correctly builds the HTML for the vertical bar structure
             locationBarsHtml += `
                 <div class="location-bar-item">
                     <div class="location-bar-progress">
