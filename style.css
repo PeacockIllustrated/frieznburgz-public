@@ -2254,7 +2254,9 @@ body {
         align-self: flex-start;
     }
 }
-/* --- Staff Management Page Styles --- */
+/* --- Staff Management & Dashboard Summary Styles --- */
+
+/* Staff Management Page Layout */
 .staff-list-grid {
     display: flex;
     flex-direction: column;
@@ -2271,6 +2273,7 @@ body {
     gap: 20px;
 }
 
+/* Individual Staff Card Styling */
 .staff-card {
     background-color: #fff;
     border: 1px solid #e0e0e0;
@@ -2335,6 +2338,7 @@ body {
     margin: 15px 0;
 }
 
+/* Staff Card Training Progress Bars */
 .staff-training-info {
     display: flex;
     flex-direction: column;
@@ -2370,12 +2374,121 @@ body {
     transition: width 0.5s ease;
 }
 
+/* FIX: Pulsing Green Bar for 100% Completion */
 .progress-fill.complete {
-    background-color: var(--success-green) !important;
+    background-color: var(--success-green);
+    animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
 }
 
 .training-metric span {
     font-weight: bold;
     flex-basis: 50px;
     text-align: right;
+    color: var(--red);
+}
+
+
+/* --- Staff Summary Card on Dashboard --- */
+.staff-summary-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-top: 10px;
+}
+
+.staff-summary-metrics {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.metric-item .metric-value {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--red);
+    display: block;
+    line-height: 1;
+}
+
+.metric-item .metric-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
+    color: var(--dim-grey);
+}
+
+.staff-summary-divider {
+    border: 0;
+    border-top: 1px dashed var(--salmon);
+    width: 90%;
+    margin: 0 auto;
+}
+
+.staff-summary-chart .chart-label {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 14px;
+    text-align: center;
+    display: block;
+    margin-bottom: 10px;
+    color: var(--dim-grey);
+}
+
+.location-bars-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Aligns bars to the bottom */
+    gap: 15px;
+    height: 100px; /* Set a fixed height for the chart area */
+    width: 100%;
+    padding: 0 10px;
+}
+
+.location-bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex: 1;
+    max-width: 50px;
+}
+
+.location-bar-progress {
+    width: 25px;
+    height: 100%;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Fills from the bottom up */
+}
+
+.location-bar-progress .bar-fill {
+    width: 100%;
+    background-color: var(--khaki);
+    border-radius: 5px;
+    transition: height 0.5s ease-out;
+}
+
+.location-bar-label {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60px;
 }
