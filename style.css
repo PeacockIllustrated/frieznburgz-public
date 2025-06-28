@@ -2254,3 +2254,128 @@ body {
         align-self: flex-start;
     }
 }
+/* --- Staff Management Page Styles --- */
+.staff-list-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 40px; /* Space between location groups */
+}
+
+.staff-group-container {
+    width: 100%;
+}
+
+.staff-group-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.staff-card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.staff-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.staff-card-header {
+    background-color: var(--dim-grey);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.staff-name {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    margin: 0;
+}
+
+.staff-role {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    background-color: var(--khaki);
+    color: var(--yellow);
+    padding: 4px 8px;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+
+.staff-card-body {
+    padding: 20px;
+}
+
+.staff-contact-info p {
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: var(--dim-grey);
+}
+
+.staff-contact-info i {
+    color: var(--red);
+    width: 18px;
+    text-align: center;
+}
+
+.staff-card-body hr {
+    border: 0;
+    border-top: 1px dashed var(--salmon);
+    margin: 15px 0;
+}
+
+.staff-training-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.training-metric {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.training-metric label {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    flex-basis: 150px;
+    flex-shrink: 0;
+}
+
+.training-progress-bar {
+    flex-grow: 1;
+    height: 18px;
+    background-color: #e9ecef;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--khaki);
+    border-radius: 99px;
+    transition: width 0.5s ease;
+}
+
+.progress-fill.complete {
+    background-color: var(--success-green) !important;
+}
+
+.training-metric span {
+    font-weight: bold;
+    flex-basis: 50px;
+    text-align: right;
+}
