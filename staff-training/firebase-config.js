@@ -1,7 +1,7 @@
-// --- staff-training/firebase-config.js ---
-// Centralizes Firebase configuration for the entire training portal.
+// --- staff-training/firebase-config.js (Final Corrected Version) ---
+// Centralizes Firebase configuration and initialization for the training portal.
 
-// Your Firebase configuration (copy-pasted from your console)
+// Your Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyA4hS3texgNpdQbjj8QIECY4n0Nl3SWwTo",
     authDomain: "friez-burgz.firebaseapp.com",
