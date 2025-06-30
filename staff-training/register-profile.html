@@ -11,9 +11,24 @@
 </head>
 <body>
     
-    <!-- FIX: The auth-container is now visible by default. No spinner is needed on this page. -->
-    <div class="auth-container" id="authContainer" style="display: flex;">
-        <div class="auth-card">
+    <div class="auth-container" style="display: flex;">
+        
+        <!-- NEW: Gatekeeper Card - Shown first -->
+        <div id="gatekeeper-container" class="auth-card">
+            <img src="../assets/logo-alt.png" alt="Friez n Burgz Logo" class="auth-logo">
+            <h2 class="auth-title">Employee Verification</h2>
+            <p class="form-intro">Please enter the company-wide password to proceed with registration.</p>
+            
+            <div class="form-group">
+                <input type="password" id="gatekeeper-password" class="auth-input" placeholder="Company Password">
+            </div>
+            
+            <button id="verify-password-btn" class="auth-button">Verify & Proceed</button>
+            <p id="gatekeeper-message" class="auth-message"></p>
+        </div>
+
+        <!-- Registration Form - Hidden by default -->
+        <div id="registration-form-container" class="auth-card" style="display: none;">
             <img src="../assets/logo-alt.png" alt="Friez n Burgz Logo" class="auth-logo">
             <h2 class="auth-title">Welcome to the Team!</h2>
             <p class="form-intro">Let's set up your staff profile. Please fill out the information below.</p>
@@ -64,6 +79,7 @@
                 <a href="login.html" class="form-hint" style="text-align:center; display: block; font-size: 14px; color: var(--dim-grey);">Already have a profile? Login here.</a>
             </form>
         </div>
+
     </div>
 
     <!-- Scripts -->
