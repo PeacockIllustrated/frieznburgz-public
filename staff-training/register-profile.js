@@ -9,17 +9,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- NEW: Gatekeeper Logic ---
     const GATEKEEPER_PASSWORD = "FNB-STAFF!"; // The secret company password
 
-    const gatekeeperContainer = document.getElementById('gatekeeper-container');
+    const gatekeeperForm = document.getElementById('gatekeeper-form');
     const registrationFormContainer = document.getElementById('registration-form-container');
     const gatekeeperPasswordInput = document.getElementById('gatekeeper-password');
-    const verifyBtn = document.getElementById('verify-password-btn');
     const gatekeeperMessage = document.getElementById('gatekeeper-message');
 
     // This function handles the password verification
     const handleVerification = () => {
         if (gatekeeperPasswordInput.value.trim() === GATEKEEPER_PASSWORD) {
             // On success, hide the gatekeeper and show the registration form
-            gatekeeperContainer.style.display = 'none';
+            gatekeeperForm.parentElement.style.display = 'none'; // Hide the entire auth-card
             registrationFormContainer.style.display = 'block';
         } else {
             // On failure, show an error message
@@ -29,13 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Add event listeners for the verification step
-    verifyBtn.addEventListener('click', handleVerification);
-    gatekeeperPasswordInput.addEventListener('keyup', (event) => {
-        // Allow pressing 'Enter' to verify
-        if (event.key === 'Enter') {
-            handleVerification();
-        }
+    // Add event listener for the gatekeeper form submission
+    gatekeeperForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Stop the form from reloading the page
+        handleVerification();
     });
     // --- End of Gatekeeper Logic ---
 
