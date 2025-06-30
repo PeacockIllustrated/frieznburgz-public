@@ -1,10 +1,46 @@
-// --- staff-training/register-profile.js (Final Corrected Version) ---
+// --- staff-training/register-profile.js (Updated with Gatekeeper) ---
 
 import { db, auth } from './firebase-config.js';
 // We need the locations array to populate the dropdown.
 import { locations } from '../config.js'; 
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // --- NEW: Gatekeeper Logic ---
+    const GATEKEEPER_PASSWORD = "FNB-STAFF-2024!"; // The secret company password
+
+    const gatekeeperContainer = document.getElementById('gatekeeper-container');
+    const registrationFormContainer = document.getElementById('registration-form-container');
+    const gatekeeperPasswordInput = document.getElementById('gatekeeper-password');
+    const verifyBtn = document.getElementById('verify-password-btn');
+    const gatekeeperMessage = document.getElementById('gatekeeper-message');
+
+    // This function handles the password verification
+    const handleVerification = () => {
+        if (gatekeeperPasswordInput.value.trim() === GATEKEEPER_PASSWORD) {
+            // On success, hide the gatekeeper and show the registration form
+            gatekeeperContainer.style.display = 'none';
+            registrationFormContainer.style.display = 'block';
+        } else {
+            // On failure, show an error message
+            gatekeeperMessage.textContent = 'Incorrect password. Please try again.';
+            gatekeeperPasswordInput.value = ''; // Clear the input
+            gatekeeperPasswordInput.focus(); // Set focus back to the input
+        }
+    };
+
+    // Add event listeners for the verification step
+    verifyBtn.addEventListener('click', handleVerification);
+    gatekeeperPasswordInput.addEventListener('keyup', (event) => {
+        // Allow pressing 'Enter' to verify
+        if (event.key === 'Enter') {
+            handleVerification();
+        }
+    });
+    // --- End of Gatekeeper Logic ---
+
+
+    // --- Existing Registration Logic (This code only runs after verification) ---
     const profileForm = document.getElementById('profile-form');
     const locationSelect = document.getElementById('location');
     const formMessage = document.getElementById('form-message');
