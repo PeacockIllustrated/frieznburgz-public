@@ -7,7 +7,7 @@ import { locations } from '../config.js';
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- NEW: Gatekeeper Logic ---
-    const GATEKEEPER_PASSWORD = "FNB-STAFF-2024!"; // The secret company password
+    const GATEKEEPER_PASSWORD = "FNB-STAFF!"; // The secret company password
 
     const gatekeeperContainer = document.getElementById('gatekeeper-container');
     const registrationFormContainer = document.getElementById('registration-form-container');
