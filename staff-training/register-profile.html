@@ -13,18 +13,20 @@
     
     <div class="auth-container" style="display: flex;">
         
-        <!-- NEW: Gatekeeper Card - Shown first -->
-        <div id="gatekeeper-container" class="auth-card">
-            <img src="../assets/logo-alt.png" alt="Friez n Burgz Logo" class="auth-logo">
-            <h2 class="auth-title">Employee Verification</h2>
-            <p class="form-intro">Please enter the company-wide password to proceed with registration.</p>
-            
-            <div class="form-group">
-                <input type="password" id="gatekeeper-password" class="auth-input" placeholder="Company Password">
-            </div>
-            
-            <button id="verify-password-btn" class="auth-button">Verify & Proceed</button>
-            <p id="gatekeeper-message" class="auth-message"></p>
+        <!-- Gatekeeper Card - Wrapped in a form to fix browser warnings -->
+        <div class="auth-card">
+            <form id="gatekeeper-form">
+                <img src="../assets/logo-alt.png" alt="Friez n Burgz Logo" class="auth-logo">
+                <h2 class="auth-title">Employee Verification</h2>
+                <p class="form-intro">Please enter the company-wide password to proceed with registration.</p>
+                
+                <div class="form-group">
+                    <input type="password" id="gatekeeper-password" class="auth-input" placeholder="Company Password" autocomplete="off">
+                </div>
+                
+                <button type="submit" id="verify-password-btn" class="auth-button">Verify & Proceed</button>
+                <p id="gatekeeper-message" class="auth-message"></p>
+            </form>
         </div>
 
         <!-- Registration Form - Hidden by default -->
@@ -36,25 +38,23 @@
             <form id="profile-form">
                 <div class="form-group">
                     <label for="fullName">Full Name</label>
-                    <input type="text" id="fullName" class="auth-input" required>
-                    <p class="form-hint">Please enter your first and last name.</p>
+                    <input type="text" id="fullName" class="auth-input" required autocomplete="name">
                 </div>
 
                 <div class="form-group">
                     <label for="email">Login Email</label>
-                    <input type="email" id="email" class="auth-input" required>
-                    <p class="form-hint">This will be your username for logging in.</p>
+                    <input type="email" id="email" class="auth-input" required autocomplete="email">
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Create a Password</label>
-                    <input type="password" id="password" class="auth-input" required>
+                    <input type="password" id="password" class="auth-input" required autocomplete="new-password">
                     <p class="form-hint">Must be at least 6 characters long.</p>
                 </div>
 
                 <div class="form-group">
                     <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" class="auth-input" required>
+                    <input type="tel" id="phone" class="auth-input" required autocomplete="tel">
                     <p class="form-hint">We'll use this for urgent shift communications.</p>
                 </div>
 
