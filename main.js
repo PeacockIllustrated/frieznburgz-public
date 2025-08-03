@@ -21,8 +21,8 @@ import { renderWastageLogPage } from './wastage.js';
 import { renderDashboardOverviewPage, showQuickAdjustmentModal, openModal, closeModal } from './dashboard.js';
 import { renderSuppliersPage } from './suppliers.js';
 import { renderOrdersPage } from './orders.js';
-import { renderStaffPage } from './staff.js'; // NEW IMPORT
-
+import { renderStaffPage } from './staff.js';
+import { renderSettingsPage } from './settings.js'; // NEW IMPORT
 
 // --- DOM Elements (centralized for main.js's direct use) ---
 const logoutBtn = document.getElementById('logoutBtn');
@@ -158,7 +158,6 @@ async function renderPageContent(pageId) {
         case 'stock-management':
             await renderStockManagementPage();
             break;
-        // NEW: Case for the staff page
         case 'staff':
             await renderStaffPage();
             break;
@@ -172,7 +171,7 @@ async function renderPageContent(pageId) {
             await renderSuppliersPage();
             break;
         case 'settings':
-            document.getElementById('settingsPage').innerHTML = `<h2 class="page-title">Settings</h2><p>App settings and user management (coming soon).</p>`;
+            await renderSettingsPage(); // CALL renderSettingsPage() instead of direct HTML
             break;
         default:
             console.warn(`No rendering function defined for page: ${pageId}`);
