@@ -14,97 +14,156 @@
 
 // --- Raw Ingredient Data for Multi-Location Import ---
 // This array holds the default items that will be copied to each location's subcollection.
+// Data parsed from provided screenshots.
 const allIngredientsDataMultiLocation = [
-    // Standard Meat Items
-    { id: 'beef_patties', name: 'Beef Patties', category: 'Meat', unit: 'lbs', currentStock: 50, reorderPoint: 20, reorderQuantity: 100 },
-    { id: 'chicken_filletz_plain', name: 'Plain Chicken Filletz', category: 'Meat', unit: 'pcs', currentStock: 75, reorderPoint: 30, reorderQuantity: 150 },
-    { id: 'chicken_breast', name: 'Chicken Breast', category: 'Meat', unit: 'lbs', currentStock: 40, reorderPoint: 15, reorderQuantity: 80 },
-    { id: 'bacon_strips', name: 'Bacon Strips', category: 'Meat', unit: 'packs', currentStock: 60, reorderPoint: 25, reorderQuantity: 120 },
-    { id: 'pastrami_slices', name: 'Pastrami Slices', category: 'Meat', unit: 'lbs', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
-    { id: 'pulled_turkey', name: 'Pulled Turkey', category: 'Meat', unit: 'lbs', currentStock: 25, reorderPoint: 10, reorderQuantity: 40 },
-    // NEW Meat Items
-    { id: 'sausage_patties', name: 'Sausage Patties', category: 'Meat', unit: 'pcs', currentStock: 60, reorderPoint: 20, reorderQuantity: 100 },
+    // --- Meat ---
+    { id: 'beef_patties', name: 'Beef Patties', category: 'Meat', unit: 'lbs', initialAmount: 50 }, // Existing, keep for consistency
+    { id: 'chicken_filletz_plain', name: 'Plain Chicken Filletz', category: 'Meat', unit: 'pcs', initialAmount: 75 }, // Existing, keep for consistency
+    { id: 'chicken_breast', name: 'Chicken Breast', category: 'Meat', unit: 'lbs', initialAmount: 40 }, // Existing, keep for consistency
+    { id: 'bacon_strips', name: 'Bacon Strips', category: 'Meat', unit: 'grams', initialAmount: 1500 }, // Converted to grams from existing unit to match spreadsheet
+    { id: 'pastrami_slices', name: 'Pastrami Slices', category: 'Meat', unit: 'grams', initialAmount: 500 }, // Converted to grams from existing unit to match spreadsheet
+    { id: 'pulled_turkey', name: 'Pulled Turkey', category: 'Meat', unit: 'lbs', initialAmount: 25 }, // Existing, keep for consistency
+    { id: 'meat_general', name: 'Meat (General)', category: 'Meat', unit: 'grams', initialAmount: 1000 },
+    { id: 'chicken_fillet_bulk', name: 'Chicken Fillet (Bulk)', category: 'Meat', unit: 'grams', initialAmount: 3000 },
+    { id: 'chorizzo', name: 'Chorizzo', category: 'Meat', unit: 'grams', initialAmount: 500 },
+    { id: 'pork_mince', name: 'Pork Mince', category: 'Meat', unit: 'grams', initialAmount: 499 },
+    { id: 'pork_patties', name: 'Pork Patties', category: 'Meat', unit: 'grams', initialAmount: 3200 },
 
+    // --- Cheeses ---
+    { id: 'american_cheese_slices', name: 'American Cheese Slices', category: 'Cheeses', unit: 'slices', initialAmount: 120 }, // Existing, keep for consistency
+    { id: 'halloumi_cheese', name: 'Halloumi Cheese', category: 'Cheeses', unit: 'grams', initialAmount: 2900 }, // Converted to grams from existing unit to match spreadsheet
+    { id: 'mozzarella_patties', name: 'Mozzarella Patties', category: 'Cheeses', unit: 'pcs', initialAmount: 45 }, // Existing, keep for consistency
+    { id: 'cheese_general', name: 'Cheese (General)', category: 'Cheeses', unit: 'grams', initialAmount: 3000 },
+    { id: 'parmigiano_cheese', name: 'Parmigiano Cheese', category: 'Cheeses', unit: 'grams', initialAmount: 2000 },
+    { id: 'grated_cheddar', name: 'Grated Cheddar', category: 'Cheeses', unit: 'grams', initialAmount: 2000 },
+    { id: 'parmigiano_regrated', name: 'Parmigiano (Regrated)', category: 'Cheeses', unit: 'grams', initialAmount: 1000 },
+    { id: 'grated_mozzarella', name: 'Grated Mozzarella', category: 'Cheeses', unit: 'grams', initialAmount: 1000 },
+    { id: 'cheese_larder_block', name: 'Cheese (Larder Block)', category: 'Cheeses', unit: 'units', initialAmount: 40 },
+    { id: 'fetta_cheese', name: 'Fetta Cheese', category: 'Cheeses', unit: 'grams', initialAmount: 3200 },
 
-    // Standard Cheese Items
-    { id: 'american_cheese_slices', name: 'American Cheese', category: 'Cheeses', unit: 'slices', currentStock: 120, reorderPoint: 50, reorderQuantity: 200 },
-    { id: 'halloumi_cheese', name: 'Halloumi Cheese', category: 'Cheeses', unit: 'blocks', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
-    { id: 'mozzarella_patties', name: 'Mozzarella Patties', category: 'Cheeses', unit: 'pcs', currentStock: 45, reorderPoint: 15, reorderQuantity: 75 },
-    // NEW Cheese Items
-    { id: 'oumi_cheese', name: 'Oumi Cheese', category: 'Cheeses', unit: 'pcs', currentStock: 35, reorderPoint: 12, reorderQuantity: 60 },
-    { id: 'cheddar_cheese_slices', name: 'Cheddar Cheese Slices', category: 'Cheeses', unit: 'slices', currentStock: 100, reorderPoint: 40, reorderQuantity: 150 }, // For "Cheeze Style Slices"
+    // --- Produce & Vegetables ---
+    { id: 'lettuce_shredded', name: 'Shredded Lettuce', category: 'Produce & Vegetables', unit: 'bags', initialAmount: 25 }, // Existing, keep for consistency
+    { id: 'onions_diced', name: 'Diced Onions', category: 'Produce & Vegetables', unit: 'kg', initialAmount: 15 }, // Existing, keep for consistency
+    { id: 'potatoes_fries', name: 'Fries Potatoes', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 20000 }, // Converted to grams from existing unit to match spreadsheet
+    { id: 'lettuce_bulk_grams', name: 'Lettuce (Bulk)', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 7000 },
+    { id: 'pickled_onions', name: 'Pickled Onions', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 1000 },
+    { id: 'red_onion', name: 'Red Onion', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 9000 },
+    { id: 'white_onion', name: 'White Onion', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 3000 },
+    { id: 'chillies', name: 'Chillies', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 10000 },
+    { id: 'pickled_gherkins', name: 'Pickled Gherkins', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 1500 },
+    { id: 'dried_peppers', name: 'Dried Peppers', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 16000 },
+    { id: 'lemon_fresh', name: 'Lemon (Fresh)', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 1350 },
+    { id: 'dried_tomatoes', name: 'Dried Tomatoes', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 1000 },
+    { id: 'cabbage_red', name: 'Red Cabbage', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 10000 },
+    { id: 'white_onions', name: 'White Onions', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 20000 },
+    { id: 'cabbage_white', name: 'White Cabbage', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 10000 },
+    { id: 'garlic_peeled', name: 'Peeled Garlic', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 1000 },
+    { id: 'cucumber_single', name: 'Cucumber (Single)', category: 'Produce & Vegetables', unit: 'units', initialAmount: 1 },
+    { id: 'rocket_salad', name: 'Rocket Salad', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 60 },
+    { id: 'cos_lettuce', name: 'Cos Lettuce', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 1000 },
+    { id: 'strawberry_fresh', name: 'Strawberry (Fresh)', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 1000 },
+    { id: 'banana_fresh', name: 'Banana (Fresh)', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 1000 },
+    { id: 'spinach_fresh', name: 'Spinach (Fresh)', category: 'Produce & Vegetables', unit: 'grams', initialAmount: 500 },
 
+    // --- Sauces & Condiments ---
+    { id: 'classic_sauce', name: 'Classic Sauce', category: 'Sauces & Condiments', unit: 'gallons', initialAmount: 15 }, // Existing, keep for consistency
+    { id: 'ketchup_heinz', name: 'Heinz Ketchup', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 4000 }, // Converted to grams from existing unit to match spreadsheet
+    { id: 'special_sauce_base', name: 'Special Sauce Base', category: 'Specialz Ingredients', unit: 'liters', initialAmount: 10 }, // Existing, keep for consistency
+    { id: 'honey_chilli_glaze', name: 'Honey Chilli Glaze', category: 'Filletz Ingredients', unit: 'liters', initialAmount: 5 }, // Existing, keep for consistency
+    { id: 'mango_puree', name: 'Mango Puree', category: 'Milkshakes of the Week', unit: 'liters', initialAmount: 8 }, // Existing, keep for consistency
+    { id: 'sauce_general', name: 'Sauce (General)', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 9600 },
+    { id: 'cheese_sauce', name: 'Cheese Sauce', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 1000 },
+    { id: 'mustard_dijon', name: 'Dijon Mustard', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 2270 },
+    { id: 'mustard_english', name: 'English Mustard', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 2250 },
+    { id: 'nacho_cheese_sauce', name: 'Nacho Cheese Sauce', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 1000 },
+    { id: 'bbq_sauce', name: 'BBQ Sauce', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 3870 },
+    { id: 'mayonnaise_heinz', name: 'Heinz Mayonnaise', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 10000 },
+    { id: 'pesto_sauce', name: 'Pesto Sauce', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 950 },
+    { id: 'piri_piri_sauce', name: 'Piri Piri Sauce', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 1000 },
+    { id: 'maple_syrup', name: 'Maple Syrup', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 435 },
+    { id: 'worcester_sauce', name: 'Worcester Sauce', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 568 },
+    { id: 'mustard_wholegrain', name: 'Wholegrain Mustard', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 2250 },
+    { id: 'pickled_juice', name: 'Pickled Juice', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 1000 },
+    { id: 'garlic_parmesan_sauce', name: 'Garlic Parmesan Sauce', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 10000 },
+    { id: 'sweet_smoked_sauce', name: 'Sweet Smoked Sauce', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 10000 },
+    { id: 'chipotle_sauce', name: 'Chipotle Sauce', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 10000 },
+    { id: 'cranberry_sauce', name: 'Cranberry Sauce', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 2720 },
+    { id: 'our_cheese_sauce', name: 'Our Cheese Sauce', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 13200 },
+    { id: 'garlic_honey', name: 'Garlic Honey', category: 'Sauces & Condiments', unit: 'grams', initialAmount: 5500 },
 
-    // Example Specialz/Filletz/Milkshake Ingredients (these would be location-specific typically)
-    { id: 'special_sauce_base', name: 'Special Sauce Base', category: 'Specialz Ingredients', unit: 'liters', currentStock: 10, reorderPoint: 3, reorderQuantity: 10 },
-    { id: 'crispy_onions', name: 'Crispy Onions', category: 'Specialz Ingredients', unit: 'kg', currentStock: 8, reorderPoint: 2, reorderQuantity: 15 },
-    { id: 'honey_chilli_glaze', name: 'Honey Chilli Glaze', category: 'Filletz Ingredients', unit: 'liters', currentStock: 5, reorderPoint: 1, reorderQuantity: 5 },
-    { id: 'mango_puree', name: 'Mango Puree', category: 'Milkshakes of the Week', unit: 'liters', currentStock: 8, reorderPoint: 2, reorderQuantity: 5 },
-    // NEW Specialz Ingredients
-    { id: 'shoestring_onions', name: 'Shoestring Onions', category: 'Specialz Ingredients', unit: 'kg', currentStock: 10, reorderPoint: 3, reorderQuantity: 20 },
-    { id: 'bacon_crumbs', name: 'Bacon Crumbs', category: 'Specialz Ingredients', unit: 'kg', currentStock: 5, reorderPoint: 1, reorderQuantity: 10 },
+    // --- Breads & Baked Goods ---
+    { id: 'burger_buns', name: 'Burger Buns', category: 'Breads & Baked Goods', unit: 'units', initialAmount: 20 }, // Converted to units from existing unit to match spreadsheet
+    { id: 'burger_buns_packs', name: 'Burger Buns (Packs)', category: 'Breads & Baked Goods', unit: 'packs', initialAmount: 40 }, // Existing for consistency, rename if needed
+    { id: 'burger_buns_single', name: 'Burger Buns (Single)', category: 'Breads & Baked Goods', unit: 'units', initialAmount: 1 }, // New single unit for import
+    { id: 'toast_bread', name: 'Bread (Toast)', category: 'Breads & Baked Goods', unit: 'grams', initialAmount: 6500 },
 
+    // --- Other Essentials ---
+    { id: 'frying_oil', name: 'Frying Oil', category: 'Other Essentials', unit: 'gallons', initialAmount: 5 }, // Existing, keep for consistency
+    { id: 'disposable_gloves', name: 'Disposable Gloves', category: 'Other Essentials', unit: 'boxes', initialAmount: 18 }, // Existing, keep for consistency
+    { id: 'grease_proof_paper', name: 'Grease Proof Paper', category: 'Other Essentials', unit: 'units', initialAmount: 100 },
+    { id: 'bag_general', name: 'Bag (General)', category: 'Other Essentials', unit: 'units', initialAmount: 100 },
+    { id: 'vitamin_a_supplement', name: 'Vitamin A Supplement', category: 'Other Essentials', unit: 'grams', initialAmount: 10000 },
+    { id: 'vitamin_d_supplement', name: 'Vitamin D Supplement', category: 'Other Essentials', unit: 'grams', initialAmount: 10000 },
+    { id: 'finzbourg_item', name: 'Finzbourg (Misc. Item)', category: 'Other Essentials', unit: 'grams', initialAmount: 10000 }, // Assuming Finzbourg is a misc item
 
-    // General Produce & Vegetables
-    { id: 'lettuce_shredded', name: 'Shredded Lettuce', category: 'Produce & Vegetables', unit: 'bags', currentStock: 25, reorderPoint: 10, reorderQuantity: 40 },
-    { id: 'onions_diced', name: 'Diced Onions', category: 'Produce & Vegetables', unit: 'kg', currentStock: 15, reorderPoint: 5, reorderQuantity: 25 },
-    { id: 'potatoes_fries', name: 'Fries Potatoes', category: 'Produce & Vegetables', unit: 'kg', currentStock: 80, reorderPoint: 25, reorderQuantity: 100 },
-    // NEW Produce & Vegetables
-    { id: 'dill_pickles', name: 'Dill Pickles', category: 'Produce & Vegetables', unit: 'jars', currentStock: 10, reorderPoint: 3, reorderQuantity: 15 },
-    { id: 'pickled_onions', name: 'Pickled Onions', category: 'Produce & Vegetables', unit: 'jars', currentStock: 8, reorderPoint: 2, reorderQuantity: 12 },
-    { id: 'fresh_chillies', name: 'Fresh Chillies', category: 'Produce & Vegetables', unit: 'kg', currentStock: 4, reorderPoint: 1, reorderQuantity: 8 },
-    { id: 'coleslaw_mix', name: 'Coleslaw Mix', category: 'Produce & Vegetables', unit: 'bags', currentStock: 12, reorderPoint: 4, reorderQuantity: 20 },
-    { id: 'hash_browns', name: 'Hash Browns', category: 'Produce & Vegetables', unit: 'packs', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
-    { id: 'hash_tots', name: 'Hash Tots', category: 'Produce & Vegetables', unit: 'packs', currentStock: 25, reorderPoint: 8, reorderQuantity: 40 },
-    { id: 'eggs', name: 'Eggs', category: 'Produce & Vegetables', unit: 'trays', currentStock: 20, reorderPoint: 7, reorderQuantity: 30 }, // For omelettes
-    { id: 'strawberry_puree', name: 'Strawberry Puree', category: 'Fruits', unit: 'liters', currentStock: 10, reorderPoint: 3, reorderQuantity: 5 },
-    { id: 'banana_puree', name: 'Banana Puree', category: 'Fruits', unit: 'liters', currentStock: 10, reorderPoint: 3, reorderQuantity: 5 },
-    { id: 'lemon_puree', name: 'Lemon Puree', category: 'Fruits', unit: 'liters', currentStock: 5, reorderPoint: 1, reorderQuantity: 3 }, // For cheesecake
+    // --- Dairy & Beverages ---
+    { id: 'milk_general', name: 'Milk (General)', category: 'Dairy & Beverages', unit: 'grams', initialAmount: 2000 },
+    { id: 'egg_white', name: 'Egg White', category: 'Dairy & Beverages', unit: 'grams', initialAmount: 1000 },
+    { id: 'egg_yolk', name: 'Egg Yolk', category: 'Dairy & Beverages', unit: 'grams', initialAmount: 1000 },
+    { id: 'butter', name: 'Butter', category: 'Dairy & Beverages', unit: 'grams', initialAmount: 2000 },
+    { id: 'yogurt', name: 'Yogurt', category: 'Dairy & Beverages', unit: 'grams', initialAmount: 1000 },
+    { id: 'milk_shake_mix', name: 'Milk Shake Mix', category: 'Dairy & Beverages', unit: 'grams', initialAmount: 10000 },
+    { id: 'fresh_milk_milkshakes', name: 'Fresh Milk (Milkshakes)', category: 'Dairy & Beverages', unit: 'grams', initialAmount: 10000 },
+    { id: 'double_cream', name: 'Double Cream', category: 'Dairy & Beverages', unit: 'grams', initialAmount: 2000 },
 
+    // --- Spices & Seasonings ---
+    { id: 'black_pepper', name: 'Black Pepper', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 500 },
+    { id: 'white_pepper', name: 'White Pepper', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 500 },
+    { id: 'salt', name: 'Salt', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 6000 },
+    { id: 'paprika_powder', name: 'Paprika Powder', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 430 },
+    { id: 'larder_basil', name: 'Larder Basil', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 160 },
+    { id: 'chili_powder', name: 'Chili Powder', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 590 },
+    { id: 'larder_chives', name: 'Larder Chives', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 410 },
+    { id: 'ground_ginger', name: 'Ground Ginger', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 2000 },
+    { id: 'thyme_herb', name: 'Thyme (Herb)', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 960 },
+    { id: 'ground_nutmeg', name: 'Ground Nutmeg', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 500 },
+    { id: 'dried_parsley', name: 'Dried Parsley', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 2000 },
+    { id: 'chilli_flakes', name: 'Chilli Flakes', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 2000 },
+    { id: 'onion_powder', name: 'Onion Powder', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 500 },
+    { id: 'garlic_flakes', name: 'Garlic Flakes', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 1000 },
+    { id: 'garlic_powder', name: 'Garlic Powder', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 10000 },
+    { id: 'monosodium_glutamate', name: 'Monosodium Glutamate', category: 'Spices & Seasonings', unit: 'grams', initialAmount: 22680 },
 
-    // General Sauces & Condiments
-    { id: 'classic_sauce', name: 'Classic Sauce', category: 'Sauces & Condiments', unit: 'gallons', currentStock: 15, reorderPoint: 5, reorderQuantity: 20 },
-    { id: 'ketchup_heinz', name: 'Heinz Ketchup', category: 'Sauces & Condiments', unit: 'gallons', currentStock: 20, reorderPoint: 8, reorderQuantity: 30 },
-    // NEW Sauces & Condiments
-    { id: 'sweet_n_smokey_sauce', name: 'Sweet N Smokey Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 10, reorderPoint: 4, reorderQuantity: 15 },
-    { id: 'creamy_garlic_sauce', name: 'Creamy Garlic Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 8, reorderPoint: 3, reorderQuantity: 12 },
-    { id: 'smokey_bbq_sauce', name: 'Smokey BBQ Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 10, reorderPoint: 4, reorderQuantity: 15 },
-    { id: 'chipotle_mayo', name: 'Chipotle Mayo', category: 'Sauces & Condiments', unit: 'liters', currentStock: 7, reorderPoint: 2, reorderQuantity: 10 },
-    { id: 'garlic_parmesan_sauce', name: 'Garlic Parmesan Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 6, reorderPoint: 2, reorderQuantity: 10 },
-    { id: 'hot_cheese_sauce', name: 'Hot Cheese Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 10, reorderPoint: 3, reorderQuantity: 15 },
-    { id: 'brown_sauce', name: 'Brown Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 8, reorderPoint: 2, reorderQuantity: 10 },
-    { id: 'sweet_n_spicy_sauce', name: 'Sweet N Spicy Sauce', category: 'Sauces & Condiments', unit: 'liters', currentStock: 7, reorderPoint: 2, reorderQuantity: 10 },
-    { id: 'mayonnaise', name: 'Mayonnaise', category: 'Sauces & Condiments', unit: 'gallons', currentStock: 15, reorderPoint: 5, reorderQuantity: 20 },
+    // --- Baking & Dry Goods ---
+    { id: 'breading', name: 'Breading', category: 'Baking & Dry Goods', unit: 'grams', initialAmount: 27800 },
+    { id: 'corn_flakes', name: 'Corn Flakes', category: 'Baking & Dry Goods', unit: 'grams', initialAmount: 500 },
+    { id: 'cornflour', name: 'Cornflour', category: 'Baking & Dry Goods', unit: 'grams', initialAmount: 3500 },
+    { id: 'flour_general', name: 'Flour (General)', category: 'Baking & Dry Goods', unit: 'grams', initialAmount: 16000 },
+    { id: 'strong_flour', name: 'Strong Flour', category: 'Baking & Dry Goods', unit: 'grams', initialAmount: 16000 },
+    { id: 'baking_powder', name: 'Baking Powder', category: 'Baking & Dry Goods', unit: 'grams', initialAmount: 800 },
+    { id: 'bechamel_mix', name: 'Bechamel Mix', category: 'Baking & Dry Goods', unit: 'grams', initialAmount: 1000 },
+    { id: 'chocolate_bits', name: 'Chocolate Bits', category: 'Dessert Ingredients', unit: 'grams', initialAmount: 1000 }, // Moved to Dessert Ingredients
 
+    // --- Frozen Goods ---
+    { id: 'hash_browns', name: 'Hash Browns', category: 'Frozen Goods', unit: 'grams', initialAmount: 420 },
 
-    // General Breads & Baked Goods
-    { id: 'burger_buns', name: 'Burger Buns', category: 'Breads & Baked Goods', unit: 'packs', currentStock: 40, reorderPoint: 15, reorderQuantity: 50 },
+    // --- Spreads & Conserves ---
+    { id: 'peanut_butter', name: 'Peanut Butter', category: 'Spreads & Conserves', unit: 'grams', initialAmount: 1000 },
+    { id: 'strawberry_jam', name: 'Strawberry Jam', category: 'Spreads & Conserves', unit: 'grams', initialAmount: 2720 },
+    { id: 'bacon_jam', name: 'Bacon Jam', category: 'Spreads & Conserves', unit: 'grams', initialAmount: 6000 },
 
+    // --- Oils & Vinegars ---
+    { id: 'cider_vinegar', name: 'Cider Vinegar', category: 'Oils & Vinegars', unit: 'grams', initialAmount: 50 },
+    { id: 'dill_oil', name: 'Dill Oil', category: 'Oils & Vinegars', unit: 'grams', initialAmount: 150 },
+    { id: 'olive_oil', name: 'Olive Oil', category: 'Oils & Vinegars', unit: 'grams', initialAmount: 1000 },
 
-    // General Other Essentials
-    { id: 'frying_oil', name: 'Frying Oil', category: 'Other Essentials', unit: 'gallons', currentStock: 5, reorderPoint: 2, reorderQuantity: 10 },
-    { id: 'disposable_gloves', name: 'Disposable Gloves', category: 'Other Essentials', unit: 'boxes', currentStock: 18, reorderPoint: 5, reorderQuantity: 25 },
-    // NEW Other Essentials
-    { id: 'milk_whole', name: 'Whole Milk', category: 'Other Essentials', unit: 'liters', currentStock: 30, reorderPoint: 10, reorderQuantity: 50 },
-    { id: 'cream_dairy', name: 'Dairy Cream', category: 'Other Essentials', unit: 'liters', currentStock: 15, reorderPoint: 5, reorderQuantity: 20 },
-    { id: 'coffee_beans', name: 'Coffee Beans', category: 'Other Essentials', unit: 'kg', currentStock: 5, reorderPoint: 2, reorderQuantity: 10 },
-    { id: 'tea_bags', name: 'Tea Bags', category: 'Other Essentials', unit: 'packs', currentStock: 10, reorderPoint: 3, reorderQuantity: 15 },
-    { id: 'hot_chocolate_powder', name: 'Hot Chocolate Powder', category: 'Other Essentials', unit: 'kg', currentStock: 5, reorderPoint: 2, reorderQuantity: 10 },
-    { id: 'seasoning_powder', name: 'Seasoning Powder', category: 'Other Essentials', unit: 'kg', currentStock: 7, reorderPoint: 2, reorderQuantity: 10 },
+    // --- Pasta & Grains ---
+    { id: 'chipotle_pasta', name: 'Chipotle Pasta', category: 'Pasta & Grains', unit: 'grams', initialAmount: 1000 },
+    { id: 'macaroni', name: 'Macaroni', category: 'Pasta & Grains', unit: 'grams', initialAmount: 4000 },
 
-
-    // NEW Dessert Ingredients (assuming some pre-made components or base ingredients)
-    { id: 'cheesecake_base_mix', name: 'Cheesecake Base Mix', category: 'Desserts', unit: 'kg', currentStock: 8, reorderPoint: 3, reorderQuantity: 15 },
-    { id: 'biscuit_base', name: 'Biscuit Base Crumbles', category: 'Desserts', unit: 'kg', currentStock: 5, reorderPoint: 2, reorderQuantity: 10 },
-    { id: 'biscoff_spread', name: 'Biscoff Spread', category: 'Desserts', unit: 'jars', currentStock: 6, reorderPoint: 2, reorderQuantity: 8 },
-    { id: 'oreo_crumbles', name: 'Oreo Crumbles', category: 'Desserts', unit: 'kg', currentStock: 4, reorderPoint: 1, reorderQuantity: 6 },
-    { id: 'banoffee_topping', name: 'Banoffee Topping', category: 'Desserts', unit: 'liters', currentStock: 5, reorderPoint: 2, reorderQuantity: 8 },
-
-
-    // NEW Milkshake Ingredients (Flavorings)
-    { id: 'vanilla_syrup', name: 'Vanilla Syrup', category: 'Milkshakes of the Week', unit: 'liters', currentStock: 12, reorderPoint: 4, reorderQuantity: 15 },
-    { id: 'chocolate_syrup', name: 'Chocolate Syrup', category: 'Milkshakes of the Week', unit: 'liters', currentStock: 12, reorderPoint: 4, reorderQuantity: 15 },
-
+    // --- Dessert Ingredients ---
+    { id: 'strawberry_topping', name: 'Strawberry Topping', category: 'Dessert Ingredients', unit: 'grams', initialAmount: 5000 },
+    { id: 'chocolate_topping', name: 'Chocolate Topping', category: 'Dessert Ingredients', unit: 'grams', initialAmount: 5000 },
 ];
 
 /**
@@ -140,10 +199,9 @@ window.importAllIngredientsForLocations = async function() {
 
     let totalImportedCount = 0;
     // Get location IDs from your config.js (assuming main.js exposes this)
-    // Fallback if main.js isn't fully loaded or locations aren't accessible
     const allLocations = window.mainApp && window.mainApp.getLocations
         ? window.mainApp.getLocations().map(loc => loc.id)
-        : ["south_shields", "forrest_hall", "byker", "whitley_bay", "newcastle_city_center"];
+        : ["south_shields", "forrest_hall", "byker", "whitley_bay", "newcastle_city_center"]; // Fallback if mainApp isn't ready
 
     if (allLocations.length === 0) {
         console.error("Import Error: No locations defined in config.js or accessible. Cannot import data.");
@@ -161,18 +219,28 @@ window.importAllIngredientsForLocations = async function() {
             // Reference to the item document WITHIN the specific location's subcollection
             const itemDocRef = db.collection('locations').doc(locationId).collection('items').doc(item.id);
 
-            // Create a copy of the item data to potentially randomize stock slightly per location
-            // This adds some variety to stock levels for demonstration purposes.
+            // Create a copy of the item data
             const itemDataCopy = { ...item };
-            itemDataCopy.currentStock = Math.max(0, item.currentStock + Math.floor(Math.random() * 20) - 10); // +/- 10 units
-            // Ensure stock isn't too high if reorder point is low, and make some critical
-            if (itemDataCopy.currentStock > itemDataCopy.reorderPoint * 2) {
-                itemDataCopy.currentStock = Math.floor(itemDataCopy.reorderPoint * 1.5);
+
+            // Set dynamic reorder points and quantities
+            // Default reorderPoint to 25% of initialAmount, min 1
+            itemDataCopy.reorderPoint = Math.max(1, Math.floor(item.initialAmount * 0.25));
+            // Default reorderQuantity to 50% to 100% of initialAmount, min 10
+            itemDataCopy.reorderQuantity = Math.max(10, Math.floor(item.initialAmount * (0.5 + Math.random() * 0.5)));
+
+            // Randomize currentStock and potentially make some critical
+            itemDataCopy.currentStock = Math.max(0, item.initialAmount + Math.floor(Math.random() * (item.initialAmount * 0.1)) - Math.floor(item.initialAmount * 0.05)); // +/- 5% of initial
+
+            // Ensure stock isn't too high compared to reorder point
+            if (itemDataCopy.currentStock > itemDataCopy.reorderPoint * 3) { // Cap max stock at 3x reorder point
+                itemDataCopy.currentStock = Math.floor(itemDataCopy.reorderPoint * 2 + Math.random() * itemDataCopy.reorderPoint);
             }
             if (Math.random() < 0.2) { // 20% chance of being critical
-                itemDataCopy.currentStock = Math.max(0, Math.floor(itemDataCopy.reorderPoint / 2) - Math.floor(Math.random() * 5));
+                itemDataCopy.currentStock = Math.max(0, Math.floor(itemDataCopy.reorderPoint / 2) - Math.floor(Math.random() * (itemDataCopy.reorderPoint * 0.1)));
             }
 
+            // Clean up the temporary initialAmount field before saving
+            delete itemDataCopy.initialAmount;
 
             batch.set(itemDocRef, itemDataCopy); // Use .set() to create or overwrite
             locationImportCount++;
@@ -198,6 +266,7 @@ window.importAllIngredientsForLocations = async function() {
         const currentSelectedLocation = window.mainApp.getSelectedLocation();
         if (currentSelectedLocation) {
             console.log("Refreshing dashboard with newly imported data.");
+            // Assuming mainApp.showDashboard re-renders the current page (dashboard)
             window.mainApp.showDashboard(currentSelectedLocation);
         }
     }
