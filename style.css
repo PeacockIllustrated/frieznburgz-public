@@ -2552,3 +2552,147 @@ body {
 #profile-form .auth-button {
     margin-top: 15px;
 }
+
+/* --- Settings Page Specific Styles --- */
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.settings-card {
+    background-color: var(--yellow);
+    border: 5px solid var(--khaki);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--salmon);
+    cursor: pointer; /* Indicate clickable for accordion */
+}
+
+.settings-header:hover {
+    color: var(--red);
+}
+
+.settings-section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.settings-content {
+    font-family: 'Futura', Arial, sans-serif;
+    color: var(--dim-grey);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.settings-content p {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.settings-content ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.settings-content li {
+    margin-bottom: 5px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.settings-content .list-bullet {
+    color: var(--khaki);
+    position: absolute;
+    left: 0;
+    font-size: 1em;
+    top: 3px; /* Adjust vertical alignment */
+}
+
+/* Accordion Specifics for Settings */
+.settings-card.accordion-card .accordion-icon {
+    display: inline-block; /* Make sure icon is visible */
+    transition: transform 0.3s ease;
+}
+
+.settings-card.accordion-card .settings-content.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out, margin 0.3s ease-out;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.settings-card.accordion-card.active .settings-content.accordion-content {
+    max-height: 500px; /* Sufficiently large to show all content */
+    padding-top: 15px;
+    margin-top: 5px;
+}
+
+.settings-card.accordion-card.active .accordion-icon {
+    transform: rotate(180deg);
+}
+
+/* Adjust button size within settings card */
+.settings-card .quick-action-btn.small-btn {
+    width: auto;
+    padding: 8px 20px;
+    margin-top: 10px;
+    align-self: center; /* Center the button in its flex column */
+}
+
+
+/* --- Responsive Adjustments for Settings Page --- */
+@media screen and (max-width: 768px) {
+    /* Settings page adjustments for smaller screens */
+    .settings-grid {
+        grid-template-columns: 1fr; /* Stack settings cards vertically */
+    }
+
+    .settings-card {
+        padding: 15px;
+    }
+
+    .settings-section-title {
+        font-size: 20px;
+    }
+
+    .settings-content {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    /* Settings page adjustments for very small mobile */
+    .settings-section-title {
+        font-size: 18px;
+    }
+
+    .settings-content {
+        font-size: 13px;
+    }
+
+    .settings-card .quick-action-btn.small-btn {
+        font-size: 13px;
+        padding: 6px 15px;
+    }
+}
