@@ -857,12 +857,13 @@ body {
     margin-top: 0;
 }
 
+
 /* Grid for holding category cards in Stock Management (Desktop) */
 .stock-items-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
+    grid-template-columns: 1fr; /* Forces vertical stacking of category cards */
+    gap: 20px; /* Space between category cards */
+    margin-top: 20px; /* Space from the subsection title */
 }
 
 /* Individual category cards within stock management */
