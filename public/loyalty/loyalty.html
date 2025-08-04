@@ -45,10 +45,12 @@
                 <p class="card-status-message" id="cardStatusMessage">Loading your card...</p>
                 
                 <div class="card-main-display">
-                    <div class="friez-burgz-vertical-text">Friez & Burgz</div>
+                    <!-- Friez & Burgz logo/text on card -->
+                    <img src="/assets/logo.png" alt="Friez n Burgz Logo" class="card-logo">
+
                     <div class="stamp-grid-container">
                         <div class="stamp-display-grid" id="stampDisplayGrid">
-                            <!-- Stamp circles will be injected here -->
+                            <!-- Stamp circles with optional icons will be injected here by JS -->
                         </div>
                     </div>
                     <div class="card-bottom-text">
@@ -96,7 +98,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-functions-compat.js"></script>
 
     <script type="module" src="firebase-loyalty-config.js"></script>
-     <script type="module" src="import-loyalty-programs.js"></script>
     <script type="module" src="loyalty-auth.js"></script>
     <script type="module" src="loyalty.js"></script>
     
