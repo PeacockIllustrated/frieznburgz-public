@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friez n Burgz | Loyalty</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@800;900&family=Futura:wght@400&family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="loyalty.css">
+    <!-- Open Graph for sharing -->
+    <meta property="og:title" content="Friez n Burgz Loyalty">
+    <meta property="og:description" content="Tap to collect stamps and earn free burgers!">
+    <meta property="og:image" content="https://yourdomain.com/assets/loyalty-og-image.jpg"> <!-- Update with your actual path -->
+    <meta property="og:type" content="website">
+</head>
+<body>
+
+    <div id="loading-spinner" class="loading-container"><div class="spinner"></div></div>
+
+    <div id="login-prompt" class="login-prompt-container" style="display: none;">
+        <div class="login-card">
+            <img src="../assets/logo.png" alt="Friez n Burgz Logo" class="login-logo">
+            <h2 class="login-title">Friez n Burgz Loyalty</h2>
+            <p>Log in to access your loyalty card and track your rewards!</p>
+            <a href="loyalty-login.html" class="login-button">Proceed to Login</a>
+            <p class="form-hint" style="text-align:center; font-size: 14px; color: var(--dim-grey); margin-top: 15px;">New? <a href="loyalty-register.html" class="text-link">Register here</a></p>
+        </div>
+    </div>
+
+    <div id="main-loyalty-wrapper" class="loyalty-wrapper" style="display: none;">
+        <header class="loyalty-header">
+            <div class="header-left">
+                <img src="../assets/logo.png" alt="Friez n Burgz Logo" class="header-logo">
+                <span class="app-name">Loyalty</span>
+            </div>
+            <div class="header-right">
+                <button id="logoutBtn" class="header-button">Logout</button>
+            </div>
+        </header>
+
+        <main class="loyalty-content">
+            <h2 class="page-title">Your Loyalty Card</h2>
+
+            <div id="loyaltyCard" class="loyalty-card">
+                <p class="card-status-message" id="cardStatusMessage">Loading your card...</p>
+                <div class="stamp-display-grid" id="stampDisplayGrid">
+                    <!-- Stamp circles will be injected here -->
+                </div>
+                <div id="rewardSection" class="reward-section" style="display: none;">
+                    <p class="reward-message" id="rewardMessage"></p>
+                    <div class="reward-code-box" id="rewardCodeBox">
+                        <span id="rewardCode"></span>
+                        <button id="copyCodeBtn" class="copy-button"><i class="fas fa-copy"></i></button>
+                    </div>
+                    <p class="reward-instruction">Show this code to staff to redeem your reward!</p>
+                </div>
+            </div>
+
+            <div class="loyalty-actions">
+                <p>Tap your phone to the "Squid" puck at the till or scan the QR code to get your stamp!</p>
+                <!-- This button is a fallback/demonstration for manual stamp if NFC/QR isn't active -->
+                <button id="getStampBtn" class="action-button primary-button"><i class="fas fa-hand-point-up"></i> Get My Stamp</button>
+                <p class="action-message" id="actionMessage"></p>
+            </div>
+
+            <div id="loyaltyHistory" class="loyalty-history">
+                <h3 class="section-title">Stamp History</h3>
+                <ul id="stampHistoryList" class="stamp-history-list">
+                    <li>No stamps yet.</li>
+                </ul>
+            </div>
+             <div class="loyalty-history">
+                <h3 class="section-title">Reward Redemption History</h3>
+                <ul id="redemptionHistoryList" class="stamp-history-list">
+                    <li>No rewards redeemed yet.</li>
+                </ul>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Firebase SDKs - Compat versions -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-functions-compat.js"></script>
+
+    <script type="module" src="firebase-loyalty-config.js"></script>
+    <script type="module" src="loyalty-auth.js"></script>
+    <script type="module" src="loyalty.js"></script>
+    
+</body>
+</html>
