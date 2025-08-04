@@ -35,20 +35,24 @@ window.importLoyaltyPrograms = async function() {
     const programsToImport = [
         {
             id: 'standard_stamps',
-            name: 'Friez n Burgz Standard Loyalty',
-            stampCountRequired: 5,
-            rewardDescription: 'Free Classic Burger',
+            name: 'Friez n Burgz Standard Loyalty Card',
             isActive: true,
-            // Example: applies to all_locations or specific location IDs if loyalty programs differ per store
+            totalStampsRequired: 10, // NEW: Total stamps for the card
+            rewards: [ // NEW: Array of reward tiers
+                { id: 'filletz_reward', threshold: 5, description: 'Free Filletz' },
+                { id: 'burger_reward', threshold: 10, description: 'Free Classic Burger' }
+            ],
             locations: ['south_shields', 'forrest_hall', 'byker', 'whitley_bay']
         },
         {
             id: 'coffee_lover_card',
             name: 'Coffee Lover Card',
-            stampCountRequired: 8,
-            rewardDescription: 'Free Regular Coffee',
             isActive: true,
-            locations: ['south_shields', 'forrest_hall'] // Maybe only some locations offer coffee
+            totalStampsRequired: 8,
+            rewards: [
+                { id: 'coffee_reward', threshold: 8, description: 'Free Regular Coffee' }
+            ],
+            locations: ['south_shields', 'forrest_hall']
         },
         // Add more loyalty programs as needed
     ];
