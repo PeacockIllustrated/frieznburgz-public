@@ -212,10 +212,11 @@ body {
     align-items: center;
     justify-content: space-between; /* Distribute content vertically */
     min-height: 260px; /* Adjusted height to accommodate content */
-    max-width: 450px; /* Increased max-width for a wider card */
+    max-width: 700px; /* Increased max-width to match content area */
     width: 100%;
     box-sizing: border-box;
     position: relative; /* For card-logo positioning */
+    overflow: hidden;
 }
 
 .card-logo {
@@ -250,9 +251,9 @@ body {
     display: grid;
     grid-template-columns: repeat(5, 1fr); /* 5 columns */
     grid-template-rows: repeat(2, 1fr); /* 2 rows */
-    gap: 15px; /* Increased gap for better spacing */
+    gap: 20px; /* Increased gap for better spacing */
     width: 100%;
-    max-width: 350px; /* Increased max-width for wider stamp arrangement */
+    max-width: 600px; /* Increased max-width for wider stamp arrangement */
     height: 100%;
 }
 
