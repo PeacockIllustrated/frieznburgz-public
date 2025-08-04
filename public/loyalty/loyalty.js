@@ -7,10 +7,8 @@ import { db, auth, functions } from './firebase-loyalty-config.js';
 const loyaltyCardElement = document.getElementById('loyaltyCard');
 const cardStatusMessage = document.getElementById('cardStatusMessage');
 const stampDisplayGrid = document.getElementById('stampDisplayGrid');
-const rewardSection = document.getElementById('rewardSection');
-const rewardMessage = document.getElementById('rewardMessage');
-const rewardCodeElement = document.getElementById('rewardCode');
-const copyCodeBtn = document.getElementById('copyCodeBtn');
+const unclaimedRewardsSection = document.getElementById('unclaimedRewardsSection');
+const unclaimedRewardsList = document.getElementById('unclaimedRewardsList'); // New element
 const getStampBtn = document.getElementById('getStampBtn');
 const actionMessage = document.getElementById('actionMessage');
 const stampHistoryList = document.getElementById('stampHistoryList');
@@ -19,7 +17,6 @@ const logoutBtn = document.getElementById('logoutBtn');
 
 // Firebase Cloud Functions Callable
 const addStampCallable = functions.httpsCallable('addStamp');
-const redeemRewardCallable = functions.httpsCallable('redeemReward'); // This will eventually be called from ADMIN, not customer app
 
 // State
 let currentUser = null;
@@ -41,30 +38,59 @@ function showMessage(element, message, isError = false) {
     }
 }
 
-function renderStamps(currentStamps, requiredStamps) {
+function renderStamps(currentStamps, totalStampsRequired) {
     stampDisplayGrid.innerHTML = '';
-    for (let i = 0; i < requiredStamps; i++) {
+    // Determine rows: 2 rows of 5
+    const numStamps = totalStampsRequired || 10; // Default to 10 if not set
+
+    for (let i = 0; i < numStamps; i++) {
         const stampCircle = document.createElement('div');
         stampCircle.classList.add('stamp-circle');
         if (i < currentStamps) {
             stampCircle.classList.add('filled');
         }
+        // Add content for stamp number if desired, for now keep empty for visual
+        // stampCircle.textContent = i + 1; 
         stampDisplayGrid.appendChild(stampCircle);
     }
-    cardStatusMessage.textContent = `You have ${currentStamps} of ${requiredStamps} stamps!`;
+    cardStatusMessage.textContent = `You have ${currentStamps} of ${numStamps} stamps!`;
     cardStatusMessage.style.color = 'var(--dim-grey)'; // Reset color
 }
 
-function renderReward(rewardUnlocked, rewardCode, rewardDescription) {
-    if (rewardUnlocked) {
-        rewardMessage.textContent = `🎉 Reward Unlocked: ${rewardDescription}!`;
-        rewardCodeElement.textContent = rewardCode;
-        rewardSection.style.display = 'flex';
+function renderUnclaimedRewards(unlockedRewards) {
+    unclaimedRewardsList.innerHTML = '';
+    if (unlockedRewards && unlockedRewards.length > 0) {
+        unclaimedRewardsSection.style.display = 'block';
+        unlockedRewards.forEach(reward => {
+            const rewardItem = document.createElement('div');
+            rewardItem.classList.add('unclaimed-reward-item');
+            rewardItem.innerHTML = `
+                <p class="unclaimed-reward-message">🎉 ${reward.description} Unlocked!</p>
+                <div class="reward-code-box">
+                    <span class="reward-code">${reward.rewardCode}</span>
+                    <button class="copy-button" data-code="${reward.rewardCode}"><i class="fas fa-copy"></i></button>
+                </div>
+            `;
+            unclaimedRewardsList.appendChild(rewardItem);
+        });
+
+        // Attach copy listeners to newly created buttons
+        document.querySelectorAll('.unclaimed-reward-item .copy-button').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const codeToCopy = event.currentTarget.dataset.code;
+                navigator.clipboard.writeText(codeToCopy).then(() => {
+                    alert('Reward code copied to clipboard!');
+                }).catch(err => {
+                    console.error('Could not copy text: ', err);
+                });
+            });
+        });
+
     } else {
-        rewardSection.style.display = 'none';
-        rewardCodeElement.textContent = '';
+        unclaimedRewardsSection.style.display = 'none';
     }
 }
+
 
 function renderStampHistory(stamps) {
     stampHistoryList.innerHTML = '';
@@ -136,8 +162,8 @@ async function startLoyaltyCardListener() {
         let loyaltyCardData = {
             currentStamps: 0,
             stamps: [],
-            rewardUnlocked: false,
-            rewardCode: null,
+            unlockedRewards: [], // Initialize new field
+            lastClaimedRewardThreshold: 0, // Initialize new field
             activeProgramId: currentLoyaltyProgram.id
         };
 
@@ -145,25 +171,24 @@ async function startLoyaltyCardListener() {
             loyaltyCardData = doc.data();
             // Ensure fields are present
             if (!loyaltyCardData.stamps) loyaltyCardData.stamps = [];
+            if (!loyaltyCardData.unlockedRewards) loyaltyCardData.unlockedRewards = []; // Defensive
             if (typeof loyaltyCardData.currentStamps !== 'number') loyaltyCardData.currentStamps = 0;
-            if (typeof loyaltyCardData.rewardUnlocked !== 'boolean') loyaltyCardData.rewardUnlocked = false;
+            if (typeof loyaltyCardData.lastClaimedRewardThreshold !== 'number') loyaltyCardData.lastClaimedRewardThreshold = 0;
         } else {
             // First time user, create a blank document if it doesn't exist
-            await loyaltyCardRef.set({
-                activeProgramId: currentLoyaltyProgram.id,
-                currentStamps: 0,
-                stamps: [],
-                rewardUnlocked: false,
-                rewardCode: null,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                lastStampTime: null
-            });
-            console.log("Created initial loyalty card document for new user.");
+            // This set operation is now handled in loyalty-login.html and loyalty-register.html
+            // If the user navigates directly here *without* going through login/register,
+            // they wouldn't have a document. Consider if this branch is still truly needed or if
+            // the initial set in login/register is sufficient. For now, rely on auth flow.
+             console.log("Loyalty card document does not exist for user. Relying on login/register to create it.");
+             // Optionally, if you expect users to somehow land here without a doc, you could redirect or show a message.
+             showMessage(cardStatusMessage, "Your loyalty card is being set up. Please try again in a moment.", false);
+             return;
         }
 
         // Render loyalty card state
-        renderStamps(loyaltyCardData.currentStamps, currentLoyaltyProgram.stampCountRequired);
-        renderReward(loyaltyCardData.rewardUnlocked, loyaltyCardData.rewardCode, currentLoyaltyProgram.rewardDescription);
+        renderStamps(loyaltyCardData.currentStamps, currentLoyaltyProgram.totalStampsRequired);
+        renderUnclaimedRewards(loyaltyCardData.unlockedRewards);
         renderStampHistory(loyaltyCardData.stamps);
         
         // Fetch and render redemption history separately (not part of loyaltyCard doc)
@@ -197,8 +222,6 @@ getStampBtn.addEventListener('click', async () => {
     actionMessage.style.color = 'var(--dim-grey)'; // Default color
 
     try {
-        // In a real scenario, storeId would come from NFC/QR reader.
-        // For demonstration, let's hardcode a store ID or get it from a global config.
         const demoStoreId = 'forrest_hall'; // Replace with dynamic store ID in production
 
         const result = await addStampCallable({ storeId: demoStoreId, method: 'ManualButton' });
@@ -208,26 +231,21 @@ getStampBtn.addEventListener('click', async () => {
 
     } catch (error) {
         console.error('Error adding stamp:', error);
-        // Error from Cloud Function (e.g., resource-exhausted, failed-precondition)
         if (error.code === 'resource-exhausted') {
-            showMessage(actionMessage, `Wait a moment before stamping again.`, true);
+            const cooldownSeconds = error.details?.cooldown ? Math.ceil(error.details.cooldown) : 30;
+            showMessage(actionMessage, `Wait ${cooldownSeconds} seconds before stamping again.`, true);
         } else if (error.code === 'failed-precondition') {
-            showMessage(actionMessage, `Reward unlocked. Redeem it first!`, true);
-        } else {
+            showMessage(actionMessage, `You have an unclaimed reward. Redeem it first!`, true);
+        } else if (error.code === 'not-found') {
+             showMessage(actionMessage, `Loyalty program not found. Contact staff.`, true);
+        }
+        else {
             showMessage(actionMessage, `Failed to add stamp: ${error.message}`, true);
         }
         getStampBtn.disabled = false; // Re-enable button on error
     }
 });
 
-copyCodeBtn.addEventListener('click', () => {
-    const textToCopy = rewardCodeElement.textContent;
-    navigator.clipboard.writeText(textToCopy).then(() => {
-        alert('Reward code copied to clipboard!');
-    }).catch(err => {
-        console.error('Could not copy text: ', err);
-    });
-});
 
 logoutBtn.addEventListener('click', async () => {
     try {
@@ -246,4 +264,39 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser = event.detail.user;
         startLoyaltyCardListener();
     });
+
+    // Check URL for stamp action (for NFC/QR integration)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('action') && urlParams.get('action') === 'stamp' && urlParams.has('storeId')) {
+        const storeIdFromUrl = urlParams.get('storeId');
+        // If user is already authenticated, directly attempt stamp.
+        // Otherwise, loyalty-auth.js will handle redirect to login, and then
+        // after login, they'll land back here and the stamp will be attempted.
+        document.addEventListener('userAuthenticatedLoyalty', async (event) => {
+             // Only attempt stamp if it hasn't been done yet on this page load
+             if (!getStampBtn.disabled && actionMessage.textContent === '') { // Simple check to prevent double stamping on redirect
+                getStampBtn.disabled = true; // Disable to prevent multiple calls
+                actionMessage.textContent = 'Processing stamp from tap...';
+                actionMessage.style.color = 'var(--dim-grey)';
+                 try {
+                    const result = await addStampCallable({ storeId: storeIdFromUrl, method: 'NFC_QR_Tap' });
+                    showMessage(actionMessage, result.data.message || 'Stamp added from tap!', false);
+                 } catch (error) {
+                    console.error('Error adding stamp from URL:', error);
+                    if (error.code === 'resource-exhausted') {
+                        const cooldownSeconds = error.details?.cooldown ? Math.ceil(error.details.cooldown) : 30;
+                        showMessage(actionMessage, `Wait ${cooldownSeconds} seconds before stamping again.`, true);
+                    } else if (error.code === 'failed-precondition') {
+                        showMessage(actionMessage, `You have an unclaimed reward. Redeem it first!`, true);
+                    } else {
+                        showMessage(actionMessage, `Failed to add stamp from tap: ${error.message}`, true);
+                    }
+                 } finally {
+                     getStampBtn.disabled = false; // Re-enable after attempt
+                     // Clean URL to prevent re-stamping on refresh
+                     history.replaceState({}, document.title, window.location.pathname);
+                 }
+            }
+        }, { once: true }); // Ensure this event listener runs only once
+    }
 });
