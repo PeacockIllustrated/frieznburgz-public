@@ -38,23 +38,46 @@ function showMessage(element, message, isError = false) {
     }
 }
 
-function renderStamps(currentStamps, totalStampsRequired) {
+function getRewardIcon(rewardId) {
+    // Map reward IDs to Font Awesome icons
+    switch (rewardId) {
+        case 'filletz_reward': return 'fa-drumstick-bite'; // Chicken/fillet icon
+        case 'burger_reward': return 'fa-burger'; // Burger icon
+        case 'coffee_reward': return 'fa-mug-hot'; // Coffee icon
+        default: return 'fa-gift'; // Generic gift icon
+    }
+}
+
+function renderStamps(currentStamps, totalStampsRequired, rewards) {
     stampDisplayGrid.innerHTML = '';
-    // Determine rows: 2 rows of 5
     const numStamps = totalStampsRequired || 10; // Default to 10 if not set
 
     for (let i = 0; i < numStamps; i++) {
         const stampCircle = document.createElement('div');
         stampCircle.classList.add('stamp-circle');
+        
+        // Check if this stamp position corresponds to a reward
+        const rewardAtThisPosition = rewards.find(r => r.threshold === (i + 1));
+
         if (i < currentStamps) {
             stampCircle.classList.add('filled');
+            // If filled, remove any potential icon to show solid stamp
+            stampCircle.innerHTML = ''; 
+        } else {
+            // If not filled, add the watermark icon for the reward if applicable
+            if (rewardAtThisPosition) {
+                const icon = getRewardIcon(rewardAtThisPosition.id);
+                stampCircle.innerHTML = `<i class="fas ${icon} reward-icon"></i>`;
+                stampCircle.setAttribute('title', `Reward at ${i + 1} stamps: ${rewardAtThisPosition.description}`);
+            } else {
+                // Optionally add a subtle number for empty stamps
+                // stampCircle.textContent = i + 1;
+            }
         }
-        // Add content for stamp number if desired, for now keep empty for visual
-        // stampCircle.textContent = i + 1; 
         stampDisplayGrid.appendChild(stampCircle);
     }
     cardStatusMessage.textContent = `You have ${currentStamps} of ${numStamps} stamps!`;
-    cardStatusMessage.style.color = 'var(--dim-grey)'; // Reset color
+    cardStatusMessage.style.color = 'var(--red)'; // Text on khaki should be red
 }
 
 function renderUnclaimedRewards(unlockedRewards) {
@@ -140,7 +163,6 @@ async function startLoyaltyCardListener() {
             return;
         }
         // For simplicity, we'll use the first active program found, or 'standard_stamps' if it exists.
-        // In a real app, users might select a program or have one assigned.
         currentLoyaltyProgram = programsSnapshot.docs.find(doc => doc.id === 'standard_stamps' && doc.data().isActive) ||
                                 programsSnapshot.docs.find(doc => doc.data().isActive);
 
@@ -162,8 +184,8 @@ async function startLoyaltyCardListener() {
         let loyaltyCardData = {
             currentStamps: 0,
             stamps: [],
-            unlockedRewards: [], // Initialize new field
-            lastClaimedRewardThreshold: 0, // Initialize new field
+            unlockedRewards: [],
+            lastClaimedRewardThreshold: 0,
             activeProgramId: currentLoyaltyProgram.id
         };
 
@@ -171,23 +193,22 @@ async function startLoyaltyCardListener() {
             loyaltyCardData = doc.data();
             // Ensure fields are present
             if (!loyaltyCardData.stamps) loyaltyCardData.stamps = [];
-            if (!loyaltyCardData.unlockedRewards) loyaltyCardData.unlockedRewards = []; // Defensive
+            if (!loyaltyCardData.unlockedRewards) loyaltyCardData.unlockedRewards = [];
             if (typeof loyaltyCardData.currentStamps !== 'number') loyaltyCardData.currentStamps = 0;
             if (typeof loyaltyCardData.lastClaimedRewardThreshold !== 'number') loyaltyCardData.lastClaimedRewardThreshold = 0;
         } else {
-            // First time user, create a blank document if it doesn't exist
-            // This set operation is now handled in loyalty-login.html and loyalty-register.html
-            // If the user navigates directly here *without* going through login/register,
-            // they wouldn't have a document. Consider if this branch is still truly needed or if
-            // the initial set in login/register is sufficient. For now, rely on auth flow.
+             // This branch should ideally not be hit if registration/login correctly creates the doc.
+             // If it is hit, it means a user authenticated without a loyalty card doc.
+             // The login.html/register.html scripts ensure the doc is created.
+             // For safety, you might want to consider creating it here too,
+             // or ensuring the auth flow is the only entry point.
              console.log("Loyalty card document does not exist for user. Relying on login/register to create it.");
-             // Optionally, if you expect users to somehow land here without a doc, you could redirect or show a message.
              showMessage(cardStatusMessage, "Your loyalty card is being set up. Please try again in a moment.", false);
              return;
         }
 
         // Render loyalty card state
-        renderStamps(loyaltyCardData.currentStamps, currentLoyaltyProgram.totalStampsRequired);
+        renderStamps(loyaltyCardData.currentStamps, currentLoyaltyProgram.totalStampsRequired, currentLoyaltyProgram.rewards);
         renderUnclaimedRewards(loyaltyCardData.unlockedRewards);
         renderStampHistory(loyaltyCardData.stamps);
         
