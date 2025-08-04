@@ -3,7 +3,7 @@ const functions = require('firebase-functions');
 // The Firebase Admin SDK to access Firestore.
 const admin = require('firebase-admin');
 // Import the CORS middleware (ensure you ran npm install cors)
-const cors = require('cors')({ origin: true });
+const cors = require('cors')({ origin: true }); // Still including for completeness, though onCall handles many cases
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
@@ -15,7 +15,7 @@ const db = admin.firestore();
 // --- Loyalty System Configuration ---
 const DEFAULT_STAMP_THRESHOLD = 5;
 const DEFAULT_REWARD_DESCRIPTION = "Free Classic Burger";
-const STAMP_COOLDOWN_SECONDS = 30; // Changed to seconds for clarity with message
+const STAMP_COOLDOWN_SECONDS = 30; // Cooldown period to prevent rapid re-stamping
 
 function generateRewardCode() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -59,9 +59,9 @@ exports.addStamp = functions.https.onCall(async (data, context) => {
                 stamps: [], // Ensure this is initialized as an empty array
                 rewardUnlocked: false,
                 rewardCode: null,
-                lastStampTime: null,
+                lastStampTime: null, // This is a top-level field, ok to be FieldValue.serverTimestamp() later
                 lastClaimed: null,
-                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                createdAt: admin.firestore.FieldValue.serverTimestamp(), // Top-level field, ok
                 lastUsedStoreId: storeId
             };
             console.log(`Creating new loyalty card for user ${userId} at store ${storeId}.`);
@@ -95,15 +95,13 @@ exports.addStamp = functions.https.onCall(async (data, context) => {
         const programDoc = await transaction.get(programRef);
 
         if (!programDoc.exists) {
-            // This is the error you were seeing. If it still happens, the 'standard_stamps' program isn't there.
             throw new functions.https.HttpsError('not-found', `Loyalty program "${programIdToUse}" not found. Please ensure it's imported.`);
         }
         const programRules = programDoc.data();
-        const stampThreshold = programRules.stampCountRequired; // Expecting this to be a number from Firestore
+        const stampThreshold = programRules.stampCountRequired;
         if (typeof stampThreshold !== 'number' || stampThreshold <= 0) {
             throw new functions.https.HttpsError('internal', `Invalid stamp threshold found for program "${programIdToUse}".`);
         }
-
 
         // If a reward is already unlocked, don't add more stamps until it's claimed
         if (loyaltyCardData.rewardUnlocked === true) {
@@ -115,20 +113,16 @@ exports.addStamp = functions.https.onCall(async (data, context) => {
 
         // Add the new stamp
         const newStamp = {
-            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            // Use admin.firestore.Timestamp.now() for timestamps within arrays
+            timestamp: admin.firestore.Timestamp.now(), // FIX: Changed from FieldValue.serverTimestamp()
             method: method || 'unknown',
             storeId: storeId
         };
-        // Note: staffId is not passed from customer app. If you need it, staff must do the stamping.
-        // If the `staffId` in the loyaltyCardData.stamps array is meant to be the staff member who *approved* the stamp,
-        // then the stamping logic needs to happen on the Admin Dashboard side.
-        // For now, assuming customer stamps themselves, so no staffId here for the stamp itself.
-        // If staff verification needed, this stamp `staffId` would be context.auth.uid of the staff.
-
-
         loyaltyCardData.stamps.push(newStamp);
         loyaltyCardData.currentStamps = (loyaltyCardData.currentStamps || 0) + 1;
-        loyaltyCardData.lastStampTime = admin.firestore.FieldValue.serverTimestamp();
+        
+        // Use FieldValue.serverTimestamp() for top-level lastStampTime
+        loyaltyCardData.lastStampTime = admin.firestore.FieldValue.serverTimestamp(); 
         loyaltyCardData.lastUsedStoreId = storeId;
 
         // Check if reward is unlocked
@@ -168,8 +162,8 @@ exports.redeemReward = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'Staff member must be authenticated to redeem a reward.');
     }
-    const staffId = context.auth.uid; // This is the staff member's UID
-    const { userId, storeId, rewardCode } = data; // userId is the CUSTOMER's UID
+    const staffId = context.auth.uid;
+    const { userId, storeId, rewardCode } = data;
 
     if (!userId || !storeId || !rewardCode) {
         throw new functions.https.HttpsError('invalid-argument', 'Customer User ID, Store ID, and Reward Code are required.');
