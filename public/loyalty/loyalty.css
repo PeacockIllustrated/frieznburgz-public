@@ -171,7 +171,7 @@ body {
 .loyalty-content {
     flex-grow: 1; /* Takes up remaining space */
     padding: 20px;
-    max-width: 600px; /* Max width for content on large screens */
+    max-width: 700px; /* Increased max-width for better use of space */
     margin: 20px auto; /* Center content */
     width: 100%;
     box-sizing: border-box;
@@ -211,8 +211,8 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: space-between; /* Distribute content vertically */
-    min-height: 280px; /* Adjusted height to accommodate content */
-    max-width: 400px; /* Constrain width for a card-like aspect ratio */
+    min-height: 260px; /* Adjusted height to accommodate content */
+    max-width: 450px; /* Increased max-width for a wider card */
     width: 100%;
     box-sizing: border-box;
     position: relative; /* For card-logo positioning */
@@ -252,8 +252,8 @@ body {
     grid-template-rows: repeat(2, 1fr); /* 2 rows */
     gap: 15px; /* Increased gap for better spacing */
     width: 100%;
-    max-width: 300px; /* Constrain overall stamp grid width */
-    height: 100%; /* Take full height of its container */
+    max-width: 350px; /* Increased max-width for wider stamp arrangement */
+    height: 100%;
 }
 
 .stamp-circle {
@@ -305,7 +305,8 @@ body {
     text-transform: uppercase;
     white-space: nowrap;
     line-height: 1.1;
-    margin-top: 20px; /* Space from stamps */
+    margin-top: auto; /* Push to bottom using auto margin */
+    margin-bottom: 0; /* Remove any default bottom margin */
     z-index: 1;
 }
 .card-bottom-text p {
@@ -466,9 +467,9 @@ body {
 
     /* Loyalty Card specific mobile adjustments */
     .loyalty-card {
-        padding: 15px; /* Adjust padding */
-        min-height: 220px; /* Further adjust height for smaller screens */
-        max-width: 320px;
+        padding: 10px; /* Slightly less padding on very small mobile */
+        min-height: 200px; /* Further adjust height for very small screens */
+        max-width: 300px; /* Adjusted max width for very small screens */
     }
     .card-logo {
         height: 30px;
@@ -484,8 +485,8 @@ body {
         padding: 0 5px; /* Reduced horizontal padding */
     }
     .stamp-display-grid {
-        gap: 10px; /* Adjust gap for smaller screens */
-        max-width: 280px;
+        gap: 8px; /* Slightly smaller gap on very small mobile for better fit */
+        max-width: 260px; /* Adjusted max-width for very small screens */
     }
     .stamp-circle {
         width: 40px;
