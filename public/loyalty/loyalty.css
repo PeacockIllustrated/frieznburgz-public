@@ -198,89 +198,186 @@ body {
     border-bottom: 1px dashed var(--salmon);
 }
 
-/* --- Loyalty Card Display --- */
+/* --- Loyalty Card Display (10-Stamp Visual) --- */
 .loyalty-card {
-    background-color: var(--yellow);
-    border: 5px solid var(--khaki);
-    border-radius: 20px;
-    padding: 25px;
+    background-color: var(--khaki); /* Match actual card background */
+    border: 5px solid var(--red); /* Match actual card border */
+    border-radius: 15px; /* Slightly less rounded than 20px for card */
+    padding: 15px; /* Adjust padding to make space for text */
     text-align: center;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative; /* For absolute positioning of vertical text */
+    height: 300px; /* Fixed height to fit the card layout */
+    overflow: hidden; /* Ensure nothing spills out */
 }
+
 .card-status-message {
     font-size: 18px;
     font-weight: bold;
-    color: var(--dim-grey);
-    margin-bottom: 20px;
+    color: var(--red); /* Text on khaki should be red */
+    margin-bottom: 15px; /* Reduced margin */
+    z-index: 1; /* Ensure it's above vertical text */
 }
+
+.card-main-display {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.friez-burgz-vertical-text {
+    position: absolute;
+    left: 10px; /* Adjust as needed */
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    transform-origin: left top;
+    white-space: nowrap;
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 24px; /* Adjust size to fit */
+    color: var(--red);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    z-index: 0;
+}
+
+.stamp-grid-container {
+    flex-grow: 1; /* Allows grid to take available space */
+    display: flex; /* To center the grid within its container */
+    justify-content: center;
+    align-items: center;
+    padding: 0 40px; /* Space for vertical text */
+    height: 100%;
+}
+
 .stamp-display-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5 stamps per row */
-    gap: 15px;
-    max-width: 350px; /* Adjust based on desired circle size */
-    margin: 0 auto;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns */
+    grid-template-rows: repeat(2, 1fr); /* 2 rows */
+    gap: 10px; /* Smaller gap between stamps */
+    width: 100%; /* Take full width of its container */
+    max-width: 300px; /* Limit overall stamp grid width */
+    height: 100%; /* Take full height of its container */
 }
+
 .stamp-circle {
-    width: 50px;
-    height: 50px;
+    width: 50px; /* Fixed size */
+    height: 50px; /* Fixed size */
     border-radius: 50%;
-    border: 3px dashed var(--salmon);
+    border: 3px dashed var(--red); /* Red dashed border for empty */
+    background-color: var(--yellow); /* White background for empty */
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 24px;
-    color: var(--dim-grey);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    color: var(--red);
+    transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    cursor: default; /* Not clickable directly */
 }
 .stamp-circle.filled {
-    background-color: var(--khaki);
-    border-color: var(--khaki);
-    color: var(--yellow);
-    box-shadow: inset 0 0 0 2px var(--khaki), 0 0 0 2px var(--khaki); /* Inner/outer border effect */
+    background-color: var(--red); /* Red background when filled */
+    border-color: var(--red);
+    color: var(--yellow); /* Yellow text when filled */
+    box-shadow: inset 0 0 0 2px var(--red), 0 0 0 2px var(--red);
+    transform: scale(1.05); /* Slight pop for filled stamp */
 }
-/* Reward Section */
-.reward-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px dashed var(--khaki);
-}
-.reward-message {
+
+.card-bottom-text {
+    position: absolute;
+    bottom: 15px; /* Adjust as needed */
+    left: 50%;
+    transform: translateX(-50%);
     font-family: 'Fraunces', serif;
     font-weight: 900;
-    font-size: 22px;
+    font-size: 22px; /* Adjust size to fit */
     color: var(--red);
+    text-transform: uppercase;
+    white-space: nowrap;
+    line-height: 1.1;
+    z-index: 1;
+}
+.card-bottom-text p {
+    margin: 0;
+}
+
+
+/* --- Unclaimed Rewards Section --- */
+.unclaimed-rewards-section {
+    background-color: var(--yellow);
+    border: 5px solid var(--success-green); /* Green border for rewards */
+    border-radius: 15px;
+    padding: 15px 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+.unclaimed-rewards-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 24px;
+    color: var(--success-green);
     margin-bottom: 15px;
 }
-.reward-code-box {
+#unclaimedRewardsList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.unclaimed-reward-item {
+    background-color: #e6ffe6; /* Light green background */
+    border: 1px dashed var(--success-green);
+    border-radius: 10px;
+    padding: 10px 15px;
+}
+.unclaimed-reward-message {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--dim-grey);
+    margin-bottom: 10px;
+}
+.reward-code-box { /* Reused from old reward section */
     background-color: var(--red);
     color: var(--yellow);
-    padding: 10px 20px;
+    padding: 10px 15px;
     border-radius: 8px;
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: 24px;
+    font-size: 20px; /* Slightly smaller for multiple codes */
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
-    margin-bottom: 10px;
+    width: fit-content;
+    margin: 0 auto;
 }
-.copy-button {
+.reward-code {
+    user-select: all; /* Allow selection for easy copy */
+}
+.copy-button { /* Reused from old reward section */
     background: none;
     border: none;
     color: var(--yellow);
-    font-size: 18px;
+    font-size: 16px; /* Slightly smaller */
     cursor: pointer;
     transition: color 0.2s ease;
 }
 .copy-button:hover { color: var(--khaki); }
+
 .reward-instruction {
     font-size: 14px;
     color: var(--salmon);
+    margin-top: 15px;
 }
+
 
 /* --- Loyalty Actions (Stamp Button) --- */
 .loyalty-actions {
@@ -361,18 +458,38 @@ body {
     .loyalty-header .header-logo { height: 30px; }
     .loyalty-header .app-name { font-size: 18px; }
     .page-title { font-size: 28px; }
-    .stamp-display-grid {
-        grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
-        gap: 10px;
-        max-width: none;
+
+    /* Loyalty Card specific mobile adjustments */
+    .loyalty-card {
+        padding: 10px;
+        height: 250px; /* Adjust height for smaller screens */
+    }
+    .card-status-message {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    .friez-burgz-vertical-text {
+        font-size: 20px;
+        left: 5px; /* Adjust more for smaller screens */
+    }
+    .stamp-grid-container {
+        padding: 0 30px; /* Reduce padding to give more space */
     }
     .stamp-circle {
         width: 40px;
         height: 40px;
         font-size: 20px;
     }
-    .reward-message { font-size: 18px; }
-    .reward-code-box { font-size: 20px; padding: 8px 15px; }
+    .card-bottom-text {
+        font-size: 18px;
+        bottom: 10px;
+    }
+
+    .unclaimed-rewards-title { font-size: 20px; }
+    .unclaimed-reward-message { font-size: 16px; }
+    .reward-code-box { font-size: 18px; padding: 6px 12px; }
+    .copy-button { font-size: 14px; }
+
     .action-button { font-size: 18px; padding: 12px 25px; }
     .section-title { font-size: 18px; }
     .history-item { font-size: 13px; }
