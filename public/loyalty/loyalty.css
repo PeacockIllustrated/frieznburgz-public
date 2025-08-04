@@ -198,72 +198,61 @@ body {
     border-bottom: 1px dashed var(--salmon);
 }
 
-/* --- Loyalty Card Display (10-Stamp Visual) --- */
+/* --- Loyalty Card Display (10-Stamp Visual - Re-imagined) --- */
 .loyalty-card {
     background-color: var(--khaki); /* Match actual card background */
     border: 5px solid var(--red); /* Match actual card border */
-    border-radius: 15px; /* Slightly less rounded than 20px for card */
-    padding: 15px; /* Adjust padding to make space for text */
+    border-radius: 15px;
+    padding: 20px; /* Increased padding for better internal spacing */
     text-align: center;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     margin-bottom: 30px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: relative; /* For absolute positioning of vertical text */
-    height: 300px; /* Fixed height to fit the card layout */
-    overflow: hidden; /* Ensure nothing spills out */
+    justify-content: space-between; /* Distribute content vertically */
+    min-height: 280px; /* Adjusted height to accommodate content */
+    max-width: 400px; /* Constrain width for a card-like aspect ratio */
+    width: 100%;
+    box-sizing: border-box;
+    position: relative; /* For card-logo positioning */
+}
+
+.card-logo {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    height: 40px; /* Size the logo to fit top-left */
+    width: auto;
+    z-index: 1;
 }
 
 .card-status-message {
+    font-family: 'Montserrat', sans-serif; /* Adjusted font */
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 800;
     color: var(--red); /* Text on khaki should be red */
-    margin-bottom: 15px; /* Reduced margin */
-    z-index: 1; /* Ensure it's above vertical text */
-}
-
-.card-main-display {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-.friez-burgz-vertical-text {
-    position: absolute;
-    left: 10px; /* Adjust as needed */
-    top: 50%;
-    transform: translateY(-50%) rotate(-90deg);
-    transform-origin: left top;
-    white-space: nowrap;
-    font-family: 'Fraunces', serif;
-    font-weight: 900;
-    font-size: 24px; /* Adjust size to fit */
-    color: var(--red);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    z-index: 0;
+    margin-top: 60px; /* Space from top logo */
+    margin-bottom: 20px;
+    z-index: 1;
 }
 
 .stamp-grid-container {
-    flex-grow: 1; /* Allows grid to take available space */
-    display: flex; /* To center the grid within its container */
+    flex-grow: 1; /* Allows grid to take available vertical space */
+    display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0 40px; /* Space for vertical text */
-    height: 100%;
+    padding: 0 10px; /* Reduced horizontal padding */
+    width: 100%;
 }
 
 .stamp-display-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr); /* 5 columns */
     grid-template-rows: repeat(2, 1fr); /* 2 rows */
-    gap: 10px; /* Smaller gap between stamps */
-    width: 100%; /* Take full width of its container */
-    max-width: 300px; /* Limit overall stamp grid width */
+    gap: 15px; /* Increased gap for better spacing */
+    width: 100%;
+    max-width: 300px; /* Constrain overall stamp grid width */
     height: 100%; /* Take full height of its container */
 }
 
@@ -279,28 +268,44 @@ body {
     font-size: 24px;
     color: var(--red);
     transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
-    cursor: default; /* Not clickable directly */
+    cursor: default;
+    position: relative; /* For watermark icon positioning */
+    overflow: hidden; /* To ensure icon doesn't spill out */
 }
+
+/* Watermark icon style */
+.stamp-circle .reward-icon {
+    font-size: 28px; /* Slightly larger icon */
+    color: rgba(var(--red), 0.3); /* Subtle red tint */
+    opacity: 0.7;
+    position: absolute; /* Center within circle */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 .stamp-circle.filled {
     background-color: var(--red); /* Red background when filled */
     border-color: var(--red);
-    color: var(--yellow); /* Yellow text when filled */
+    color: var(--yellow); /* Yellow text/icon when filled */
     box-shadow: inset 0 0 0 2px var(--red), 0 0 0 2px var(--red);
     transform: scale(1.05); /* Slight pop for filled stamp */
 }
+/* Hide watermark icon when stamp is filled */
+.stamp-circle.filled .reward-icon {
+    display: none;
+}
+
 
 .card-bottom-text {
-    position: absolute;
-    bottom: 15px; /* Adjust as needed */
-    left: 50%;
-    transform: translateX(-50%);
     font-family: 'Fraunces', serif;
     font-weight: 900;
-    font-size: 22px; /* Adjust size to fit */
+    font-size: 20px; /* Adjusted size for better fit */
     color: var(--red);
     text-transform: uppercase;
     white-space: nowrap;
     line-height: 1.1;
+    margin-top: 20px; /* Space from stamps */
     z-index: 1;
 }
 .card-bottom-text p {
@@ -461,28 +466,39 @@ body {
 
     /* Loyalty Card specific mobile adjustments */
     .loyalty-card {
-        padding: 10px;
-        height: 250px; /* Adjust height for smaller screens */
+        padding: 15px; /* Adjust padding */
+        min-height: 220px; /* Further adjust height for smaller screens */
+        max-width: 320px;
+    }
+    .card-logo {
+        height: 30px;
+        top: 10px;
+        left: 10px;
     }
     .card-status-message {
         font-size: 16px;
-        margin-bottom: 10px;
-    }
-    .friez-burgz-vertical-text {
-        font-size: 20px;
-        left: 5px; /* Adjust more for smaller screens */
+        margin-top: 50px;
+        margin-bottom: 15px;
     }
     .stamp-grid-container {
-        padding: 0 30px; /* Reduce padding to give more space */
+        padding: 0 5px; /* Reduced horizontal padding */
+    }
+    .stamp-display-grid {
+        gap: 10px; /* Adjust gap for smaller screens */
+        max-width: 280px;
     }
     .stamp-circle {
         width: 40px;
         height: 40px;
         font-size: 20px;
     }
+    .stamp-circle .reward-icon {
+        font-size: 24px;
+    }
     .card-bottom-text {
-        font-size: 18px;
+        font-size: 16px;
         bottom: 10px;
+        margin-top: 15px;
     }
 
     .unclaimed-rewards-title { font-size: 20px; }
