@@ -1,18 +1,11 @@
 // --- loyaltyManagement.js ---
 // Manages the rendering and logic for the Admin Dashboard's Loyalty Management page.
 
-// Import database and auth instances. Note: functions is not exported from firebase.js,
-// so we'll obtain the Functions service from the global firebase instance instead.
-import { db, auth } from './firebase.js';
+import { db, auth, functions } from './firebase.js'; // Import Admin SDK Firebase instances
 import { getSelectedLocation, getLocationDisplayName } from './config.js'; // For store context
 
 // DOM Elements
 const loyaltyManagementContent = document.getElementById('loyaltyManagementContent');
-
-// Obtain the Firebase Functions service via the global firebase instance. This avoids relying
-// on a non-existent named export from firebase.js. Ensure the Firebase Functions SDK is loaded
-// via script tags in index.html.
-
 
 // Callable Cloud Functions from Admin SDK for admin tasks
 const adminAdjustStampCallable = functions.httpsCallable('adminAdjustStamp');
@@ -114,11 +107,13 @@ async function searchCustomer() {
     try {
         let customerDocRef;
         // Assume searchInput is a UID first, then try email lookup if it fails.
+        // For simplicity, directly try UID first. In real app, might lookup staff/users collection.
         customerDocRef = db.collection('loyaltyCards').doc(searchInput);
         let docSnap = await customerDocRef.get();
 
         if (!docSnap.exists) {
             // If not found by UID, try by email. This requires querying the 'loyaltyCards' collection.
+            // Note: Email lookup can be slow on large collections without an index.
             const querySnapshot = await db.collection('loyaltyCards')
                                         .where('email', '==', searchInput)
                                         .limit(1)
@@ -256,6 +251,9 @@ async function handleRedeemReward() {
         redeemCodeInput.value = ''; // Clear input
 
         // Refresh customer details to show updated state (will be done by snapshot listener if active)
+        // Or re-call displayCustomerLoyaltyDetails(currentCustomerLoyaltyCard) if listener not enough
+        // The snapshot listener on the customer's loyalty card document will automatically update the UI.
+        // For admin dashboard, we need to manually re-fetch data for the currently displayed customer.
         await searchCustomer(); // Re-search to refresh data shown
 
     } catch (error) {
