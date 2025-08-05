@@ -1,7 +1,7 @@
 // --- loyaltyManagement.js ---
 // Manages the rendering and logic for the Admin Dashboard's Loyalty Management page.
 
-import { db, auth, functions } from './firebase.js'; // Import Admin SDK Firebase instances
+import { db, auth, } from './firebase.js'; // Import Admin SDK Firebase instances
 import { getSelectedLocation, getLocationDisplayName } from './config.js'; // For store context
 
 // DOM Elements
