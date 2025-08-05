@@ -2697,3 +2697,265 @@ body {
         padding: 6px 15px;
     }
 }
+
+/* --- Admin Dashboard Loyalty Management Page Styles --- */
+
+.loyalty-admin-card {
+    background-color: var(--yellow);
+    border: 5px solid var(--khaki);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center content horizontally */
+    text-align: center;
+}
+
+.loyalty-admin-card .card-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 24px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--salmon);
+    padding-bottom: 5px;
+    width: 100%; /* Ensure title spans full width */
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.loyalty-admin-card .card-title #customerNameDisplay {
+    font-size: 0.8em;
+    color: var(--dim-grey);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50%;
+}
+
+.loyalty-admin-card .input-group {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 400px; /* Constrain search input width */
+    margin-bottom: 15px;
+}
+
+.loyalty-admin-card .auth-input {
+    flex-grow: 1; /* Allow input to fill space */
+    margin-bottom: 0; /* Override default margin */
+}
+
+.loyalty-admin-card .auth-button.small-btn {
+    width: auto;
+    padding: 10px 15px;
+    font-size: 14px;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.loyalty-admin-card .auth-message {
+    margin-top: 10px;
+    width: 100%;
+}
+
+/* Customer Details Section */
+.loyalty-admin-card .current-customer-info {
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 15px;
+    color: var(--dim-grey);
+    margin-bottom: 20px;
+    border-bottom: 1px dashed var(--salmon);
+    padding-bottom: 10px;
+    width: 100%;
+}
+
+.loyalty-admin-card .stamps-overview {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.loyalty-admin-card .stamps-overview h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--dim-grey);
+    margin-bottom: 10px;
+}
+
+/* Smaller stamp grid for admin view */
+.stamp-display-grid.small-grid {
+    gap: 8px; /* Smaller gap */
+    max-width: 250px; /* Smaller overall grid width */
+    margin: 0 auto; /* Center the grid */
+}
+
+.stamp-display-grid.small-grid .stamp-circle {
+    width: 35px; /* Smaller circles */
+    height: 35px;
+    border-width: 2px;
+}
+
+.stamp-display-grid.small-grid .stamp-circle .reward-icon {
+    font-size: 20px; /* Smaller icon */
+}
+
+.loyalty-admin-card .unclaimed-rewards-admin {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.loyalty-admin-card .unclaimed-rewards-admin h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--dim-grey);
+    margin-bottom: 10px;
+}
+
+.unclaimed-rewards-list-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    background-color: var(--light-grey);
+    border-radius: 10px;
+}
+
+.unclaimed-rewards-list-admin .unclaimed-reward-item-admin {
+    background-color: var(--yellow);
+    border: 1px dashed var(--success-green);
+    border-radius: 8px;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.unclaimed-rewards-list-admin .unclaimed-reward-item-admin p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--dim-grey);
+}
+.unclaimed-rewards-list-admin .unclaimed-reward-item-admin p strong {
+    color: var(--success-green);
+}
+.unclaimed-rewards-list-admin .small-text {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+
+/* Admin Actions Grid */
+.admin-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    width: 100%;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px dashed var(--salmon);
+}
+
+.admin-action-box {
+    background-color: var(--light-grey);
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.admin-action-box h4 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--red);
+    margin-bottom: 0;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px dashed var(--salmon);
+    padding-bottom: 10px;
+}
+
+.admin-action-box .auth-input {
+    width: calc(100% - 20px);
+    margin-bottom: 0; /* Override default */
+}
+
+.admin-action-box .auth-button {
+    width: 100%;
+    font-size: 16px;
+    padding: 10px 20px;
+}
+
+/* Full History Section */
+.loyalty-history-admin {
+    width: 100%;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px dashed var(--salmon);
+}
+
+.loyalty-history-admin .section-title {
+    text-align: center;
+}
+
+.loyalty-history-admin .stamp-history-list .history-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.loyalty-history-admin .stamp-history-list .history-item .history-date {
+    font-weight: bold;
+    color: var(--red);
+    margin-bottom: 5px;
+}
+.loyalty-history-admin .stamp-history-list .history-item .history-description {
+    font-size: 1em;
+    color: var(--dim-grey);
+}
+
+/* Responsive adjustments for admin loyalty page */
+@media screen and (max-width: 768px) {
+    .loyalty-admin-card {
+        padding: 15px;
+    }
+    .loyalty-admin-card .card-title {
+        font-size: 20px;
+    }
+    .loyalty-admin-card .current-customer-info,
+    .loyalty-admin-card .stamps-overview h4,
+    .admin-action-box h4 {
+        font-size: 16px;
+    }
+    .admin-actions-grid {
+        grid-template-columns: 1fr; /* Stack actions vertically on smaller screens */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .loyalty-admin-card .card-title {
+        font-size: 18px;
+    }
+    .loyalty-admin-card .auth-button.small-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    .loyalty-admin-card .auth-input,
+    .admin-action-box .auth-input {
+        font-size: 14px;
+        padding: 10px;
+    }
+    .admin-action-box h4 {
+        font-size: 18px;
+    }
+    .admin-action-box .auth-button {
+        font-size: 14px;
+        padding: 8px 15px;
+    }
+}
