@@ -12,7 +12,7 @@ const loyaltyManagementContent = document.getElementById('loyaltyManagementConte
 // Obtain the Firebase Functions service via the global firebase instance. This avoids relying
 // on a non-existent named export from firebase.js. Ensure the Firebase Functions SDK is loaded
 // via script tags in index.html.
-const functions = firebase.functions();
+
 
 // Callable Cloud Functions from Admin SDK for admin tasks
 const adminAdjustStampCallable = functions.httpsCallable('adminAdjustStamp');
