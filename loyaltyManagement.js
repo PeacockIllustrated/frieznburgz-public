@@ -30,7 +30,7 @@ export async function renderLoyaltyManagementPage() {
         <div class="loyalty-admin-card">
             <h3 class="card-title">Find Customer Loyalty Card</h3>
             <div class="input-group">
-                <input type="text" id="customerSearchInput" placeholder="Enter customer email or UID" class="auth-input">
+                <input type="text" id="customerSearchInput" placeholder="Enter customer email, name, or UID" class="auth-input">
                 <button id="searchCustomerBtn" class="auth-button small-btn"><i class="fas fa-search"></i> Search</button>
             </div>
             <p id="searchMessage" class="auth-message"></p>
@@ -88,7 +88,7 @@ export async function renderLoyaltyManagementPage() {
 }
 
 /**
- * Searches for a customer's loyalty card by email or UID.
+ * Searches for a customer's loyalty card by email, name or UID.
  */
 async function searchCustomer() {
     const searchInput = document.getElementById('customerSearchInput').value.trim();
@@ -100,37 +100,44 @@ async function searchCustomer() {
     currentCustomerLoyaltyCard = null; // Clear previous customer data
 
     if (!searchInput) {
-        searchMessage.textContent = 'Please enter an email or UID.';
+        searchMessage.textContent = 'Please enter an email, name, or UID.';
         return;
     }
 
     try {
-        let customerDocRef;
-        // Assume searchInput is a UID first, then try email lookup if it fails.
-        // For simplicity, directly try UID first. In real app, might lookup staff/users collection.
-        customerDocRef = db.collection('loyaltyCards').doc(searchInput);
-        let docSnap = await customerDocRef.get();
+        let docSnap = null;
+        const loyaltyCardsCollection = db.collection('loyaltyCards');
 
-        if (!docSnap.exists) {
-            // If not found by UID, try by email. This requires querying the 'loyaltyCards' collection.
-            // Note: Email lookup can be slow on large collections without an index.
-            const querySnapshot = await db.collection('loyaltyCards')
-                                        .where('email', '==', searchInput)
-                                        .limit(1)
-                                        .get();
-            if (!querySnapshot.empty) {
-                docSnap = querySnapshot.docs[0];
-                customerDocRef = docSnap.ref; // Update ref to the found doc
+        // Attempt 1: Search by UID
+        const docById = await loyaltyCardsCollection.doc(searchInput).get();
+        if (docById.exists) {
+            docSnap = docById;
+        }
+
+        // Attempt 2: Search by Email (if not found by UID)
+        if (!docSnap) {
+            const queryByEmail = await loyaltyCardsCollection.where('email', '==', searchInput).limit(1).get();
+            if (!queryByEmail.empty) {
+                docSnap = queryByEmail.docs[0];
+            }
+        }
+        
+        // Attempt 3: Search by Full Name (if still not found)
+        if (!docSnap) {
+            const queryByName = await loyaltyCardsCollection.where('fullName', '==', searchInput).limit(1).get();
+            if (!queryByName.empty) {
+                docSnap = queryByName.docs[0];
             }
         }
 
-        if (docSnap.exists) {
+
+        if (docSnap && docSnap.exists) {
             currentCustomerLoyaltyCard = { id: docSnap.id, ...docSnap.data() };
             searchMessage.textContent = '';
             displayCustomerLoyaltyDetails(currentCustomerLoyaltyCard);
             customerLoyaltyDetails.style.display = 'block';
         } else {
-            searchMessage.textContent = 'Customer loyalty card not found. Check email/UID.';
+            searchMessage.textContent = 'Customer loyalty card not found. Check email/name/UID.';
         }
     } catch (error) {
         console.error('Error searching customer:', error);
@@ -143,8 +150,8 @@ async function searchCustomer() {
  * @param {Object} customerData - The loyalty card document data.
  */
 async function displayCustomerLoyaltyDetails(customerData) {
-    document.getElementById('customerNameDisplay').textContent = `- ${customerData.fullName || customerData.email || customerData.id}`;
-    document.getElementById('currentCustomerInfo').textContent = `Email: ${customerData.email || 'N/A'} | UID: ${customerData.id}`;
+    document.getElementById('customerNameDisplay').textContent = `- ${customerData.fullName || customerData.email || 'Customer'}`;
+    document.getElementById('currentCustomerInfo').textContent = `Name: ${customerData.fullName || 'N/A'} | Email: ${customerData.email || 'N/A'} | UID: ${customerData.id}`;
     document.getElementById('currentStampsDisplay').textContent = customerData.currentStamps;
 
     // Fetch and display program rules for total stamps required and rewards
@@ -159,7 +166,7 @@ async function displayCustomerLoyaltyDetails(customerData) {
     }
     document.getElementById('totalStampsRequiredDisplay').textContent = programRules.totalStampsRequired;
 
-    // Render stamp circles for admin view (reusing logic but different DOM element)
+    // Render stamp circles for admin view
     renderAdminStamps(customerData.currentStamps, programRules.totalStampsRequired, programRules.rewards);
     
     // Display unclaimed rewards
@@ -170,11 +177,24 @@ async function displayCustomerLoyaltyDetails(customerData) {
             const rewardItem = document.createElement('div');
             rewardItem.classList.add('unclaimed-reward-item-admin');
             rewardItem.innerHTML = `
-                <p><strong>${reward.description}</strong> (Code: ${reward.rewardCode})</p>
-                <p class="small-text">Unlocked: ${reward.unlockedAt ? reward.unlockedAt.toDate().toLocaleString() : 'N/A'}</p>
+                <div class="reward-info">
+                    <p><strong>${reward.description}</strong> (Code: ${reward.rewardCode})</p>
+                    <p class="small-text">Unlocked: ${reward.unlockedAt ? reward.unlockedAt.toDate().toLocaleString() : 'N/A'}</p>
+                </div>
+                <button class="auth-button small-btn quick-redeem-btn" data-code="${reward.rewardCode}">Quick Redeem</button>
             `;
             unclaimedRewardsAdminList.appendChild(rewardItem);
         });
+
+        // Add event listeners for the new "Quick Redeem" buttons
+        document.querySelectorAll('.quick-redeem-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const rewardCode = event.currentTarget.dataset.code;
+                document.getElementById('redeemCodeInput').value = rewardCode;
+                handleRedeemReward(); // Automatically trigger the redeem function
+            });
+        });
+
     } else {
         unclaimedRewardsAdminList.innerHTML = '<p>No unclaimed rewards for this customer.</p>';
     }
@@ -201,13 +221,11 @@ function renderAdminStamps(currentStamps, totalStampsRequired, rewards) {
             stampCircle.classList.add('filled');
         } else {
             if (rewardAtThisPosition) {
-                // You might need a fa icon map here similar to loyalty.js, or just use a generic icon
                 let icon = '';
                 if (rewardAtThisPosition.id === 'filletz_reward') icon = 'fa-drumstick-bite';
                 else if (rewardAtThisPosition.id === 'burger_reward') icon = 'fa-burger';
                 else if (rewardAtThisPosition.id === 'coffee_reward') icon = 'fa-mug-hot';
                 else icon = 'fa-gift';
-
                 stampCircle.innerHTML = `<i class="fas ${icon} reward-icon"></i>`;
             }
         }
@@ -235,7 +253,7 @@ async function handleRedeemReward() {
 
     redeemMessage.textContent = 'Processing redemption...';
     try {
-        const selectedLocationId = getSelectedLocation(); // Get current admin's selected location
+        const selectedLocationId = getSelectedLocation(); 
         if (!selectedLocationId) {
             redeemMessage.textContent = 'Please select a location in the header first.';
             return;
@@ -250,11 +268,8 @@ async function handleRedeemReward() {
         redeemMessage.textContent = result.data.message;
         redeemCodeInput.value = ''; // Clear input
 
-        // Refresh customer details to show updated state (will be done by snapshot listener if active)
-        // Or re-call displayCustomerLoyaltyDetails(currentCustomerLoyaltyCard) if listener not enough
-        // The snapshot listener on the customer's loyalty card document will automatically update the UI.
-        // For admin dashboard, we need to manually re-fetch data for the currently displayed customer.
-        await searchCustomer(); // Re-search to refresh data shown
+        // Re-search to refresh data shown
+        await searchCustomer(); 
 
     } catch (error) {
         console.error('Error redeeming reward:', error);
@@ -298,8 +313,7 @@ async function handleAdminAdjustStamps() {
         adjustStampInput.value = '';
         adjustReasonInput.value = '';
 
-        // Refresh customer details
-        await searchCustomer(); // Re-search to refresh data shown
+        await searchCustomer();
 
     } catch (error) {
         console.error('Error adjusting stamps:', error);
@@ -315,12 +329,10 @@ async function displayFullHistory(userId) {
     fullHistoryList.innerHTML = '<li>Loading full history...</li>';
 
     try {
-        // Fetch loyalty card data (it contains the stamps array)
         const loyaltyCardDoc = await db.collection('loyaltyCards').doc(userId).get();
         const loyaltyCardData = loyaltyCardDoc.data();
         const stamps = loyaltyCardData?.stamps || [];
 
-        // Fetch redemption history
         const redemptionSnapshot = await db.collection('rewardsRedeemed')
                                             .where('userId', '==', userId)
                                             .orderBy('redeemedAt', 'desc')
@@ -330,7 +342,6 @@ async function displayFullHistory(userId) {
         const combinedHistory = [];
 
         stamps.forEach(stamp => {
-            // Ensure stamp timestamp is a Timestamp object
             const timestamp = stamp.timestamp instanceof firebase.firestore.Timestamp ? stamp.timestamp : (stamp.timestamp ? new firebase.firestore.Timestamp(stamp.timestamp.seconds, stamp.timestamp.nanoseconds) : null);
             if (timestamp) {
                  combinedHistory.push({
@@ -354,7 +365,6 @@ async function displayFullHistory(userId) {
             }
         });
 
-        // Sort by timestamp (most recent first)
         combinedHistory.sort((a, b) => b.timestamp - a.timestamp);
 
         fullHistoryList.innerHTML = '';
@@ -363,7 +373,11 @@ async function displayFullHistory(userId) {
         } else {
             combinedHistory.forEach(entry => {
                 const li = document.createElement('li');
-                li.classList.add('history-item', entry.type === 'redeemed' ? 'redeemed' : '');
+                li.classList.add('history-item');
+                // *** FIX: Only add 'redeemed' class if it exists to prevent error ***
+                if (entry.type === 'redeemed') {
+                    li.classList.add('redeemed');
+                }
                 li.innerHTML = `
                     <span class="history-date">${entry.date}:</span> 
                     <span class="history-description">${entry.details}</span>
