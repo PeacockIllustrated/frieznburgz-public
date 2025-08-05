@@ -23,6 +23,7 @@ import { renderSuppliersPage } from './suppliers.js';
 import { renderOrdersPage } from './orders.js';
 import { renderStaffPage } from './staff.js';
 import { renderSettingsPage } from './settings.js'; // NEW IMPORT
+import { renderLoyaltyManagementPage } from './loyaltyManagement.js';
 
 // --- DOM Elements (centralized for main.js's direct use) ---
 const logoutBtn = document.getElementById('logoutBtn');
@@ -160,6 +161,10 @@ async function renderPageContent(pageId) {
             break;
         case 'staff':
             await renderStaffPage();
+            break;
+        case 'loyalty-management': // NEW CASE
+            await renderLoyaltyManagementPage();
+            console.log('Rendering Loyalty Management page...');
             break;
         case 'wastage-log':
             await renderWastageLogPage();
