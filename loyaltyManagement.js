@@ -9,7 +9,7 @@ const loyaltyManagementContent = document.getElementById('loyaltyManagementConte
 
 // Callable Cloud Functions from Admin SDK for admin tasks
 const adminAdjustStampCallable = functions.httpsCallable('adminAdjustStamp');
-const redeemRewardCallable = functions.httpsCallable('redeemReward'); // Reusing existing one
+const redeemRewardCallable = functions.httpsCallable('redeemReward');
 
 // State
 let currentCustomerLoyaltyCard = null; // The loyalty card currently being viewed/managed
@@ -27,6 +27,16 @@ export async function renderLoyaltyManagementPage() {
         <h2 class="page-title">Loyalty Management</h2>
         <p>Manage customer loyalty cards for ${locationName}.</p>
 
+        <!-- NEW: Quick Redeem Section -->
+        <div class="loyalty-admin-card quick-redeem-card">
+            <h3 class="card-title"><i class="fas fa-bolt"></i> Quick Redeem</h3>
+            <div class="input-group">
+                <input type="text" id="quickRedeemCodeInput" placeholder="Enter customer's reward code..." class="auth-input">
+                <button id="quickRedeemVerifyBtn" class="auth-button small-btn">Verify</button>
+            </div>
+            <p id="quickRedeemMessage" class="auth-message"></p>
+        </div>
+
         <div class="loyalty-admin-card">
             <h3 class="card-title">Find Customer Loyalty Card</h3>
             <div class="input-group">
@@ -39,21 +49,14 @@ export async function renderLoyaltyManagementPage() {
         <div id="customerLoyaltyDetails" class="loyalty-admin-card" style="display: none;">
             <h3 class="card-title">Customer Loyalty Details <span id="customerNameDisplay"></span></h3>
             <p class="current-customer-info" id="currentCustomerInfo"></p>
-
             <div class="stamps-overview">
                 <h4>Current Stamps: <span id="currentStampsDisplay">0</span> / <span id="totalStampsRequiredDisplay">0</span></h4>
-                <div class="stamp-display-grid small-grid" id="adminStampDisplayGrid">
-                    <!-- Stamps will be rendered here -->
-                </div>
+                <div class="stamp-display-grid small-grid" id="adminStampDisplayGrid"></div>
             </div>
-
             <div class="unclaimed-rewards-admin">
                 <h4>Unclaimed Rewards:</h4>
-                <div id="unclaimedRewardsAdminList" class="unclaimed-rewards-list-admin">
-                    <p>No unclaimed rewards.</p>
-                </div>
+                <div id="unclaimedRewardsAdminList" class="unclaimed-rewards-list-admin"></div>
             </div>
-
             <div class="admin-actions-grid">
                 <div class="admin-action-box">
                     <h4>Redeem Reward</h4>
@@ -69,23 +72,130 @@ export async function renderLoyaltyManagementPage() {
                     <p id="adjustMessage" class="auth-message"></p>
                 </div>
             </div>
-
             <div class="loyalty-history-admin">
                 <h3 class="section-title">Full Stamp & Redemption History</h3>
-                <ul id="fullHistoryList" class="stamp-history-list">
-                    <li>Loading history...</li>
-                </ul>
+                <ul id="fullHistoryList" class="stamp-history-list"></ul>
             </div>
         </div>
     `;
 
     // Attach event listeners
+    document.getElementById('quickRedeemVerifyBtn').addEventListener('click', handleQuickRedeemSearch);
     document.getElementById('searchCustomerBtn').addEventListener('click', searchCustomer);
     document.getElementById('redeemRewardBtn').addEventListener('click', handleRedeemReward);
     document.getElementById('adjustStampsBtn').addEventListener('click', handleAdminAdjustStamps);
-
-    console.log('Loyalty Management page rendered.');
 }
+
+/**
+ * NEW: Searches for a customer by their reward code and opens a verification modal.
+ */
+async function handleQuickRedeemSearch() {
+    const codeInput = document.getElementById('quickRedeemCodeInput');
+    const messageEl = document.getElementById('quickRedeemMessage');
+    const rewardCode = codeInput.value.trim();
+
+    if (!rewardCode) {
+        messageEl.textContent = 'Please enter a reward code.';
+        return;
+    }
+
+    messageEl.textContent = 'Verifying code...';
+
+    try {
+        // This query scans the entire collection.
+        const loyaltyCardsSnapshot = await db.collection('loyaltyCards').get();
+        let foundCustomer = null;
+        let foundReward = null;
+
+        loyaltyCardsSnapshot.forEach(doc => {
+            const cardData = doc.data();
+            if (cardData.unlockedRewards && Array.isArray(cardData.unlockedRewards)) {
+                const reward = cardData.unlockedRewards.find(r => r.rewardCode === rewardCode);
+                if (reward) {
+                    foundCustomer = { id: doc.id, ...cardData };
+                    foundReward = reward;
+                }
+            }
+        });
+
+        if (foundCustomer && foundReward) {
+            messageEl.textContent = '';
+            openVerificationModal(foundCustomer, foundReward);
+        } else {
+            messageEl.textContent = 'Invalid or already redeemed code.';
+        }
+    } catch (error) {
+        console.error('Error during quick redeem search:', error);
+        messageEl.textContent = `Error: ${error.message}`;
+    }
+}
+
+/**
+ * NEW: Opens a modal to verify customer details before redeeming.
+ */
+function openVerificationModal(customer, reward) {
+    const title = 'Verify Reward Redemption';
+    const bodyHtml = `
+        <div class="verification-details">
+            <p><strong>Customer:</strong> ${customer.fullName || 'N/A'}</p>
+            <p><strong>Email:</strong> ${customer.email || 'N/A'}</p>
+            <p class="reward-to-redeem"><strong>Reward:</strong> ${reward.description}</p>
+        </div>
+    `;
+    const footerHtml = `
+        <button id="modalConfirmRedeemBtn" class="auth-button">Confirm & Redeem</button>
+        <button id="modalCancelBtn" class="auth-button secondary-btn">Cancel</button>
+    `;
+
+    window.mainApp.openModal(title, bodyHtml, footerHtml);
+
+    document.getElementById('modalCancelBtn').addEventListener('click', window.mainApp.closeModal);
+    document.getElementById('modalConfirmRedeemBtn').addEventListener('click', () => {
+        executeQuickRedemption(customer.id, reward.rewardCode);
+    });
+}
+
+/**
+ * NEW: Executes the final redemption from the verification modal.
+ */
+async function executeQuickRedemption(userId, rewardCode) {
+    const modalMessage = document.getElementById('modalMessage');
+    const modalFooter = document.getElementById('modalFooter');
+    modalFooter.style.display = 'none'; // Hide buttons during processing
+    modalMessage.textContent = 'Processing redemption...';
+    modalMessage.style.display = 'block';
+
+    const selectedLocationId = getSelectedLocation();
+    if (!selectedLocationId) {
+        modalMessage.textContent = 'Error: No location selected in header.';
+        modalFooter.style.display = 'flex';
+        return;
+    }
+
+    try {
+        const result = await redeemRewardCallable({
+            userId: userId,
+            storeId: selectedLocationId,
+            rewardCode: rewardCode
+        });
+
+        modalMessage.textContent = result.data.message;
+        document.getElementById('quickRedeemCodeInput').value = ''; // Clear input on success
+
+        // If the main customer details were visible, refresh them.
+        if (currentCustomerLoyaltyCard && currentCustomerLoyaltyCard.id === userId) {
+            await searchCustomer();
+        }
+
+        setTimeout(() => window.mainApp.closeModal(), 2000);
+
+    } catch (error) {
+        console.error('Error during quick redemption:', error);
+        modalMessage.textContent = `Redemption failed: ${error.message}`;
+        modalFooter.style.display = 'flex';
+    }
+}
+
 
 /**
  * Searches for a customer's loyalty card by email, name or UID.
@@ -129,7 +239,6 @@ async function searchCustomer() {
                 docSnap = queryByName.docs[0];
             }
         }
-
 
         if (docSnap && docSnap.exists) {
             currentCustomerLoyaltyCard = { id: docSnap.id, ...docSnap.data() };
@@ -232,7 +341,6 @@ function renderAdminStamps(currentStamps, totalStampsRequired, rewards) {
         adminStampDisplayGrid.appendChild(stampCircle);
     }
 }
-
 
 /**
  * Handles reward redemption by an admin.
@@ -374,7 +482,6 @@ async function displayFullHistory(userId) {
             combinedHistory.forEach(entry => {
                 const li = document.createElement('li');
                 li.classList.add('history-item');
-                // *** FIX: Only add 'redeemed' class if it exists to prevent error ***
                 if (entry.type === 'redeemed') {
                     li.classList.add('redeemed');
                 }
