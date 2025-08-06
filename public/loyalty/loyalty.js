@@ -17,7 +17,6 @@ const overlayProcessingContent = document.getElementById('overlay-processing');
 const overlaySuccessContent = document.getElementById('overlay-success');
 const overlayErrorContent = document.getElementById('overlay-error');
 const overlayErrorMessage = document.getElementById('overlay-error-message');
-// NEW: Gamification Elements
 const streakDisplay = document.getElementById('streak-display');
 const trophyCase = document.getElementById('trophy-case');
 
@@ -138,16 +137,22 @@ async function fetchAndRenderTrophies() {
 async function startLoyaltyCardListener() {
     if (unsubscribeLoyaltyCard) unsubscribeLoyaltyCard();
 
-    // Fetch program rules once
+    // *** FIX IS HERE ***
+    // Instead of using a hardcoded ID, we fetch the first active program.
     try {
-        const programDoc = await db.collection('loyaltyPrograms').doc(DEFAULT_PROGRAM_ID).get();
-        currentLoyaltyProgram = programDoc.exists ? programDoc.data() : null;
-        if (!currentLoyaltyProgram) {
+        const programsSnapshot = await db.collection('loyaltyPrograms')
+            .where('isActive', '==', true)
+            .limit(1)
+            .get();
+        
+        if (programsSnapshot.empty) {
             showMessage(cardStatusMessage, "No active loyalty programs found.", true);
             return;
         }
+        currentLoyaltyProgram = programsSnapshot.docs[0].data(); // Get the data from the first active program
     } catch (error) {
         console.error("Error fetching loyalty programs:", error);
+        showMessage(cardStatusMessage, "Error loading loyalty programs.", true);
         return;
     }
 
@@ -167,11 +172,9 @@ async function startLoyaltyCardListener() {
         renderStamps(cardData.currentStamps, currentLoyaltyProgram.totalStampsRequired, currentLoyaltyProgram.rewards);
         renderGamification(cardData.currentStreak, cardData.completedCardCount);
         renderUnclaimedRewards(cardData.unlockedRewards);
-        // History and Trophies are now in separate sections, no need to re-render them here.
         
     }, (error) => console.error("Error listening to loyalty card changes:", error));
     
-    // Initial fetch for history sections that don't need real-time updates
     fetchAndRenderTrophies();
 }
 
@@ -186,20 +189,55 @@ async function processStampAttempt(storeId, method) {
 
     try {
         await addStampCallable({ storeId, method });
+        
         overlayProcessingContent.style.display = 'none';
         overlaySuccessContent.style.display = 'block';
+
     } catch (error) {
         console.error('Error adding stamp:', error);
+        
         overlayProcessingContent.style.display = 'none';
         overlayErrorContent.style.display = 'block';
         overlayErrorMessage.textContent = error.message || 'Stamp Failed';
         loyaltyCardElement.classList.add('stamp-failure-animation');
         setTimeout(() => loyaltyCardElement.classList.remove('stamp-failure-animation'), 600);
+
     } finally {
         setTimeout(() => {
             processingOverlay.classList.remove('visible');
-            // Re-enabling is handled by the renderStamps function based on whether the card is full
+            // Re-enabling is handled by the renderStamps function
         }, 1500);
+    }
+}
+
+
+function renderUnclaimedRewards(unlockedRewards) {
+    unclaimedRewardsList.innerHTML = '';
+    if (unlockedRewards && unlockedRewards.length > 0) {
+        unclaimedRewardsSection.style.display = 'block';
+        unlockedRewards.forEach(reward => {
+            const rewardItem = document.createElement('div');
+            rewardItem.classList.add('unclaimed-reward-item');
+            rewardItem.innerHTML = `
+                <p class="unclaimed-reward-message">🎉 ${reward.description} Unlocked!</p>
+                <div class="reward-code-box">
+                    <span class="reward-code">${reward.rewardCode}</span>
+                    <button class="copy-button" data-code="${reward.rewardCode}"><i class="fas fa-copy"></i></button>
+                </div>
+            `;
+            unclaimedRewardsList.appendChild(rewardItem);
+        });
+
+        document.querySelectorAll('.unclaimed-reward-item .copy-button').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const codeToCopy = event.currentTarget.dataset.code;
+                navigator.clipboard.writeText(codeToCopy).then(() => {
+                    alert('Reward code copied to clipboard!');
+                }).catch(err => console.error('Could not copy text: ', err));
+            });
+        });
+    } else {
+        unclaimedRewardsSection.style.display = 'none';
     }
 }
 
