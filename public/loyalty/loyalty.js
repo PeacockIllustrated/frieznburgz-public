@@ -11,14 +11,15 @@ const unclaimedRewardsSection = document.getElementById('unclaimedRewardsSection
 const unclaimedRewardsList = document.getElementById('unclaimedRewardsList');
 const getStampBtn = document.getElementById('getStampBtn');
 const actionMessage = document.getElementById('actionMessage');
-const stampHistoryList = document.getElementById('stampHistoryList');
-const redemptionHistoryList = document.getElementById('redemptionHistoryList');
 const logoutBtn = document.getElementById('logoutBtn');
 const processingOverlay = document.getElementById('processing-overlay');
 const overlayProcessingContent = document.getElementById('overlay-processing');
 const overlaySuccessContent = document.getElementById('overlay-success');
 const overlayErrorContent = document.getElementById('overlay-error');
 const overlayErrorMessage = document.getElementById('overlay-error-message');
+// NEW: Gamification Elements
+const streakDisplay = document.getElementById('streak-display');
+const trophyCase = document.getElementById('trophy-case');
 
 // Firebase Cloud Functions Callable
 const addStampCallable = functions.httpsCallable('addStamp');
@@ -50,6 +51,8 @@ function getRewardIcon(rewardId) {
     }
 }
 
+// --- NEW/UPDATED RENDERING FUNCTIONS ---
+
 function renderStamps(currentStamps, totalStampsRequired, rewards) {
     stampDisplayGrid.innerHTML = '';
     const numStamps = totalStampsRequired || 10;
@@ -58,7 +61,6 @@ function renderStamps(currentStamps, totalStampsRequired, rewards) {
         const stampCircle = document.createElement('div');
         stampCircle.classList.add('stamp-circle');
         const rewardAtThisPosition = rewards.find(r => r.threshold === (i + 1));
-
         if (i < currentStamps) {
             stampCircle.classList.add('filled');
         } else {
@@ -70,125 +72,109 @@ function renderStamps(currentStamps, totalStampsRequired, rewards) {
         }
         stampDisplayGrid.appendChild(stampCircle);
     }
-    cardStatusMessage.textContent = `You have ${currentStamps} of ${numStamps} stamps!`;
+    
+    if (currentStamps >= totalStampsRequired) {
+        cardStatusMessage.textContent = 'Card Complete! Redeem your reward!';
+        getStampBtn.disabled = true;
+        getStampBtn.textContent = 'Card Full';
+    } else {
+        cardStatusMessage.textContent = `You have ${currentStamps} of ${numStamps} stamps!`;
+        getStampBtn.disabled = false;
+        getStampBtn.innerHTML = '<i class="fas fa-hand-point-up"></i> Get My Stamp';
+    }
     cardStatusMessage.style.color = 'var(--red)';
 }
 
-function renderUnclaimedRewards(unlockedRewards) {
-    unclaimedRewardsList.innerHTML = '';
-    if (unlockedRewards && unlockedRewards.length > 0) {
-        unclaimedRewardsSection.style.display = 'block';
-        unlockedRewards.forEach(reward => {
-            const rewardItem = document.createElement('div');
-            rewardItem.classList.add('unclaimed-reward-item');
-            rewardItem.innerHTML = `
-                <p class="unclaimed-reward-message">🎉 ${reward.description} Unlocked!</p>
-                <div class="reward-code-box">
-                    <span class="reward-code">${reward.rewardCode}</span>
-                    <button class="copy-button" data-code="${reward.rewardCode}"><i class="fas fa-copy"></i></button>
-                </div>
-            `;
-            unclaimedRewardsList.appendChild(rewardItem);
-        });
-
-        document.querySelectorAll('.unclaimed-reward-item .copy-button').forEach(button => {
-            button.addEventListener('click', (event) => {
-                const codeToCopy = event.currentTarget.dataset.code;
-                navigator.clipboard.writeText(codeToCopy).then(() => {
-                    alert('Reward code copied to clipboard!');
-                }).catch(err => console.error('Could not copy text: ', err));
-            });
-        });
-    } else {
-        unclaimedRewardsSection.style.display = 'none';
-    }
+function renderGamification(streak, completedCards) {
+    streakDisplay.innerHTML = `
+        <i class="fas fa-fire-alt streak-icon"></i>
+        <div class="streak-text">
+            <span class="streak-count">${streak || 0}</span>
+            <span class="streak-label">Day Streak</span>
+        </div>
+    `;
+    trophyCase.innerHTML = `
+        <i class="fas fa-trophy trophy-icon"></i>
+        <div class="trophy-text">
+            <span class="trophy-count">${completedCards || 0}</span>
+            <span class="trophy-label">Cards Completed</span>
+        </div>
+    `;
 }
 
-function renderStampHistory(stamps) {
-    stampHistoryList.innerHTML = '';
-    if (stamps && stamps.length > 0) {
-        stamps.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
-        stamps.forEach(stamp => {
+async function fetchAndRenderTrophies() {
+    const trophyList = document.getElementById('trophy-list');
+    if (!trophyList) return;
+    
+    trophyList.innerHTML = '<li>Loading trophies...</li>';
+    try {
+        const trophySnapshot = await db.collection('completedLoyaltyCards')
+            .where('userId', '==', currentUser.uid)
+            .orderBy('completedAt', 'desc')
+            .limit(5)
+            .get();
+        
+        if (trophySnapshot.empty) {
+            trophyList.innerHTML = '<li>No completed cards yet. Fill one up to earn a trophy!</li>';
+            return;
+        }
+
+        trophyList.innerHTML = '';
+        trophySnapshot.forEach(doc => {
+            const trophy = doc.data();
+            const date = trophy.completedAt.toDate().toLocaleDateString();
             const li = document.createElement('li');
-            li.classList.add('history-item');
-            const date = stamp.timestamp ? stamp.timestamp.toDate().toLocaleString() : 'N/A';
-            li.innerHTML = `Stamp added at ${date} <span class="history-detail"> (Store: ${stamp.storeId || 'Unknown'}, Method: ${stamp.method || 'Unknown'})</span>`;
-            stampHistoryList.appendChild(li);
+            li.classList.add('trophy-item');
+            li.innerHTML = `<i class="fas fa-award"></i> <span>${trophy.programName || 'Loyalty Card'} completed on ${date}</span>`;
+            trophyList.appendChild(li);
         });
-    } else {
-        stampHistoryList.innerHTML = '<li>No stamps recorded yet.</li>';
+    } catch (error) {
+        console.error("Error fetching trophies:", error);
+        trophyList.innerHTML = '<li>Could not load trophy history.</li>';
     }
 }
 
-function renderRedemptionHistory(redemptions) {
-    redemptionHistoryList.innerHTML = '';
-    if (redemptions && redemptions.length > 0) {
-        redemptions.sort((a, b) => b.redeemedAt.toMillis() - a.redeemedAt.toMillis());
-        redemptions.forEach(redemption => {
-            const li = document.createElement('li');
-            li.classList.add('history-item', 'redeemed');
-            const date = redemption.redeemedAt ? redemption.redeemedAt.toDate().toLocaleString() : 'N/A';
-            li.innerHTML = `Reward "${redemption.rewardDescription}" redeemed on ${date} <span class="history-detail"> (Store: ${redemption.storeId || 'Unknown'})</span>`;
-            redemptionHistoryList.appendChild(li);
-        });
-    } else {
-        redemptionHistoryList.innerHTML = '<li>No rewards redeemed yet.</li>';
-    }
-}
-
-// --- Main Loyalty Card Listener & Renderer ---
+// --- Main Listener ---
 async function startLoyaltyCardListener() {
     if (unsubscribeLoyaltyCard) unsubscribeLoyaltyCard();
 
+    // Fetch program rules once
     try {
-        const programsSnapshot = await db.collection('loyaltyPrograms').get();
-        const standardProgramDoc = programsSnapshot.docs.find(doc => doc.id === 'standard_stamps' && doc.data().isActive);
-        currentLoyaltyProgram = standardProgramDoc ? standardProgramDoc.data() : null;
-
+        const programDoc = await db.collection('loyaltyPrograms').doc(DEFAULT_PROGRAM_ID).get();
+        currentLoyaltyProgram = programDoc.exists ? programDoc.data() : null;
         if (!currentLoyaltyProgram) {
             showMessage(cardStatusMessage, "No active loyalty programs found.", true);
             return;
         }
     } catch (error) {
         console.error("Error fetching loyalty programs:", error);
-        showMessage(cardStatusMessage, "Error loading loyalty programs.", true);
         return;
     }
 
     loyaltyCardRef = db.collection('loyaltyCards').doc(currentUser.uid);
     unsubscribeLoyaltyCard = loyaltyCardRef.onSnapshot(async (doc) => {
-        let loyaltyCardData = { currentStamps: 0, stamps: [], unlockedRewards: [] };
+        let cardData = { currentStamps: 0, stamps: [], unlockedRewards: [], currentStreak: 0, completedCardCount: 0 };
         if (doc.exists) {
-            loyaltyCardData = doc.data();
-            // Check for new stamp and animate if needed
-            if (loyaltyCardData.currentStamps > currentStampCount) {
+            cardData = doc.data();
+            if (cardData.currentStamps > currentStampCount) {
                 const stampsOnCard = stampDisplayGrid.querySelectorAll('.stamp-circle');
-                const targetStampElement = stampsOnCard[currentStampCount]; // Animate the one that was just added
+                const targetStampElement = stampsOnCard[currentStampCount];
                 if(targetStampElement) targetStampElement.classList.add('stamp-success-animation');
             }
-            currentStampCount = loyaltyCardData.currentStamps || 0;
+            currentStampCount = cardData.currentStamps || 0;
         }
 
-        renderStamps(loyaltyCardData.currentStamps, currentLoyaltyProgram.totalStampsRequired, currentLoyaltyProgram.rewards);
-        renderUnclaimedRewards(loyaltyCardData.unlockedRewards);
-        renderStampHistory(loyaltyCardData.stamps);
+        renderStamps(cardData.currentStamps, currentLoyaltyProgram.totalStampsRequired, currentLoyaltyProgram.rewards);
+        renderGamification(cardData.currentStreak, cardData.completedCardCount);
+        renderUnclaimedRewards(cardData.unlockedRewards);
+        // History and Trophies are now in separate sections, no need to re-render them here.
         
-        try {
-            const redemptionSnapshot = await db.collection('rewardsRedeemed').where('userId', '==', currentUser.uid).orderBy('redeemedAt', 'desc').limit(5).get();
-            renderRedemptionHistory(redemptionSnapshot.docs.map(doc => doc.data()));
-        } catch (error) {
-            console.error("Error fetching redemption history:", error);
-        }
-    }, (error) => {
-        console.error("Error listening to loyalty card changes:", error);
-    });
+    }, (error) => console.error("Error listening to loyalty card changes:", error));
+    
+    // Initial fetch for history sections that don't need real-time updates
+    fetchAndRenderTrophies();
 }
 
-/**
- * Centralized function to handle a stamp attempt with UI feedback.
- * @param {string} storeId - The ID of the store where the stamp is being given.
- * @param {string} method - The method used (e.g., 'ManualButton', 'NFC_QR_Tap').
- */
 async function processStampAttempt(storeId, method) {
     if (getStampBtn.disabled) return;
 
@@ -200,58 +186,29 @@ async function processStampAttempt(storeId, method) {
 
     try {
         await addStampCallable({ storeId, method });
-        
-        // Show success message in overlay
         overlayProcessingContent.style.display = 'none';
         overlaySuccessContent.style.display = 'block';
-        // Note: The actual stamp animation is now handled by the onSnapshot listener
-
     } catch (error) {
         console.error('Error adding stamp:', error);
-        
-        // Show error message in overlay
         overlayProcessingContent.style.display = 'none';
         overlayErrorContent.style.display = 'block';
-        if (error.code === 'resource-exhausted') {
-            const cooldown = error.details?.cooldown ? Math.ceil(error.details.cooldown) : 'a few';
-            overlayErrorMessage.textContent = `Please wait ${cooldown} seconds.`;
-        } else {
-            overlayErrorMessage.textContent = 'Stamp Failed';
-        }
-
-        // Trigger card shake animation
+        overlayErrorMessage.textContent = error.message || 'Stamp Failed';
         loyaltyCardElement.classList.add('stamp-failure-animation');
         setTimeout(() => loyaltyCardElement.classList.remove('stamp-failure-animation'), 600);
-
     } finally {
-        // Hide overlay after a delay to let user see the result
         setTimeout(() => {
             processingOverlay.classList.remove('visible');
-            getStampBtn.disabled = false;
+            // Re-enabling is handled by the renderStamps function based on whether the card is full
         }, 1500);
     }
 }
 
-// --- Event Handlers ---
+// --- Event Handlers & Init ---
+getStampBtn.addEventListener('click', () => processStampAttempt('forrest_hall', 'ManualButton'));
+logoutBtn.addEventListener('click', () => auth.signOut().then(() => window.location.href = 'loyalty-login.html'));
 
-getStampBtn.addEventListener('click', () => {
-    const demoStoreId = 'forrest_hall';
-    processStampAttempt(demoStoreId, 'ManualButton');
-});
-
-logoutBtn.addEventListener('click', async () => {
-    try {
-        await auth.signOut();
-        window.location.href = 'loyalty-login.html';
-    } catch (error) {
-        console.error("Error logging out:", error);
-    }
-});
-
-// --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
     let stampAttempted = false;
-
     document.addEventListener('userAuthenticatedLoyalty', (event) => {
         currentUser = event.detail.user;
         startLoyaltyCardListener();
@@ -260,7 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (urlParams.has('action') && urlParams.get('action') === 'stamp' && !stampAttempted) {
             stampAttempted = true;
             const storeIdFromUrl = urlParams.get('storeId');
-            
             setTimeout(() => {
                 processStampAttempt(storeIdFromUrl, 'NFC_QR_Tap');
                 history.replaceState({}, document.title, window.location.pathname);

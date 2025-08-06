@@ -2,8 +2,6 @@
 const functions = require('firebase-functions');
 // The Firebase Admin SDK to access Firestore.
 const admin = require('firebase-admin');
-// Import the CORS middleware (ensure you ran npm install cors)
-const cors = require('cors')({ origin: true }); // Still including for completeness, though onCall handles many cases
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
@@ -13,20 +11,14 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 // --- Loyalty System Configuration Defaults ---
-// These are fallbacks if loyaltyPrograms collection is empty or misconfigured.
 const DEFAULT_PROGRAM_ID = 'standard_stamps';
-const DEFAULT_TOTAL_STAMPS_REQUIRED = 10;
-const DEFAULT_REWARDS = [
-    { id: 'filletz_reward', threshold: 5, description: 'Free Filletz' },
-    { id: 'burger_reward', threshold: 10, description: 'Free Classic Burger' }
-];
-const STAMP_COOLDOWN_SECONDS = 30; // Cooldown period to prevent rapid re-stamping
+const STREAK_REWARD_THRESHOLD = 7; // Reward at 7 days
 
 // --- Helper to generate a unique reward code ---
-function generateRewardCode() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ012345654321789'; // Added more chars for variety
-    let result = 'FBG-';
-    for (let i = 0; i < 6; i++) { // FBG-XXXXXX
+function generateRewardCode(prefix = 'FBG') {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = `${prefix}-`;
+    for (let i = 0; i < 6; i++) {
         result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;
@@ -34,11 +26,7 @@ function generateRewardCode() {
 
 /**
  * Cloud Function: addStamp
- * Adds a stamp to a user's loyalty card.
- * This function should be called from the customer's loyalty app.
- *
- * @param {Object} data - Contains storeId and tap/scan method.
- * @param {Object} context - Contains authentication info of the calling user.
+ * Adds a stamp and updates the user's daily streak.
  */
 exports.addStamp = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
@@ -55,154 +43,123 @@ exports.addStamp = functions.https.onCall(async (data, context) => {
 
     return db.runTransaction(async (transaction) => {
         const doc = await transaction.get(loyaltyCardRef);
-        let loyaltyCardData;
-
-        // Initialize default data if document doesn't exist
+        
         if (!doc.exists) {
-            loyaltyCardData = {
-                activeProgramId: DEFAULT_PROGRAM_ID,
-                currentStamps: 0,
-                stamps: [], // Ensure this is initialized as an empty array
-                unlockedRewards: [], // Array to store unlocked but unclaimed rewards
-                lastStampTime: null,
-                lastClaimedRewardThreshold: 0, // Tracks the highest threshold claimed
-                createdAt: admin.firestore.FieldValue.serverTimestamp(),
-                lastUsedStoreId: storeId,
-                fullName: null, // Placeholder, client can update on register
-                email: null     // Placeholder, client can update on register
-            };
-            console.log(`Creating new loyalty card for user ${userId} at store ${storeId}.`);
-        } else {
-            loyaltyCardData = doc.data();
-            // Ensure necessary fields are initialized if migrating old data or first login
-            if (!loyaltyCardData.stamps) loyaltyCardData.stamps = [];
-            if (!loyaltyCardData.unlockedRewards) loyaltyCardData.unlockedRewards = [];
-            if (typeof loyaltyCardData.currentStamps !== 'number') loyaltyCardData.currentStamps = 0;
-            if (typeof loyaltyCardData.lastClaimedRewardThreshold !== 'number') loyaltyCardData.lastClaimedRewardThreshold = 0;
-
-
-            // Cooldown check: Prevent stamping too frequently
-            if (loyaltyCardData.lastStampTime) {
-                const lastStampDate = loyaltyCardData.lastStampTime.toDate();
-                const now = new Date();
-                const diffSeconds = (now.getTime() - lastStampDate.getTime()) / 1000;
-
-                if (diffSeconds < STAMP_COOLDOWN_SECONDS) {
-                    throw new functions.https.HttpsError(
-                        'resource-exhausted',
-                        `Please wait ${Math.ceil(STAMP_COOLDOWN_SECONDS - diffSeconds)} seconds before adding another stamp.`,
-                        { cooldown: STAMP_COOLDOWN_SECONDS - diffSeconds }
-                    );
-                }
-            }
+            // This should be handled by client-side registration, but as a fallback:
+            throw new functions.https.HttpsError('not-found', 'Loyalty card not found. Please ensure you are registered.');
         }
 
-        // Get current loyalty program rules
-        const programIdToUse = loyaltyCardData.activeProgramId || DEFAULT_PROGRAM_ID;
-        const programRef = db.collection('loyaltyPrograms').doc(programIdToUse);
-        const programDoc = await transaction.get(programRef);
+        let loyaltyCardData = doc.data();
+        
+        // --- Initialize fields if they don't exist ---
+        loyaltyCardData.stamps = loyaltyCardData.stamps || [];
+        loyaltyCardData.unlockedRewards = loyaltyCardData.unlockedRewards || [];
+        loyaltyCardData.currentStamps = loyaltyCardData.currentStamps || 0;
+        loyaltyCardData.currentStreak = loyaltyCardData.currentStreak || 0;
+        loyaltyCardData.completedCardCount = loyaltyCardData.completedCardCount || 0;
 
+        // --- Fetch Program Rules ---
+        const programId = loyaltyCardData.activeProgramId || DEFAULT_PROGRAM_ID;
+        const programDoc = await db.collection('loyaltyPrograms').doc(programId).get();
         if (!programDoc.exists) {
-            throw new functions.https.HttpsError('not-found', `Loyalty program "${programIdToUse}" not found. Please ensure it's imported.`);
+            throw new functions.https.HttpsError('not-found', `Loyalty program "${programId}" not found.`);
         }
         const programRules = programDoc.data();
-        const allRewards = programRules.rewards || DEFAULT_REWARDS;
-        const totalStampsRequired = programRules.totalStampsRequired || DEFAULT_TOTAL_STAMPS_REQUIRED;
+        const totalStampsRequired = programRules.totalStampsRequired || 10;
 
-        // If totalStampsRequired is 0 or less, prevent stamps from being added.
-        if (totalStampsRequired <= 0) {
-            throw new functions.https.HttpsError('failed-precondition', `Loyalty program "${programIdToUse}" has an invalid total stamps required.`);
+        // --- Prevent adding stamps to a full card ---
+        if (loyaltyCardData.currentStamps >= totalStampsRequired) {
+            throw new functions.https.HttpsError('failed-precondition', 'Card is full! Redeem your final reward to start a new card.');
         }
 
+        // --- Streak Calculation Logic ---
+        const now = new Date();
+        const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+        let newStreak = loyaltyCardData.currentStreak;
 
-        // Add the new stamp
-        const newStampEntry = {
-            timestamp: admin.firestore.Timestamp.now(), // Use Timestamp.now() for array elements
+        if (loyaltyCardData.lastStampTime) {
+            const lastStampDate = loyaltyCardData.lastStampTime.toDate();
+            const lastStampUTC = new Date(Date.UTC(lastStampDate.getUTCFullYear(), lastStampDate.getUTCMonth(), lastStampDate.getUTCDate()));
+            
+            const diffTime = todayUTC - lastStampUTC;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 1) {
+                newStreak++; // Consecutive day
+            } else if (diffDays > 1) {
+                newStreak = 1; // Streak broken, reset to 1 for today's stamp
+            }
+            // If diffDays is 0, it's the same day, so streak doesn't change.
+        } else {
+            newStreak = 1; // First stamp ever
+        }
+        
+        loyaltyCardData.currentStreak = newStreak;
+        
+        // --- Add the new stamp ---
+        loyaltyCardData.stamps.push({
+            timestamp: admin.firestore.Timestamp.now(),
             method: method || 'unknown',
             storeId: storeId
-        };
-        loyaltyCardData.stamps.push(newStampEntry);
-        loyaltyCardData.currentStamps = (loyaltyCardData.currentStamps || 0) + 1;
-        
-        // Use FieldValue.serverTimestamp() for top-level lastStampTime
-        loyaltyCardData.lastStampTime = admin.firestore.FieldValue.serverTimestamp(); 
-        loyaltyCardData.lastUsedStoreId = storeId;
+        });
+        loyaltyCardData.currentStamps++;
+        loyaltyCardData.lastStampTime = admin.firestore.FieldValue.serverTimestamp();
 
-        // Check for newly unlocked rewards
+        // --- Reward Unlocking Logic ---
         let newlyUnlockedRewards = [];
-        allRewards.sort((a, b) => a.threshold - b.threshold); // Ensure rewards are checked in order
-        
-        for (const reward of allRewards) {
-            // Check if current stamps meet or exceed the threshold for this reward
-            // AND if this specific reward tier hasn't been unlocked/claimed previously in the current cycle
-            const alreadyUnlockedThisTier = loyaltyCardData.unlockedRewards.some(ur => ur.programRewardId === reward.id);
-            // Crucial: check against lastClaimedRewardThreshold to ensure intermediate rewards aren't re-unlocked if user has passed them
-            const claimedThisTierPreviously = loyaltyCardData.lastClaimedRewardThreshold >= reward.threshold; 
 
-            if (loyaltyCardData.currentStamps >= reward.threshold && !alreadyUnlockedThisTier && !claimedThisTierPreviously) {
+        // Check for standard rewards
+        programRules.rewards.forEach(reward => {
+            const alreadyUnlocked = loyaltyCardData.unlockedRewards.some(ur => ur.programRewardId === reward.id && !ur.isStreakReward);
+            if (loyaltyCardData.currentStamps >= reward.threshold && !alreadyUnlocked) {
                 const newReward = {
                     programRewardId: reward.id,
-                    rewardCode: generateRewardCode(),
+                    rewardCode: generateRewardCode('FBG'),
                     unlockedAt: admin.firestore.Timestamp.now(),
-                    description: reward.description
+                    description: reward.description,
+                    isStreakReward: false
                 };
                 loyaltyCardData.unlockedRewards.push(newReward);
-                newlyUnlockedRewards.push(newReward); // For response message
-                console.log(`Reward "${reward.description}" unlocked for user ${userId}: ${newReward.rewardCode}`);
+                newlyUnlockedRewards.push(newReward);
             }
+        });
+
+        // Check for 7-day streak reward
+        if (newStreak === STREAK_REWARD_THRESHOLD) {
+             const streakReward = {
+                programRewardId: '7_day_streak',
+                rewardCode: generateRewardCode('STR'),
+                unlockedAt: admin.firestore.Timestamp.now(),
+                description: "7 Day Streak! Free Fries!",
+                isStreakReward: true
+            };
+            loyaltyCardData.unlockedRewards.push(streakReward);
+            newlyUnlockedRewards.push(streakReward);
+            loyaltyCardData.currentStreak = 0; // Reset streak after reward is given
         }
-
-        // Handle card reset if total stamps are reached or exceeded
-        if (loyaltyCardData.currentStamps >= totalStampsRequired) {
-            // Check if the final reward (at totalStampsRequired) has been unlocked.
-            // If it hasn't, the user is at max stamps but didn't trigger the unlock for the final reward yet.
-            // Let's assume hitting totalStampsRequired implicitly unlocks the final reward if not already.
-            const finalReward = allRewards.find(r => r.threshold === totalStampsRequired);
-            const finalRewardAlreadyUnlocked = loyaltyCardData.unlockedRewards.some(ur => ur.programRewardId === finalReward?.id);
-
-            // If the card is 'full' and the final reward isn't pending, it means they might have passed it.
-            // For a physical card, once you hit the last stamp, you get the reward.
-            // We only truly reset the card when the final reward is *claimed*.
-            // So, no reset here based purely on `currentStamps >= totalStampsRequired`.
-            // The `redeemReward` function will handle the reset upon claiming the final reward.
-        }
-
-        // Update the loyalty card document
+        
         transaction.set(loyaltyCardRef, loyaltyCardData, { merge: true });
 
-        // Return updated state to client
         return {
             status: 'success',
-            message: 'Stamp added successfully!',
+            message: 'Stamp added!',
             currentStamps: loyaltyCardData.currentStamps,
             totalStampsRequired: totalStampsRequired,
-            unlockedRewards: loyaltyCardData.unlockedRewards, // Send back all currently unlocked rewards
-            newlyUnlockedRewards: newlyUnlockedRewards // Specifically what was just unlocked
+            newlyUnlockedRewards: newlyUnlockedRewards
         };
     });
 });
 
-
 /**
  * Cloud Function: redeemReward
- * Redeems an unlocked reward for a user.
- * This function should be called from the ADMIN DASHBOARD by a staff member.
- *
- * @param {Object} data - Contains userId (customer's UID), storeId (where redeemed), rewardCode (entered by staff).
- * @param {Object} context - Contains authentication info of the staff member.
+ * Redeems a reward and handles card completion/trophy creation.
  */
 exports.redeemReward = functions.https.onCall(async (data, context) => {
-    // 1. Authentication Check (Staff Member)
-    if (!context.auth) {
-        throw new functions.https.HttpsError('unauthenticated', 'Staff member must be authenticated to redeem a reward.');
-    }
-    // Ensure the staff member has admin role for this sensitive operation
-    if (!context.auth.token.admin) {
+    if (!context.auth || !context.auth.token.admin) {
         throw new functions.https.HttpsError('permission-denied', 'Only admin users can redeem rewards.');
     }
-
-    const staffId = context.auth.uid; // This is the staff member's UID
-    const { userId, storeId, rewardCode } = data; // userId is the CUSTOMER's UID
+    const staffId = context.auth.uid;
+    const { userId, storeId, rewardCode } = data;
 
     if (!userId || !storeId || !rewardCode) {
         throw new functions.https.HttpsError('invalid-argument', 'Customer User ID, Store ID, and Reward Code are required.');
@@ -212,128 +169,89 @@ exports.redeemReward = functions.https.onCall(async (data, context) => {
 
     return db.runTransaction(async (transaction) => {
         const doc = await transaction.get(customerLoyaltyCardRef);
-
         if (!doc.exists) {
             throw new functions.https.HttpsError('not-found', 'Customer loyalty card not found.');
         }
 
-        const loyaltyCardData = doc.data();
-        if (!loyaltyCardData.unlockedRewards) loyaltyCardData.unlockedRewards = [];
+        let loyaltyCardData = doc.data();
+        loyaltyCardData.unlockedRewards = loyaltyCardData.unlockedRewards || [];
 
-        // 2. Validate Reward Conditions: Find the specific unlocked reward by code
         const rewardToRedeemIndex = loyaltyCardData.unlockedRewards.findIndex(r => r.rewardCode === rewardCode);
-
         if (rewardToRedeemIndex === -1) {
-            throw new functions.https.HttpsError(
-                'invalid-argument',
-                'Invalid or already redeemed reward code for this user. Please ensure the code is correct and still active.'
-            );
+            throw new functions.https.HttpsError('invalid-argument', 'Invalid or already redeemed reward code.');
         }
-
+        
         const redeemedReward = loyaltyCardData.unlockedRewards[rewardToRedeemIndex];
+        loyaltyCardData.unlockedRewards.splice(rewardToRedeemIndex, 1); // Remove the reward
 
-        // Get program rules for logging and determining reset logic
-        const programRef = db.collection('loyaltyPrograms').doc(loyaltyCardData.activeProgramId || DEFAULT_PROGRAM_ID);
-        const programDoc = await transaction.get(programRef);
-        const programRules = programDoc.exists ? programDoc.data() : {};
-        const rewardDescription = redeemedReward.description; // Use description from the unlocked reward object
-        const totalStampsRequired = programRules.totalStampsRequired || DEFAULT_TOTAL_STAMPS_REQUIRED;
-
-
-        // Remove the redeemed reward from the unlockedRewards array
-        const updatedUnlockedRewards = loyaltyCardData.unlockedRewards.filter(
-            (r, index) => index !== rewardToRedeemIndex
-        );
-
-        let newCurrentStamps = loyaltyCardData.currentStamps;
-        let newLastClaimedRewardThreshold = loyaltyCardData.lastClaimedRewardThreshold;
-        let newStampsArray = loyaltyCardData.stamps;
-
-        // Find the threshold of the redeemed reward from the program rules
-        const redeemedRewardProgramRule = programRules.rewards?.find(r => r.id === redeemedReward.programRewardId);
-        if (redeemedRewardProgramRule) {
-            newLastClaimedRewardThreshold = redeemedRewardProgramRule.threshold;
-        }
-
-        // If the redeemed reward is the final reward in the program (e.g., 10th stamp burger), reset stamps to 0.
-        // This emulates getting a new card.
-        if (redeemedRewardProgramRule && redeemedRewardProgramRule.threshold === totalStampsRequired) {
-            newCurrentStamps = 0;
-            newStampsArray = []; // Clear stamps history for a new card
-            newLastClaimedRewardThreshold = 0; // Reset claimed threshold for a new cycle
-            loyaltyCardData.unlockedRewards = []; // Clear all remaining unlocked rewards if final is claimed (they forfeit other pending rewards)
-            functions.logger.log(`Final reward (${rewardCode}) claimed for user ${userId}. Loyalty card reset.`);
-        } else {
-             // For intermediate rewards (e.g., 5th stamp Filletz), stamps are NOT reset.
-             // We only update the lastClaimedRewardThreshold to prevent re-unlocking it.
-             functions.logger.log(`Intermediate reward (${rewardCode}) claimed for user ${userId}. Stamps NOT reset.`);
-        }
-
-
-        transaction.update(customerLoyaltyCardRef, {
-            currentStamps: newCurrentStamps,
-            unlockedRewards: updatedUnlockedRewards, // Save updated array
-            lastClaimed: admin.firestore.FieldValue.serverTimestamp(), // Log redemption time
-            lastClaimedRewardThreshold: newLastClaimedRewardThreshold, // Update the last claimed threshold
-            stamps: newStampsArray // Update stamps array if cleared (empty if final reward)
-        });
-
-        // 4. Log the Redemption (for analytics and audit)
+        // Log the redemption
         db.collection('rewardsRedeemed').add({
             userId: userId,
-            programId: loyaltyCardData.activeProgramId,
             rewardCode: rewardCode,
             redeemedAt: admin.firestore.FieldValue.serverTimestamp(),
-            staffId: staffId, // The staff member who redeemed it
+            staffId: staffId,
             storeId: storeId,
-            rewardDescription: rewardDescription, // Denormalize reward info
-            rewardTierId: redeemedReward.programRewardId // Log which tier was redeemed
+            rewardDescription: redeemedReward.description,
         });
 
-        return {
-            status: 'success',
-            message: `Reward "${rewardDescription}" redeemed successfully for user ${userId}.`,
-            newStamps: newCurrentStamps
-        };
+        // --- Card Completion and Trophy Logic ---
+        const programDoc = await db.collection('loyaltyPrograms').doc(loyaltyCardData.activeProgramId || DEFAULT_PROGRAM_ID).get();
+        const programRules = programDoc.data();
+        const finalReward = programRules.rewards.find(r => r.threshold === programRules.totalStampsRequired);
+
+        // Check if the redeemed reward was the final one for the card
+        if (finalReward && redeemedReward.programRewardId === finalReward.id) {
+            // 1. Create a "Trophy" of the completed card
+            const trophyData = {
+                userId: userId,
+                completedAt: admin.firestore.FieldValue.serverTimestamp(),
+                stampHistory: loyaltyCardData.stamps,
+                programName: programRules.name || 'Standard Card'
+            };
+            db.collection('completedLoyaltyCards').add(trophyData);
+
+            // 2. Reset the main loyalty card to start a new one
+            loyaltyCardData = {
+                ...loyaltyCardData,
+                currentStamps: 0,
+                stamps: [],
+                unlockedRewards: [], // Clear all pending rewards
+                lastClaimedRewardThreshold: 0,
+                completedCardCount: (loyaltyCardData.completedCardCount || 0) + 1
+            };
+            transaction.set(customerLoyaltyCardRef, loyaltyCardData);
+            
+            return { status: 'success', message: `Reward redeemed & new card started!` };
+        } else {
+            // Just an intermediate or streak reward, just update the card
+            transaction.update(customerLoyaltyCardRef, {
+                unlockedRewards: loyaltyCardData.unlockedRewards
+            });
+            return { status: 'success', message: `Reward "${redeemedReward.description}" redeemed successfully.` };
+        }
     });
 });
 
-
-/**
- * Cloud Function: adminAdjustStamp
- * Allows an admin to manually adjust a user's stamp count.
- * This function should be called from the ADMIN DASHBOARD.
- * It does NOT unlock rewards automatically. It's for data correction/override.
- *
- * @param {Object} data - Contains userId (customer's UID), newStampCount, and reason.
- * @param {Object} context - Contains authentication info of the admin user.
- */
+// --- adminAdjustStamp function remains unchanged ---
 exports.adminAdjustStamp = functions.https.onCall(async (data, context) => {
-    // 1. Authentication Check (Admin User)
     if (!context.auth || !context.auth.token.admin) {
         throw new functions.https.HttpsError('permission-denied', 'Only admin users can manually adjust stamps.');
     }
-
     const adminId = context.auth.uid;
     const { userId, newStampCount, reason } = data;
 
     if (!userId || typeof newStampCount !== 'number' || newStampCount < 0) {
         throw new functions.https.HttpsError('invalid-argument', 'Customer User ID and a valid non-negative new stamp count are required.');
     }
-
     const customerLoyaltyCardRef = db.collection('loyaltyCards').doc(userId);
 
     return db.runTransaction(async (transaction) => {
         const doc = await transaction.get(customerLoyaltyCardRef);
-
         if (!doc.exists) {
             throw new functions.https.HttpsError('not-found', 'Customer loyalty card not found.');
         }
-
         const loyaltyCardData = doc.data();
-        if (!loyaltyCardData.stamps) loyaltyCardData.stamps = [];
-
-        // Log the adjustment
+        loyaltyCardData.stamps = loyaltyCardData.stamps || [];
         const adjustmentLogEntry = {
             timestamp: admin.firestore.Timestamp.now(),
             method: 'AdminAdjust',
@@ -342,22 +260,9 @@ exports.adminAdjustStamp = functions.https.onCall(async (data, context) => {
             reason: reason || 'Manual adjustment by admin',
             adminId: adminId
         };
-        loyaltyCardData.stamps.push(adjustmentLogEntry); // Add to the stamp history for audit
-
-        // Update currentStamps directly
+        loyaltyCardData.stamps.push(adjustmentLogEntry);
         loyaltyCardData.currentStamps = newStampCount;
-        
-        // When stamps are manually adjusted, we do NOT trigger automatic reward unlocking.
-        // Rewards should only be unlocked via the customer's natural progression or specific admin action to trigger it.
-        // We also do NOT clear unlockedRewards or lastClaimedRewardThreshold here,
-        // as this is just a count adjustment, not a cycle reset.
-
-        transaction.update(customerLoyaltyCardRef, loyaltyCardData); // Update the loyalty card
-
-        return {
-            status: 'success',
-            message: `Stamps for user ${userId} manually adjusted to ${newStampCount}.`,
-            newStamps: newStampCount
-        };
+        transaction.update(customerLoyaltyCardRef, loyaltyCardData);
+        return { status: 'success', message: `Stamps adjusted to ${newStampCount}.`, newStamps: newStampCount };
     });
 });
