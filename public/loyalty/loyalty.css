@@ -512,3 +512,163 @@ body {
     .section-title { font-size: 18px; }
     .history-item { font-size: 13px; }
 }
+/* --- public/loyalty/loyalty.css --- */
+
+/* Color Variables */
+:root {
+    --red: #e71e26;
+    --yellow: white;
+    --dim-grey: #2f2f2f;
+    --khaki: #fbae29;
+    --salmon: #ff9686;
+    --light-grey: #f4f4f4;
+    --success-green: #28a745;
+}
+
+/* Global Styles */
+body {
+    margin: 0;
+    font-family: 'Futura', Arial, sans-serif;
+    background-color: var(--light-grey);
+    color: var(--dim-grey);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Loading, Login & Overlay --- */
+.loading-container, .login-prompt-container {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex;
+    justify-content: center; align-items: center; background-color: var(--light-grey); z-index: 2000;
+}
+.spinner {
+    border: 8px solid #f3f3f3; border-top: 8px solid var(--red); border-radius: 50%;
+    width: 60px; height: 60px; animation: spin 1s linear infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.login-card {
+    background-color: var(--yellow); border: 5px solid var(--khaki); border-radius: 20px;
+    padding: 40px 30px; text-align: center; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    max-width: 400px; width: 90%;
+}
+.login-logo { max-width: 150px; margin-bottom: 20px; }
+.login-title {
+    font-family: 'Fraunces', serif; font-weight: 900; font-size: 30px;
+    color: var(--red); text-transform: uppercase; margin: 0 0 10px 0;
+}
+.login-button {
+    background-color: var(--red); color: var(--yellow); padding: 12px 25px; border-radius: 8px;
+    text-decoration: none; font-family: 'Montserrat', sans-serif; font-weight: 800;
+    text-transform: uppercase; transition: all 0.2s ease; display: inline-block;
+}
+.login-button:hover { background-color: var(--khaki); color: var(--red); }
+
+/* --- Main Loyalty App Layout --- */
+.loyalty-wrapper { display: flex; flex-direction: column; width: 100%; min-height: 100vh; background-color: var(--light-grey); }
+.loyalty-header {
+    background-color: var(--red); border-bottom: 5px solid var(--khaki); padding: 10px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100;
+}
+.loyalty-header .header-left { display: flex; align-items: center; gap: 15px; }
+.loyalty-header .header-logo { height: 40px; }
+.loyalty-header .app-name { font-family: 'Fraunces', serif; font-weight: 900; font-size: 24px; color: var(--yellow); text-transform: uppercase; }
+.loyalty-header .header-button {
+    background-color: var(--yellow); color: var(--red); border: 2px solid var(--red);
+    border-radius: 5px; padding: 8px 15px; font-family: 'Montserrat', sans-serif;
+    font-weight: 800; font-size: 14px; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease;
+}
+.loyalty-header .header-button:hover { background-color: var(--khaki); color: var(--yellow); border-color: var(--khaki); }
+.loyalty-content { flex-grow: 1; padding: 20px; max-width: 700px; margin: 20px auto; width: 100%; box-sizing: border-box; }
+.page-title { font-family: 'Fraunces', serif; font-weight: 900; font-size: 32px; color: var(--red); text-transform: uppercase; text-align: center; margin-bottom: 25px; }
+.section-title { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 20px; color: var(--dim-grey); text-transform: uppercase; margin-top: 30px; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px dashed var(--salmon); }
+
+/* --- Loyalty Card Display (FIXED LAYOUT) --- */
+.loyalty-card {
+    background-color: var(--khaki); border: 5px solid var(--red); border-radius: 15px;
+    padding: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 30px; max-width: 700px; width: 100%; box-sizing: border-box; position: relative;
+}
+.card-main-display {
+    display: flex; flex-direction: column; justify-content: space-between;
+    align-items: center; min-height: 220px;
+}
+.card-logo { position: absolute; top: 15px; left: 15px; height: 40px; }
+.card-status-message { font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 800; color: var(--red); margin: 0; }
+.stamp-grid-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; width: 100%; padding: 20px 0; }
+.stamp-display-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px;
+    width: 100%; max-width: 350px;
+}
+.stamp-circle {
+    aspect-ratio: 1 / 1; border-radius: 50%; border: 3px dashed var(--red);
+    background-color: var(--yellow); display: flex; justify-content: center; align-items: center;
+    font-size: 24px; color: var(--red); transition: all 0.3s ease; position: relative;
+}
+.stamp-circle .reward-icon { font-size: 28px; color: rgba(47, 47, 47, 0.2); }
+.stamp-circle.filled { background-color: var(--red); border-color: var(--red); box-shadow: 0 0 0 2px var(--red); }
+.stamp-circle.filled .reward-icon { display: none; }
+.card-bottom-text { font-family: 'Fraunces', serif; font-weight: 900; font-size: 20px; color: var(--red); text-transform: uppercase; line-height: 1.1; }
+.card-bottom-text p { margin: 0; }
+
+/* --- Unclaimed Rewards & Actions --- */
+.unclaimed-rewards-section { background-color: var(--yellow); border: 5px solid var(--success-green); border-radius: 15px; padding: 15px 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px; }
+.unclaimed-rewards-title { font-family: 'Fraunces', serif; font-weight: 900; font-size: 24px; color: var(--success-green); margin-bottom: 15px; }
+#unclaimedRewardsList { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+.unclaimed-reward-item { background-color: #e6ffe6; border: 1px dashed var(--success-green); border-radius: 10px; padding: 10px 15px; }
+.unclaimed-reward-message { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 18px; color: var(--dim-grey); margin-bottom: 10px; }
+.reward-code-box { background-color: var(--red); color: var(--yellow); padding: 10px 15px; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; width: fit-content; margin: 0 auto; }
+.copy-button { background: none; border: none; color: var(--yellow); font-size: 16px; cursor: pointer; transition: color 0.2s ease; }
+.copy-button:hover { color: var(--khaki); }
+.reward-instruction { font-size: 14px; color: var(--salmon); margin-top: 15px; }
+.loyalty-actions { text-align: center; margin-bottom: 30px; padding: 20px; background-color: var(--yellow); border: 5px solid var(--red); border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+.action-button { background-color: var(--red); color: var(--yellow); border: none; padding: 15px 30px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 20px; text-transform: uppercase; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 10px; }
+.action-button:hover:not(:disabled) { background-color: var(--khaki); color: var(--red); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+.action-button:disabled { background-color: #cccccc; cursor: not-allowed; opacity: 0.8; }
+.action-message { font-size: 14px; margin-top: 15px; display: none; }
+
+/* --- History Lists --- */
+.stamp-history-list { list-style: none; padding: 0; margin: 0; }
+.history-item { background-color: var(--yellow); border: 1px solid #eee; padding: 10px 15px; margin-bottom: 8px; border-radius: 8px; font-size: 14px; color: var(--dim-grey); }
+.history-item.redeemed { border-left: 5px solid var(--success-green); background-color: #e6ffe6; }
+.history-item .history-detail { font-size: 0.9em; color: #6c757d; font-style: italic; }
+
+/* --- Processing Overlay & Stamp Animations --- */
+.processing-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(231, 30, 38, 0.7); /* Semi-transparent red */
+    -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+    display: none; justify-content: center; align-items: center; z-index: 3000;
+    color: var(--yellow); opacity: 0; transition: opacity 0.3s ease;
+}
+.processing-overlay.visible { display: flex; opacity: 1; }
+.overlay-content { text-align: center; font-family: 'Montserrat', sans-serif; }
+#overlay-processing i { font-size: 60px; animation: tap-pulse 1.2s infinite ease-in-out; }
+#overlay-success i { font-size: 80px; color: #90ee90; }
+#overlay-error i { font-size: 80px; color: #ffcccb; }
+.overlay-content p { margin-top: 15px; font-size: 20px; font-weight: 800; text-transform: uppercase; }
+@keyframes tap-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+/* Stamp Success Animation */
+.stamp-success-animation { animation: stamp-pop 0.5s ease-out forwards; }
+@keyframes stamp-pop { 0% { transform: scale(0.5); opacity: 0; } 80% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+
+/* Card Failure Animation */
+.stamp-failure-animation { animation: card-shake 0.5s ease-in-out; }
+@keyframes card-shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 480px) {
+    .login-card { padding: 30px 15px; }
+    .login-title { font-size: 24px; }
+    .loyalty-header .header-logo { height: 30px; }
+    .loyalty-header .app-name { font-size: 18px; }
+    .page-title { font-size: 28px; }
+    .loyalty-card { padding: 10px; }
+    .card-main-display { min-height: 180px; }
+    .stamp-display-grid { max-width: 280px; gap: 10px; }
+    .stamp-circle .reward-icon { font-size: 20px; }
+    .card-bottom-text { font-size: 16px; }
+    .action-button { font-size: 18px; padding: 12px 25px; }
+}
