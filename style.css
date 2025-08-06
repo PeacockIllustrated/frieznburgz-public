@@ -2713,7 +2713,7 @@ body {
     text-align: center;
 }
 
-/* NEW: Styles for Quick Redeem card */
+/* Styles for Quick Redeem card */
 .quick-redeem-card {
     background-color: #fffbeb; /* A slightly different color to stand out */
     border-color: var(--red);
@@ -2805,20 +2805,21 @@ body {
 
 /* Smaller stamp grid for admin view */
 .stamp-display-grid.small-grid {
-    gap: 8px; /* Smaller gap */
-    max-width: 300px; /* Smaller overall grid width */
-    margin: 0 auto; /* Center the grid */
+    display: grid; /* <-- THIS IS THE FIX */
+    gap: 8px;
+    max-width: 300px;
+    margin: 0 auto;
     grid-template-columns: repeat(auto-fit, minmax(35px, 1fr));
 }
 
 .stamp-display-grid.small-grid .stamp-circle {
-    width: 35px; /* Smaller circles */
+    width: 35px;
     height: 35px;
     border-width: 2px;
 }
 
 .stamp-display-grid.small-grid .stamp-circle .reward-icon {
-    font-size: 20px; /* Smaller icon */
+    font-size: 20px;
 }
 
 .loyalty-admin-card .unclaimed-rewards-admin {
