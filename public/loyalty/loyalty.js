@@ -14,7 +14,11 @@ const actionMessage = document.getElementById('actionMessage');
 const stampHistoryList = document.getElementById('stampHistoryList');
 const redemptionHistoryList = document.getElementById('redemptionHistoryList');
 const logoutBtn = document.getElementById('logoutBtn');
-const processingOverlay = document.getElementById('processing-overlay'); // New overlay element
+const processingOverlay = document.getElementById('processing-overlay');
+const overlayProcessingContent = document.getElementById('overlay-processing');
+const overlaySuccessContent = document.getElementById('overlay-success');
+const overlayErrorContent = document.getElementById('overlay-error');
+const overlayErrorMessage = document.getElementById('overlay-error-message');
 
 // Firebase Cloud Functions Callable
 const addStampCallable = functions.httpsCallable('addStamp');
@@ -24,7 +28,7 @@ let currentUser = null;
 let loyaltyCardRef = null;
 let unsubscribeLoyaltyCard = null;
 let currentLoyaltyProgram = null;
-let currentStampCount = 0; // Keep track of the current stamp count for animations
+let currentStampCount = 0;
 
 // --- Utility Functions ---
 
@@ -53,7 +57,6 @@ function renderStamps(currentStamps, totalStampsRequired, rewards) {
     for (let i = 0; i < numStamps; i++) {
         const stampCircle = document.createElement('div');
         stampCircle.classList.add('stamp-circle');
-        
         const rewardAtThisPosition = rewards.find(r => r.threshold === (i + 1));
 
         if (i < currentStamps) {
@@ -157,7 +160,13 @@ async function startLoyaltyCardListener() {
         let loyaltyCardData = { currentStamps: 0, stamps: [], unlockedRewards: [] };
         if (doc.exists) {
             loyaltyCardData = doc.data();
-            currentStampCount = loyaltyCardData.currentStamps || 0; // Update state
+            // Check for new stamp and animate if needed
+            if (loyaltyCardData.currentStamps > currentStampCount) {
+                const stampsOnCard = stampDisplayGrid.querySelectorAll('.stamp-circle');
+                const targetStampElement = stampsOnCard[currentStampCount]; // Animate the one that was just added
+                if(targetStampElement) targetStampElement.classList.add('stamp-success-animation');
+            }
+            currentStampCount = loyaltyCardData.currentStamps || 0;
         }
 
         renderStamps(loyaltyCardData.currentStamps, currentLoyaltyProgram.totalStampsRequired, currentLoyaltyProgram.rewards);
@@ -169,64 +178,64 @@ async function startLoyaltyCardListener() {
             renderRedemptionHistory(redemptionSnapshot.docs.map(doc => doc.data()));
         } catch (error) {
             console.error("Error fetching redemption history:", error);
-            redemptionHistoryList.innerHTML = '<li>Error loading redemption history.</li>';
         }
     }, (error) => {
         console.error("Error listening to loyalty card changes:", error);
-        showMessage(cardStatusMessage, "Failed to load loyalty card data.", true);
     });
 }
 
 /**
- * NEW: Centralized function to handle a stamp attempt with UI feedback.
+ * Centralized function to handle a stamp attempt with UI feedback.
  * @param {string} storeId - The ID of the store where the stamp is being given.
  * @param {string} method - The method used (e.g., 'ManualButton', 'NFC_QR_Tap').
  */
 async function processStampAttempt(storeId, method) {
-    if (getStampBtn.disabled) return; // Prevent multiple clicks
+    if (getStampBtn.disabled) return;
 
     getStampBtn.disabled = true;
+    overlayProcessingContent.style.display = 'block';
+    overlaySuccessContent.style.display = 'none';
+    overlayErrorContent.style.display = 'none';
     processingOverlay.classList.add('visible');
 
-    // Find the next stamp to be animated
-    const stampsOnCard = stampDisplayGrid.querySelectorAll('.stamp-circle');
-    const targetStampElement = stampsOnCard[currentStampCount];
-
     try {
-        const result = await addStampCallable({ storeId, method });
-        // The onSnapshot listener will handle the official re-render.
-        // This animation provides immediate feedback.
-        if (targetStampElement) {
-            targetStampElement.classList.add('stamp-success-animation');
-            // Clean up animation class after it runs
-            setTimeout(() => targetStampElement.classList.remove('stamp-success-animation'), 600);
-        }
-        showMessage(actionMessage, result.data.message || 'Stamp added!', false);
+        await addStampCallable({ storeId, method });
+        
+        // Show success message in overlay
+        overlayProcessingContent.style.display = 'none';
+        overlaySuccessContent.style.display = 'block';
+        // Note: The actual stamp animation is now handled by the onSnapshot listener
 
     } catch (error) {
         console.error('Error adding stamp:', error);
+        
+        // Show error message in overlay
+        overlayProcessingContent.style.display = 'none';
+        overlayErrorContent.style.display = 'block';
+        if (error.code === 'resource-exhausted') {
+            const cooldown = error.details?.cooldown ? Math.ceil(error.details.cooldown) : 'a few';
+            overlayErrorMessage.textContent = `Please wait ${cooldown} seconds.`;
+        } else {
+            overlayErrorMessage.textContent = 'Stamp Failed';
+        }
+
+        // Trigger card shake animation
         loyaltyCardElement.classList.add('stamp-failure-animation');
         setTimeout(() => loyaltyCardElement.classList.remove('stamp-failure-animation'), 600);
 
-        if (error.code === 'resource-exhausted') {
-            const cooldown = error.details?.cooldown ? Math.ceil(error.details.cooldown) : 30;
-            showMessage(actionMessage, `Wait ${cooldown} seconds before stamping again.`, true);
-        } else {
-            showMessage(actionMessage, `Failed to add stamp: ${error.message}`, true);
-        }
     } finally {
-        // Hide overlay after a short delay to let the user see the animation
+        // Hide overlay after a delay to let user see the result
         setTimeout(() => {
             processingOverlay.classList.remove('visible');
             getStampBtn.disabled = false;
-        }, 1000);
+        }, 1500);
     }
 }
 
 // --- Event Handlers ---
 
 getStampBtn.addEventListener('click', () => {
-    const demoStoreId = 'forrest_hall'; // Replace with dynamic store ID in production
+    const demoStoreId = 'forrest_hall';
     processStampAttempt(demoStoreId, 'ManualButton');
 });
 
@@ -236,28 +245,24 @@ logoutBtn.addEventListener('click', async () => {
         window.location.href = 'loyalty-login.html';
     } catch (error) {
         console.error("Error logging out:", error);
-        alert("Failed to log out.");
     }
 });
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    let stampAttempted = false; // Flag to prevent multiple runs on one page load
+    let stampAttempted = false;
 
     document.addEventListener('userAuthenticatedLoyalty', (event) => {
         currentUser = event.detail.user;
         startLoyaltyCardListener();
 
-        // Check for stamp action from URL, now that we know user is logged in
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('action') && urlParams.get('action') === 'stamp' && urlParams.has('storeId') && !stampAttempted) {
-            stampAttempted = true; // Set flag
+        if (urlParams.has('action') && urlParams.get('action') === 'stamp' && !stampAttempted) {
+            stampAttempted = true;
             const storeIdFromUrl = urlParams.get('storeId');
             
-            // Wait a brief moment for the card to render before animating
             setTimeout(() => {
                 processStampAttempt(storeIdFromUrl, 'NFC_QR_Tap');
-                // Clean URL to prevent re-stamping on refresh
                 history.replaceState({}, document.title, window.location.pathname);
             }, 500);
         }
