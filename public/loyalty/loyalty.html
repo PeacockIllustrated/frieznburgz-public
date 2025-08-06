@@ -15,6 +15,14 @@
 </head>
 <body>
 
+    <!-- NEW: Processing Overlay -->
+    <div id="processing-overlay" class="processing-overlay">
+        <div class="overlay-content">
+            <i class="fas fa-hand-pointer"></i>
+            <p>Processing Tap...</p>
+        </div>
+    </div>
+
     <div id="loading-spinner" class="loading-container"><div class="spinner"></div></div>
 
     <div id="login-prompt" class="login-prompt-container" style="display: none;">
@@ -45,12 +53,10 @@
                 <p class="card-status-message" id="cardStatusMessage">Loading your card...</p>
                 
                 <div class="card-main-display">
-                    <!-- Friez & Burgz logo/text on card -->
                     <img src="/assets/logo-alt.png" alt="Friez n Burgz Logo" class="card-logo">
-
                     <div class="stamp-grid-container">
                         <div class="stamp-display-grid" id="stampDisplayGrid">
-                            <!-- Stamp circles with optional icons will be injected here by JS -->
+                            <!-- Stamp circles will be injected here -->
                         </div>
                     </div>
                     <div class="card-bottom-text">
@@ -61,16 +67,13 @@
 
                 <div id="unclaimedRewardsSection" class="unclaimed-rewards-section" style="display: none;">
                     <h3 class="unclaimed-rewards-title">Ready to Claim!</h3>
-                    <div id="unclaimedRewardsList">
-                        <!-- Unclaimed rewards will be injected here -->
-                    </div>
+                    <div id="unclaimedRewardsList"></div>
                     <p class="reward-instruction">Show the code(s) to staff to redeem!</p>
                 </div>
             </div>
 
             <div class="loyalty-actions">
                 <p>Tap your phone to the "Squid" puck at the till or scan the QR code to get your stamp!</p>
-                <!-- This button is a fallback/demonstration for manual stamp if NFC/QR isn't active -->
                 <button id="getStampBtn" class="action-button primary-button"><i class="fas fa-hand-point-up"></i> Get My Stamp</button>
                 <p class="action-message" id="actionMessage"></p>
             </div>
@@ -87,7 +90,6 @@
                     <li>No rewards redeemed yet.</li>
                 </ul>
             </div>
-
         </main>
     </div>
 
