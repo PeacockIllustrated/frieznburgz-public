@@ -673,13 +673,16 @@ body {
     .action-button { font-size: 18px; padding: 12px 25px; }
 }
 
-/* --- NEW: Gamification & Trophy Styles --- */
+
+
+/* --- Gamification & Trophy Styles (Enhanced) --- */
 
 .gamification-stats {
     display: flex;
     justify-content: center;
     gap: 20px;
     margin-bottom: 25px;
+    flex-wrap: wrap;
 }
 
 .stat-item {
@@ -691,6 +694,7 @@ body {
     gap: 15px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     border: 1px solid #eee;
+    min-width: 200px;
 }
 
 .streak-icon {
@@ -703,17 +707,10 @@ body {
     color: #ffcc00; /* Gold color for the trophy */
 }
 
-.streak-text, .trophy-text {
+.streak-details {
     display: flex;
     flex-direction: column;
-    line-height: 1.2;
-}
-
-.streak-count, .trophy-count {
-    font-family: 'Fraunces', serif;
-    font-weight: 900;
-    font-size: 24px;
-    color: var(--dim-grey);
+    gap: 5px;
 }
 
 .streak-label, .trophy-label {
@@ -722,14 +719,69 @@ body {
     color: #6c757d;
 }
 
-.trophy-item {
+.streak-progress-bar {
+    display: flex;
+    gap: 4px;
+}
+
+.streak-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    border: 2px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.streak-dot.active {
+    background-color: #ff9500;
+    border-color: #e68600;
+}
+
+.trophy-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.trophy-count {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 24px;
+    color: var(--dim-grey);
+}
+
+.trophy-card {
     background-color: #fff9e6;
     border-left: 5px solid #ffcc00;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
 }
 
-.trophy-item i {
+.trophy-card-icon {
     color: #ffcc00;
+    font-size: 24px;
+}
+
+.trophy-card-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.trophy-card-title {
+    font-weight: bold;
+    color: var(--dim-grey);
+}
+
+.trophy-card-date {
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+.trophy-empty-state {
+    text-align: center;
+    font-style: italic;
+    color: #6c757d;
+    padding: 15px;
 }
