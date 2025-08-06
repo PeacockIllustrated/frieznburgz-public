@@ -2713,6 +2713,19 @@ body {
     text-align: center;
 }
 
+/* NEW: Styles for Quick Redeem card */
+.quick-redeem-card {
+    background-color: #fffbeb; /* A slightly different color to stand out */
+    border-color: var(--red);
+}
+
+.quick-redeem-card .card-title {
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .loyalty-admin-card .card-title {
     font-family: 'Fraunces', serif;
     font-weight: 900;
@@ -2957,4 +2970,70 @@ body {
 }
 .loyalty-history-admin .stamp-history-list .history-item.redeemed .history-description {
     color: var(--success-green);
+}
+
+/* Styles for the verification modal */
+.verification-details {
+    text-align: left;
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 16px;
+    color: var(--dim-grey);
+}
+
+.verification-details p {
+    margin: 10px 0;
+    line-height: 1.4;
+}
+
+.verification-details p strong {
+    color: var(--red);
+    display: inline-block;
+    width: 90px; /* Align the labels */
+}
+
+.verification-details .reward-to-redeem {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed var(--salmon);
+    font-size: 18px;
+}
+
+/* Responsive adjustments for admin loyalty page */
+@media screen and (max-width: 768px) {
+    .loyalty-admin-card {
+        padding: 15px;
+    }
+    .loyalty-admin-card .card-title {
+        font-size: 20px;
+    }
+    .loyalty-admin-card .current-customer-info,
+    .loyalty-admin-card .stamps-overview h4,
+    .admin-action-box h4 {
+        font-size: 16px;
+    }
+    .admin-actions-grid {
+        grid-template-columns: 1fr; /* Stack actions vertically on smaller screens */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .loyalty-admin-card .card-title {
+        font-size: 18px;
+    }
+    .loyalty-admin-card .auth-button.small-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    .loyalty-admin-card .auth-input,
+    .admin-action-box .auth-input {
+        font-size: 14px;
+        padding: 10px;
+    }
+    .admin-action-box h4 {
+        font-size: 18px;
+    }
+    .admin-action-box .auth-button {
+        font-size: 14px;
+        padding: 8px 15px;
+    }
 }
