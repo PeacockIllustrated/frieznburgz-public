@@ -15,11 +15,19 @@
 </head>
 <body>
 
-    <!-- NEW: Processing Overlay -->
+    <!-- UPDATED: Processing Overlay with states -->
     <div id="processing-overlay" class="processing-overlay">
-        <div class="overlay-content">
+        <div id="overlay-processing" class="overlay-content">
             <i class="fas fa-hand-pointer"></i>
             <p>Processing Tap...</p>
+        </div>
+        <div id="overlay-success" class="overlay-content" style="display: none;">
+            <i class="fas fa-check-circle"></i>
+            <p>Success!</p>
+        </div>
+        <div id="overlay-error" class="overlay-content" style="display: none;">
+            <i class="fas fa-times-circle"></i>
+            <p id="overlay-error-message">Stamp Failed</p>
         </div>
     </div>
 
