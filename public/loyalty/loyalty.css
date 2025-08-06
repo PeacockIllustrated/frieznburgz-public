@@ -672,3 +672,64 @@ body {
     .card-bottom-text { font-size: 16px; }
     .action-button { font-size: 18px; padding: 12px 25px; }
 }
+
+/* --- NEW: Gamification & Trophy Styles --- */
+
+.gamification-stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.stat-item {
+    background-color: var(--yellow);
+    padding: 10px 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #eee;
+}
+
+.streak-icon {
+    font-size: 36px;
+    color: #ff9500; /* Orange color for the flame */
+}
+
+.trophy-icon {
+    font-size: 36px;
+    color: #ffcc00; /* Gold color for the trophy */
+}
+
+.streak-text, .trophy-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.streak-count, .trophy-count {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 24px;
+    color: var(--dim-grey);
+}
+
+.streak-label, .trophy-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.trophy-item {
+    background-color: #fff9e6;
+    border-left: 5px solid #ffcc00;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.trophy-item i {
+    color: #ffcc00;
+}
