@@ -29,17 +29,9 @@ let loyaltyCardRef = null;
 let unsubscribeLoyaltyCard = null;
 let currentLoyaltyProgram = null;
 let currentStampCount = 0;
+const STREAK_GOAL = 7; // The number of days for a streak reward
 
 // --- Utility Functions ---
-
-function showMessage(element, message, isError = false) {
-    element.textContent = message;
-    element.style.color = isError ? 'var(--red)' : 'var(--success-green)';
-    element.style.display = 'block';
-    setTimeout(() => {
-        element.style.display = 'none';
-    }, 4000);
-}
 
 function getRewardIcon(rewardId) {
     switch (rewardId) {
@@ -50,7 +42,7 @@ function getRewardIcon(rewardId) {
     }
 }
 
-// --- NEW/UPDATED RENDERING FUNCTIONS ---
+// --- UPDATED RENDERING FUNCTIONS ---
 
 function renderStamps(currentStamps, totalStampsRequired, rewards) {
     stampDisplayGrid.innerHTML = '';
@@ -85,13 +77,20 @@ function renderStamps(currentStamps, totalStampsRequired, rewards) {
 }
 
 function renderGamification(streak, completedCards) {
+    // --- STREAK VISUALIZATION ---
+    let streakDotsHtml = '';
+    for (let i = 1; i <= STREAK_GOAL; i++) {
+        streakDotsHtml += `<div class="streak-dot ${i <= streak ? 'active' : ''}"></div>`;
+    }
     streakDisplay.innerHTML = `
         <i class="fas fa-fire-alt streak-icon"></i>
-        <div class="streak-text">
-            <span class="streak-count">${streak || 0}</span>
-            <span class="streak-label">Day Streak</span>
+        <div class="streak-details">
+            <span class="streak-label">${streak || 0} Day Streak</span>
+            <div class="streak-progress-bar">${streakDotsHtml}</div>
         </div>
     `;
+    
+    // --- TROPHY VISUALIZATION ---
     trophyCase.innerHTML = `
         <i class="fas fa-trophy trophy-icon"></i>
         <div class="trophy-text">
@@ -114,7 +113,7 @@ async function fetchAndRenderTrophies() {
             .get();
         
         if (trophySnapshot.empty) {
-            trophyList.innerHTML = '<li>No completed cards yet. Fill one up to earn a trophy!</li>';
+            trophyList.innerHTML = '<li class="trophy-empty-state">No completed cards yet. Fill one up to earn a trophy!</li>';
             return;
         }
 
@@ -123,13 +122,19 @@ async function fetchAndRenderTrophies() {
             const trophy = doc.data();
             const date = trophy.completedAt.toDate().toLocaleDateString();
             const li = document.createElement('li');
-            li.classList.add('trophy-item');
-            li.innerHTML = `<i class="fas fa-award"></i> <span>${trophy.programName || 'Loyalty Card'} completed on ${date}</span>`;
+            li.classList.add('trophy-card');
+            li.innerHTML = `
+                <i class="fas fa-trophy trophy-card-icon"></i>
+                <div class="trophy-card-details">
+                    <span class="trophy-card-title">${trophy.programName || 'Loyalty Card'}</span>
+                    <span class="trophy-card-date">Completed on ${date}</span>
+                </div>
+            `;
             trophyList.appendChild(li);
         });
     } catch (error) {
         console.error("Error fetching trophies:", error);
-        trophyList.innerHTML = '<li>Could not load trophy history.</li>';
+        trophyList.innerHTML = '<li class="trophy-empty-state" style="color: var(--red);">Could not load trophy history.</li>';
     }
 }
 
@@ -137,22 +142,14 @@ async function fetchAndRenderTrophies() {
 async function startLoyaltyCardListener() {
     if (unsubscribeLoyaltyCard) unsubscribeLoyaltyCard();
 
-    // *** FIX IS HERE ***
-    // Instead of using a hardcoded ID, we fetch the first active program.
     try {
-        const programsSnapshot = await db.collection('loyaltyPrograms')
-            .where('isActive', '==', true)
-            .limit(1)
-            .get();
-        
+        const programsSnapshot = await db.collection('loyaltyPrograms').where('isActive', '==', true).limit(1).get();
         if (programsSnapshot.empty) {
-            showMessage(cardStatusMessage, "No active loyalty programs found.", true);
             return;
         }
-        currentLoyaltyProgram = programsSnapshot.docs[0].data(); // Get the data from the first active program
+        currentLoyaltyProgram = programsSnapshot.docs[0].data();
     } catch (error) {
         console.error("Error fetching loyalty programs:", error);
-        showMessage(cardStatusMessage, "Error loading loyalty programs.", true);
         return;
     }
 
@@ -180,7 +177,6 @@ async function startLoyaltyCardListener() {
 
 async function processStampAttempt(storeId, method) {
     if (getStampBtn.disabled) return;
-
     getStampBtn.disabled = true;
     overlayProcessingContent.style.display = 'block';
     overlaySuccessContent.style.display = 'none';
@@ -189,27 +185,21 @@ async function processStampAttempt(storeId, method) {
 
     try {
         await addStampCallable({ storeId, method });
-        
         overlayProcessingContent.style.display = 'none';
         overlaySuccessContent.style.display = 'block';
-
     } catch (error) {
         console.error('Error adding stamp:', error);
-        
         overlayProcessingContent.style.display = 'none';
         overlayErrorContent.style.display = 'block';
         overlayErrorMessage.textContent = error.message || 'Stamp Failed';
         loyaltyCardElement.classList.add('stamp-failure-animation');
         setTimeout(() => loyaltyCardElement.classList.remove('stamp-failure-animation'), 600);
-
     } finally {
         setTimeout(() => {
             processingOverlay.classList.remove('visible');
-            // Re-enabling is handled by the renderStamps function
         }, 1500);
     }
 }
-
 
 function renderUnclaimedRewards(unlockedRewards) {
     unclaimedRewardsList.innerHTML = '';
@@ -227,13 +217,10 @@ function renderUnclaimedRewards(unlockedRewards) {
             `;
             unclaimedRewardsList.appendChild(rewardItem);
         });
-
         document.querySelectorAll('.unclaimed-reward-item .copy-button').forEach(button => {
             button.addEventListener('click', (event) => {
                 const codeToCopy = event.currentTarget.dataset.code;
-                navigator.clipboard.writeText(codeToCopy).then(() => {
-                    alert('Reward code copied to clipboard!');
-                }).catch(err => console.error('Could not copy text: ', err));
+                navigator.clipboard.writeText(codeToCopy).then(() => alert('Reward code copied!'));
             });
         });
     } else {
