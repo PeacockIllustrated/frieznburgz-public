@@ -46,6 +46,17 @@ export async function renderLoyaltyManagementPage() {
             <p id="searchMessage" class="auth-message"></p>
         </div>
 
+        <!-- NEW: Customer Directory (Phone Book) -->
+        <div class="loyalty-admin-card">
+            <h3 class="card-title collapsible-header">
+                <span><i class="fas fa-address-book"></i> Customer Directory</span>
+                <span class="toggle-btn"><i class="fas fa-chevron-down"></i></span>
+            </h3>
+            <div id="customerDirectoryList" class="directory-list" style="display: none;">
+                <p>Loading customers...</p>
+            </div>
+        </div>
+
         <div id="customerLoyaltyDetails" class="loyalty-admin-card" style="display: none;">
             <h3 class="card-title">Customer Loyalty Details <span id="customerNameDisplay"></span></h3>
             <p class="current-customer-info" id="currentCustomerInfo"></p>
@@ -84,6 +95,10 @@ export async function renderLoyaltyManagementPage() {
     document.getElementById('searchCustomerBtn').addEventListener('click', searchCustomer);
     document.getElementById('redeemRewardBtn').addEventListener('click', handleRedeemReward);
     document.getElementById('adjustStampsBtn').addEventListener('click', handleAdminAdjustStamps);
+
+    // NEW: Setup for directory
+    setupDirectoryToggle();
+    renderCustomerDirectory();
 }
 
 /**
@@ -194,6 +209,90 @@ async function executeQuickRedemption(userId, rewardCode) {
         modalMessage.textContent = `Redemption failed: ${error.message}`;
         modalFooter.style.display = 'flex';
     }
+}
+
+
+// NEW: Renders a searchable, collapsible list of all loyalty customers.
+async function renderCustomerDirectory() {
+    const directoryList = document.getElementById('customerDirectoryList');
+    try {
+        // Fetch all loyalty cards and order them by name
+        const loyaltyCardsSnapshot = await db.collection('loyaltyCards').orderBy('fullName', 'asc').get();
+        if (loyaltyCardsSnapshot.empty) {
+            directoryList.innerHTML = '<p>No loyalty customers found.</p>';
+            return;
+        }
+
+        // Use a document fragment for performance
+        const fragment = document.createDocumentFragment();
+        const ul = document.createElement('ul');
+        ul.className = 'directory-ul';
+
+        loyaltyCardsSnapshot.forEach(doc => {
+            const customer = doc.data();
+            // Use email as the primary identifier, fallback to UID
+            const identifier = customer.email || doc.id;
+            const li = document.createElement('li');
+            li.className = 'directory-item';
+            li.dataset.identifier = identifier;
+            li.textContent = `${customer.fullName || 'N/A'} (${customer.email || 'No Email'})`;
+            ul.appendChild(li);
+        });
+
+        fragment.appendChild(ul);
+        directoryList.innerHTML = ''; // Clear "Loading..." message
+        directoryList.appendChild(fragment);
+
+        // Add a single event listener to the parent list
+        directoryList.addEventListener('click', (event) => {
+            const target = event.target;
+            if (target.matches('.directory-item')) {
+                const identifier = target.dataset.identifier;
+                document.getElementById('customerSearchInput').value = identifier;
+                document.getElementById('searchCustomerBtn').click();
+                // Collapse the directory after selection
+                const header = document.querySelector('.collapsible-header');
+                if (header) {
+                    const directoryList = document.getElementById('customerDirectoryList');
+                    if (directoryList.style.display !== 'none') {
+                        header.click();
+                    }
+                }
+                // Scroll to the details section for better UX
+                document.getElementById('customerLoyaltyDetails').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching customer directory:', error);
+        directoryList.innerHTML = '<p class="auth-message">Error loading customer list.</p>';
+    }
+}
+
+
+// NEW: Sets up the toggle functionality for the customer directory.
+function setupDirectoryToggle() {
+    const header = document.querySelector('.collapsible-header');
+    if (!header) return;
+
+    const directoryList = document.getElementById('customerDirectoryList');
+    const icon = header.querySelector('.toggle-btn i');
+
+    header.addEventListener('click', (event) => {
+        // Prevent the directory item click from also toggling the list
+        if (event.target.closest('.directory-item')) {
+            return;
+        }
+
+        const isHidden = directoryList.style.display === 'none';
+        if (isHidden) {
+            directoryList.style.display = 'block';
+            if (icon) icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+        } else {
+            directoryList.style.display = 'none';
+            if (icon) icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+        }
+    });
 }
 
 
