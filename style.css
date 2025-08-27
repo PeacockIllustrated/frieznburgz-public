@@ -3112,9 +3112,10 @@ body {
 /* --- NEW: Loyalty Customer Directory Styles --- */
 .collapsible-header {
     display: flex;
-    justify-content: space-between; /* Pushes toggle button to the right */
+    justify-content: space-between;
     align-items: center;
     width: 100%;
+    cursor: pointer;
 }
 
 .collapsible-header .toggle-btn {
@@ -3139,6 +3140,25 @@ body {
     padding: 10px;
 }
 
+.directory-header {
+    background-color: var(--red);
+    color: var(--yellow);
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 16px;
+    text-transform: uppercase;
+    padding: 5px 15px;
+    border-radius: 5px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    position: sticky;
+    top: -10px; /* Adjust based on padding of parent */
+    z-index: 1;
+}
+.directory-header:first-of-type {
+    margin-top: 0;
+}
+
 .directory-ul {
     list-style: none;
     padding: 0;
@@ -3147,6 +3167,10 @@ body {
 }
 
 .directory-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
     padding: 10px 15px;
     font-family: 'Futura', Arial, sans-serif;
     font-size: 16px;
@@ -3164,4 +3188,22 @@ body {
 .directory-item:hover {
     background-color: #fffbeb;
     color: var(--red);
+}
+
+.directory-item-name {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 15px;
+}
+
+.directory-item-stamps {
+    font-weight: bold;
+    color: var(--red);
+    background-color: #ffeaea;
+    padding: 3px 8px;
+    border-radius: 99px;
+    font-size: 14px;
+    flex-shrink: 0;
 }

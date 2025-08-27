@@ -216,49 +216,78 @@ async function executeQuickRedemption(userId, rewardCode) {
 async function renderCustomerDirectory() {
     const directoryList = document.getElementById('customerDirectoryList');
     try {
-        // Fetch all loyalty cards and order them by name
         const loyaltyCardsSnapshot = await db.collection('loyaltyCards').orderBy('fullName', 'asc').get();
         if (loyaltyCardsSnapshot.empty) {
             directoryList.innerHTML = '<p>No loyalty customers found.</p>';
             return;
         }
 
-        // Use a document fragment for performance
-        const fragment = document.createDocumentFragment();
-        const ul = document.createElement('ul');
-        ul.className = 'directory-ul';
+        // Group customers by the first letter of their full name
+        const groupedCustomers = loyaltyCardsSnapshot.docs.reduce((acc, doc) => {
+            const customer = { id: doc.id, ...doc.data() };
+            const name = customer.fullName || 'N/A';
+            // Ensure name is a string before calling charAt
+            const firstLetter = (typeof name === 'string' && name.length > 0) ? name.charAt(0).toUpperCase() : '#';
+            if (!acc[firstLetter]) {
+                acc[firstLetter] = [];
+            }
+            acc[firstLetter].push(customer);
+            return acc;
+        }, {});
 
-        loyaltyCardsSnapshot.forEach(doc => {
-            const customer = doc.data();
-            // Use email as the primary identifier, fallback to UID
-            const identifier = customer.email || doc.id;
-            const li = document.createElement('li');
-            li.className = 'directory-item';
-            li.dataset.identifier = identifier;
-            li.textContent = `${customer.fullName || 'N/A'} (${customer.email || 'No Email'})`;
-            ul.appendChild(li);
+        const fragment = document.createDocumentFragment();
+
+        // Get sorted keys ('A', 'B', 'C'...)
+        const sortedKeys = Object.keys(groupedCustomers).sort();
+
+        sortedKeys.forEach(letter => {
+            // Add letter header
+            const header = document.createElement('div');
+            header.className = 'directory-header';
+            header.textContent = letter;
+            fragment.appendChild(header);
+
+            const ul = document.createElement('ul');
+            ul.className = 'directory-ul';
+            groupedCustomers[letter].forEach(customer => {
+                const identifier = customer.email || customer.id;
+                const li = document.createElement('li');
+                li.className = 'directory-item';
+                li.dataset.identifier = identifier;
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'directory-item-name';
+                nameSpan.textContent = `${customer.fullName || 'N/A'} (${customer.email || 'No Email'})`;
+
+                const stampSpan = document.createElement('span');
+                stampSpan.className = 'directory-item-stamps';
+                stampSpan.textContent = `Stamps: ${customer.currentStamps || 0}`;
+
+                li.appendChild(nameSpan);
+                li.appendChild(stampSpan);
+                ul.appendChild(li);
+            });
+            fragment.appendChild(ul);
         });
 
-        fragment.appendChild(ul);
         directoryList.innerHTML = ''; // Clear "Loading..." message
         directoryList.appendChild(fragment);
 
-        // Add a single event listener to the parent list
+        // Add a single event listener to the parent list for delegation
         directoryList.addEventListener('click', (event) => {
-            const target = event.target;
-            if (target.matches('.directory-item')) {
+            const target = event.target.closest('.directory-item');
+            if (target) {
                 const identifier = target.dataset.identifier;
                 document.getElementById('customerSearchInput').value = identifier;
                 document.getElementById('searchCustomerBtn').click();
-                // Collapse the directory after selection
+
                 const header = document.querySelector('.collapsible-header');
                 if (header) {
-                    const directoryList = document.getElementById('customerDirectoryList');
-                    if (directoryList.style.display !== 'none') {
+                    const dirList = document.getElementById('customerDirectoryList');
+                    if (dirList.style.display !== 'none') {
                         header.click();
                     }
                 }
-                // Scroll to the details section for better UX
                 document.getElementById('customerLoyaltyDetails').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
