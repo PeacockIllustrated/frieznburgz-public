@@ -19,7 +19,6 @@ export async function importAdminUser() {
     }
 
     const userId = user.uid;
-    console.log(`Attempting to provision admin rights for user UID: ${userId}`);
 
     const confirmImport = confirm(
         "Are you sure you want to create an admin staff profile for the currently logged-in user?\n\n" +
@@ -30,7 +29,6 @@ export async function importAdminUser() {
     );
 
     if (!confirmImport) {
-        console.log("Admin import cancelled by user.");
         return;
     }
 
@@ -63,7 +61,6 @@ export async function importAdminUser() {
     try {
         await batch.commit();
         alert(`Successfully provisioned admin user "${adminStaffData.name}" with UID: ${userId}. Please refresh the page.`);
-        console.log("Admin import successful. Staff document and admin config updated.");
     } catch (error) {
         alert("An error occurred during admin import. Check the console for details.");
         console.error("Error during admin import batch commit:", error);

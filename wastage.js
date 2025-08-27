@@ -16,7 +16,6 @@ import { createWasteLogItemHtml } from './wastage-template.js'; // Template for 
  */
 export async function renderWastageLogPage() {
     const wastageLogContent = document.getElementById('wastageLogContent'); // GET IT HERE!
-    console.log('wastage.js: renderWastageLogPage called.');
 
     const selectedLocationId = getSelectedLocation();
     if (!selectedLocationId) {
@@ -42,7 +41,6 @@ export async function renderWastageLogPage() {
             </ul>
         </div>
     `;
-    console.log('wastage.js: Base HTML structure for wastage page set.');
 
 
     // 2. IMPORTANT: Get references to the newly created DOM elements *within this page*
@@ -67,7 +65,6 @@ export async function renderWastageLogPage() {
 
     // 4. Load log entries
     await loadWasteLog(currentWasteLogList); // Load initial log entries
-    console.log(`wastage.js: Wastage log page rendered for ${selectedLocationId}.`);
 }
 
 /**

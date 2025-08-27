@@ -28,7 +28,6 @@ window.importLoyaltyPrograms = async function() {
         "ONLY RUN THIS ONCE FOR INITIAL SETUP."
     );
     if (!confirmImport) {
-        console.log("Loyalty program import cancelled by user.");
         return;
     }
 
@@ -60,7 +59,6 @@ window.importLoyaltyPrograms = async function() {
     const batch = db.batch();
     let importedCount = 0;
 
-    console.log('Starting import for Loyalty Programs...');
 
     programsToImport.forEach(program => {
         const programDocRef = db.collection('loyaltyPrograms').doc(program.id);
@@ -70,7 +68,6 @@ window.importLoyaltyPrograms = async function() {
 
     try {
         await batch.commit();
-        console.log(`Successfully imported ${importedCount} Loyalty Programs.`);
         alert(`Successfully imported ${importedCount} Loyalty Programs!`);
     } catch (error) {
         console.error('Error importing Loyalty Programs:', error);

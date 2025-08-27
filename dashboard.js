@@ -3,7 +3,10 @@
 import { db, auth } from './firebase.js';
 import { getSelectedLocation, getLocationDisplayName } from './config.js';
 import { createDashboardCardHtml, createCriticalItemHtml, createRecentWasteItemHtml, createStaffSummaryCardHtml } from './dashboard-template.js';
-import { getCurrentStockItems } from './stock.js';
+import { getCurrentStockItems, getAllUniqueStockItems } from './stock.js';
+import { getSuppliers } from './suppliers.js';
+import { createOrderFormModalBodyHtml, getItemOptionsHtml } from './orders-template.js';
+
 
 // --- DOM Elements ---
 const dashboardPage = document.getElementById('dashboardPage');
@@ -68,7 +71,7 @@ export async function renderDashboardOverviewPage() {
                 <div class="quick-actions-content">
                     <button class="auth-button quick-action-btn" id="quickAddStockBtn">Quick Add Stock</button>
                     <button class="auth-button quick-action-btn" id="quickLogWasteBtn">Quick Log Waste</button>
-                    <button class="auth-button quick-action-btn disabled" disabled>Create Order (Coming Soon)</button>
+                    <button class="auth-button quick-action-btn" id="quickCreateOrderBtn">Create Order</button>
                 </div>
             </div>
         </div>
@@ -76,6 +79,7 @@ export async function renderDashboardOverviewPage() {
 
     document.getElementById('quickAddStockBtn').addEventListener('click', () => showQuickAdjustmentModal('add'));
     document.getElementById('quickLogWasteBtn').addEventListener('click', () => showQuickAdjustmentModal('waste'));
+    document.getElementById('quickCreateOrderBtn').addEventListener('click', showCreateOrderModal);
 
     // Fetch and Render All Data in Parallel
     await Promise.all([
@@ -222,6 +226,181 @@ export async function showQuickAdjustmentModal(type) {
         modalQtyInput.addEventListener('change', () => { if (parseInt(modalQtyInput.value, 10) < 1) modalQtyInput.value = 1; });
     }
 }
+
+// --- Quick Create Order Functions ---
+
+async function showCreateOrderModal() {
+    const title = 'Create New Order';
+
+    // Fetch data needed for the modal
+    const allSuppliers = await getSuppliers();
+    const allUniqueStockItems = await getAllUniqueStockItems();
+
+    // Create modal body and footer
+    const bodyHtml = createOrderFormModalBodyHtml(null, allSuppliers, allUniqueStockItems);
+    const footerHtml = `<button id="saveOrderBtn" class="auth-button">Save Order</button><button id="closeModalBtn" class="auth-button secondary-btn">Cancel</button>`;
+
+    openModal(title, bodyHtml, footerHtml);
+
+    // --- Attach event listeners to the new modal content ---
+    const orderSupplierCardsContainer = document.getElementById('orderSupplierCardsContainer');
+    const orderSupplierIdInput = document.getElementById('orderSupplierId');
+    const orderSupplierNameInput = document.getElementById('orderSupplierName');
+    const supplierSelectionMessage = document.getElementById('supplierSelectionMessage');
+    const orderItemsList = document.getElementById('orderItemsList');
+    const addOrderItemBtn = document.getElementById('addOrderItemBtn');
+    const orderItemMessage = document.getElementById('orderItemMessage');
+
+    let filteredSupplierItemsCache = [];
+
+    const selectSupplierCard = (supplierId, supplierName) => {
+        orderSupplierCardsContainer.querySelectorAll('.compact-supplier-card').forEach(card => card.classList.remove('selected'));
+        const selectedCard = orderSupplierCardsContainer.querySelector(`[data-supplier-id="${supplierId}"]`);
+        if (selectedCard) selectedCard.classList.add('selected');
+
+        orderSupplierIdInput.value = supplierId;
+        orderSupplierNameInput.value = supplierName;
+        supplierSelectionMessage.style.display = 'none';
+
+        const selectedSupplier = allSuppliers.find(s => s.id === supplierId);
+        if (selectedSupplier && selectedSupplier.itemsSupplied && selectedSupplier.itemsSupplied.length > 0) {
+            filteredSupplierItemsCache = allUniqueStockItems.filter(item => selectedSupplier.itemsSupplied.includes(item.name));
+            orderItemMessage.style.display = 'none';
+            addOrderItemBtn.disabled = false;
+        } else {
+            filteredSupplierItemsCache = [];
+            orderItemMessage.textContent = 'No items configured for this supplier.';
+            orderItemMessage.style.display = 'block';
+            addOrderItemBtn.disabled = true;
+        }
+        orderItemsList.innerHTML = '';
+        addOrderItemRow(orderItemsList, filteredSupplierItemsCache);
+    };
+
+    orderSupplierCardsContainer.querySelectorAll('.compact-supplier-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const supplierId = card.dataset.supplierId;
+            const supplierName = card.dataset.supplierName;
+            selectSupplierCard(supplierId, supplierName);
+        });
+    });
+
+    addOrderItemBtn.addEventListener('click', () => addOrderItemRow(orderItemsList, filteredSupplierItemsCache));
+
+    orderItemsList.addEventListener('click', (event) => {
+        if (event.target.closest('.remove-item-btn')) {
+            if (orderItemsList.children.length > 1) {
+                event.target.closest('.order-item-row').remove();
+            } else {
+                alert('An order must have at least one item.');
+            }
+        }
+    });
+
+    orderItemsList.addEventListener('change', (event) => {
+        const target = event.target;
+        if (target.classList.contains('order-item-select')) {
+            const selectedOption = target.options[target.selectedIndex];
+            target.closest('.order-item-row').querySelector('.order-item-unit').textContent = selectedOption.dataset.unit || 'units';
+            const qtyInput = target.closest('.order-item-row').querySelector('.order-item-qty');
+            qtyInput.disabled = (target.value === '');
+            if (target.value !== '' && (!qtyInput.value || parseInt(qtyInput.value) < 1)) {
+                qtyInput.value = 1;
+            }
+        }
+    });
+
+    document.getElementById('saveOrderBtn').addEventListener('click', handleQuickCreateOrder);
+    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+}
+
+async function handleQuickCreateOrder() {
+    const modalMessage = document.getElementById('modalMessage');
+    modalMessage.style.display = 'none';
+
+    const selectedLocationId = getSelectedLocation();
+    const supplierId = document.getElementById('orderSupplierId').value;
+    const supplierName = document.getElementById('orderSupplierName').value;
+    const orderItemsList = document.getElementById('orderItemsList');
+    const notes = document.getElementById('orderNotes').value.trim();
+
+    const items = [];
+    let isValidOrder = true;
+    let hasAtLeastOneItem = false;
+
+    orderItemsList.querySelectorAll('.order-item-row').forEach(row => {
+        const itemSelect = row.querySelector('.order-item-select');
+        const qtyInput = row.querySelector('.order-item-qty');
+        const itemId = itemSelect.value;
+        const quantity = parseInt(qtyInput.value, 10);
+        const itemName = itemSelect.options[itemSelect.selectedIndex]?.text.split('(')[0].trim() || '';
+        const itemUnit = row.querySelector('.order-item-unit').textContent;
+
+        if (itemId && quantity > 0) {
+            items.push({ itemId, itemName, quantity, unit: itemUnit });
+            hasAtLeastOneItem = true;
+        } else if (itemId || qtyInput.value) {
+            isValidOrder = false;
+        }
+    });
+
+    if (!supplierId) {
+        modalMessage.textContent = 'Please select a supplier.';
+        modalMessage.style.display = 'block';
+        return;
+    }
+    if (!isValidOrder || !hasAtLeastOneItem) {
+        modalMessage.textContent = 'Please ensure all items have a valid quantity.';
+        modalMessage.style.display = 'block';
+        return;
+    }
+
+    const orderToSave = {
+        supplierId,
+        supplierName,
+        items,
+        notes,
+        locationId: selectedLocationId,
+        orderedBy: auth.currentUser ? auth.currentUser.email : 'Unknown',
+        timestampOrdered: firebase.firestore.FieldValue.serverTimestamp(),
+        status: 'Pending'
+    };
+
+    modalMessage.textContent = 'Saving order...';
+    modalMessage.style.display = 'block';
+
+    try {
+        await db.collection('locations').doc(selectedLocationId).collection('orders').add(orderToSave);
+        modalMessage.textContent = 'Order created successfully!';
+        setTimeout(() => {
+            closeModal();
+            // Optionally, navigate to orders page
+            // if (window.mainApp) window.mainApp.handleNavigationClick('orders');
+        }, 1000);
+    } catch (error) {
+        console.error('Error creating order:', error);
+        modalMessage.textContent = `Error: ${error.message}`;
+    }
+}
+
+function addOrderItemRow(container, itemsForDropdown) {
+    const itemOptions = getItemOptionsHtml(itemsForDropdown);
+    const newRowHtml = `
+        <div class="order-item-row">
+            <div class="select-wrapper item-select-wrapper">
+                <select class="order-item-select" ${itemsForDropdown.length === 0 ? 'disabled' : ''}>
+                    ${itemOptions}
+                </select>
+                <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+            <input type="number" class="order-item-qty auth-input modal-input" value="1" min="1" placeholder="Qty" disabled>
+            <span class="order-item-unit">units</span>
+            <button class="remove-item-btn secondary-btn" type="button"><i class="fas fa-times"></i></button>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', newRowHtml);
+}
+
 
 async function handleModalAdjustment(type) {
     const selectedLocationId = getSelectedLocation();

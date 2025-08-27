@@ -154,7 +154,6 @@ export async function renderStockManagementPage() {
         }
 
         initializeStockAccordion();
-        console.log(`Stock items loaded and rendered for ${selectedLocationId}.`);
 
         // NEW: Load and display stock activity log
         await loadStockActivityLog(stockActivityLog);
@@ -178,7 +177,6 @@ function initializeStockAccordion() {
             }
         });
     });
-    console.log('Stock accordion initialized for category headers.');
 }
 
 
@@ -240,7 +238,6 @@ async function updateLocalStock(itemId, categoryId, change, inputElement, itemDi
     if (confirmBtn) {
         confirmBtn.disabled = false;
     }
-    console.log(`Local update: Item ${itemId} in category ${categoryId} set to ${newStockValue}. Pending changes:`, pendingStockChanges);
 }
 
 /**
@@ -257,7 +254,6 @@ async function handleConfirmCategoryChanges(categoryId, confirmBtn) {
 
     const categoryChanges = pendingStockChanges[categoryId];
     if (!categoryChanges || Object.keys(categoryChanges).length === 0) {
-        console.log('No pending changes for this category.');
         confirmBtn.disabled = true;
         return;
     }
@@ -300,7 +296,6 @@ async function handleConfirmCategoryChanges(categoryId, confirmBtn) {
     }
 
     if (changedItemIds.length === 0) {
-        console.log('No actual stock changes detected for this category after all local adjustments.');
         delete pendingStockChanges[categoryId]; // Clear even if no net change
         await renderStockManagementPage(); // Re-render to clear highlights
         return;
@@ -317,14 +312,11 @@ async function handleConfirmCategoryChanges(categoryId, confirmBtn) {
         });
         await logBatch.commit(); // Commit log entries
 
-        console.log(`Successfully committed ${changedItemIds.length} changes and logged to Firestore for category ${categoryId}.`);
-
         delete pendingStockChanges[categoryId]; // Clear confirmed changes
 
         // Remove visual feedback from affected items by re-rendering the whole page
         // This ensures currentItemsData is perfectly in sync with Firestore
         await renderStockManagementPage();
-        console.log('Stock management page re-rendered after category commit.');
 
     } catch (error) {
         console.error(`Error committing changes for category ${categoryId}:`, error);
@@ -423,7 +415,6 @@ async function loadStockActivityLog(container) {
             });
             container.appendChild(groupDiv);
         });
-        console.log('Stock activity log loaded.');
 
     } catch (error) {
         console.error('Error loading stock activity log:', error);
@@ -464,7 +455,6 @@ export function getCurrentStockItems() {
  * @returns {Promise<Array<Object>>} A promise that resolves to an array of unique item objects.
  */
 export async function getAllUniqueStockItems() {
-    console.log('stock.js: Fetching all unique items from all locations...');
     const uniqueItemsMap = new Map(); // Use a Map to store unique items by their ID
     const allLocations = locations; // Get locations from config.js
 
@@ -481,7 +471,6 @@ export async function getAllUniqueStockItems() {
             });
         }
         const uniqueItemsArray = Array.from(uniqueItemsMap.values());
-        console.log(`stock.js: Fetched ${uniqueItemsArray.length} unique items across all locations. Sample:`, uniqueItemsArray.slice(0, 5)); // Log a sample
         // Optionally sort them for consistent display
         return uniqueItemsArray.sort((a, b) => a.name.localeCompare(b.name));
 

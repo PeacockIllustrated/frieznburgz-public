@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.dispatchEvent(new CustomEvent('userAuthenticatedLoyalty', { detail: { user } }));
         } else {
             // No user is logged in, hide content and show prompt
-            console.log('No user session found for loyalty app. Showing login prompt.');
             if (loadingSpinner) loadingSpinner.style.display = 'none';
             if (mainContent) mainContent.style.display = 'none';
             if (loginPrompt) loginPrompt.style.display = 'flex'; // Use flex for centering the prompt

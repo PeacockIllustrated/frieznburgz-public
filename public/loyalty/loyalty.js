@@ -9,7 +9,6 @@ const cardStatusMessage = document.getElementById('cardStatusMessage');
 const stampDisplayGrid = document.getElementById('stampDisplayGrid');
 const unclaimedRewardsSection = document.getElementById('unclaimedRewardsSection');
 const unclaimedRewardsList = document.getElementById('unclaimedRewardsList');
-const getStampBtn = document.getElementById('getStampBtn');
 const actionMessage = document.getElementById('actionMessage');
 const logoutBtn = document.getElementById('logoutBtn');
 const processingOverlay = document.getElementById('processing-overlay');
@@ -66,12 +65,8 @@ function renderStamps(currentStamps, totalStampsRequired, rewards) {
     
     if (currentStamps >= totalStampsRequired) {
         cardStatusMessage.textContent = 'Card Complete! Redeem your reward!';
-        getStampBtn.disabled = true;
-        getStampBtn.textContent = 'Card Full';
     } else {
         cardStatusMessage.textContent = `You have ${currentStamps} of ${numStamps} stamps!`;
-        getStampBtn.disabled = false;
-        getStampBtn.innerHTML = '<i class="fas fa-hand-point-up"></i> Get My Stamp';
     }
     cardStatusMessage.style.color = 'var(--red)';
 }
@@ -176,8 +171,6 @@ async function startLoyaltyCardListener() {
 }
 
 async function processStampAttempt(storeId, method) {
-    if (getStampBtn.disabled) return;
-    getStampBtn.disabled = true;
     overlayProcessingContent.style.display = 'block';
     overlaySuccessContent.style.display = 'none';
     overlayErrorContent.style.display = 'none';
@@ -229,7 +222,6 @@ function renderUnclaimedRewards(unlockedRewards) {
 }
 
 // --- Event Handlers & Init ---
-getStampBtn.addEventListener('click', () => processStampAttempt('forrest_hall', 'ManualButton'));
 logoutBtn.addEventListener('click', () => auth.signOut().then(() => window.location.href = 'loyalty-login.html'));
 
 document.addEventListener('DOMContentLoaded', () => {

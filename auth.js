@@ -18,7 +18,6 @@ const authMessage = document.getElementById('authMessage');
 export function initAuth() {
     loginBtn.addEventListener('click', handleEmailLogin);
     googleLoginBtn.addEventListener('click', handleGoogleLogin);
-    console.log('Auth event listeners initialized.');
 }
 
 /**
@@ -36,7 +35,6 @@ async function handleEmailLogin() {
     try {
         await auth.signInWithEmailAndPassword(email, password);
         authMessage.textContent = ''; // Clear message on success
-        console.log('Email/Password login successful.');
     } catch (error) {
         authMessage.textContent = `Login failed: ${error.message}`;
         console.error('Email/Password Login error:', error);
@@ -51,7 +49,6 @@ async function handleGoogleLogin() {
     try {
         await auth.signInWithPopup(provider);
         authMessage.textContent = ''; // Clear message on success
-        console.log('Google Sign-in successful.');
     } catch (error) {
         authMessage.textContent = `Google Sign-in failed: ${error.message}`;
         console.error('Google Sign-in error:', error);
@@ -68,7 +65,6 @@ export function showAuth() {
     loginEmail.value = '';
     loginPassword.value = '';
     authMessage.textContent = '';
-    console.log('Authentication screen shown.');
 }
 
 /**
@@ -76,5 +72,4 @@ export function showAuth() {
  */
 export function hideAuth() {
     authContainer.style.display = 'none';
-    console.log('Authentication screen hidden.');
 }

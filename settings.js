@@ -117,5 +117,4 @@ export async function renderSettingsPage() {
         });
     });
 
-    console.log('Settings page rendered.');
 }

@@ -193,7 +193,6 @@ window.importAllIngredientsForLocations = async function() {
         "ONLY RUN THIS ONCE FOR INITIAL SETUP AND TEST WITH CAUTION."
     );
     if (!confirmImport) {
-        console.log("Multi-location import cancelled by user.");
         return;
     }
 
@@ -213,7 +212,6 @@ window.importAllIngredientsForLocations = async function() {
     for (const locationId of allLocations) {
         const batch = db.batch();
         let locationImportCount = 0;
-        console.log(`Starting import for location: ${locationId}`);
 
         for (const item of allIngredientsDataMultiLocation) {
             // Reference to the item document WITHIN the specific location's subcollection
@@ -249,7 +247,6 @@ window.importAllIngredientsForLocations = async function() {
         try {
             await batch.commit();
             totalImportedCount += locationImportCount;
-            console.log(`Successfully imported ${locationImportCount} items for ${locationId}.`);
         } catch (error) {
             console.error(`Error importing for ${locationId}:`, error);
             alert(`Failed to import items for ${locationId}: ${error.message}. Check console for details.`);
@@ -257,7 +254,6 @@ window.importAllIngredientsForLocations = async function() {
         }
     }
 
-    console.log(`Total successfully imported ${totalImportedCount} ingredients across all locations.`);
     alert(`All ingredients (${totalImportedCount} total) successfully imported across all locations!`);
 
     // After import, if a location is already chosen in the app, force a dashboard refresh
@@ -265,7 +261,6 @@ window.importAllIngredientsForLocations = async function() {
     if (window.mainApp && typeof window.mainApp.getSelectedLocation === 'function') {
         const currentSelectedLocation = window.mainApp.getSelectedLocation();
         if (currentSelectedLocation) {
-            console.log("Refreshing dashboard with newly imported data.");
             // Assuming mainApp.showDashboard re-renders the current page (dashboard)
             window.mainApp.showDashboard(currentSelectedLocation);
         }

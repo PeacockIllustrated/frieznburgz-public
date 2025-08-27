@@ -52,7 +52,6 @@ function initializeApp() {
     // Observe Firebase authentication state changes
     auth.onAuthStateChanged(handleAuthStateChange);
 
-    console.log('Application initialized.');
 }
 
 /**
@@ -100,7 +99,6 @@ function showDashboard(locationId) {
     // Automatically render content for the default dashboard page
     renderPageContent('dashboard');
 
-    console.log(`Dashboard shown for location: ${getLocationDisplayName(locationId)}`);
 }
 
 /**
@@ -109,7 +107,6 @@ function showDashboard(locationId) {
 async function handleLogout() {
     try {
         await auth.signOut();
-        console.log('User logged out successfully.');
     } catch (error) {
         console.error('Logout error:', error);
         alert('Failed to log out. Please try again.');
@@ -123,7 +120,6 @@ function handleChangeLocation() {
     clearSelectedLocation(); // Clear the currently selected location from local storage
     hideDashboardContainer(); // Hide the dashboard
     showLocationSelection(); // Show the location selection screen again
-    console.log('User requested to change location.');
 }
 
 /**
@@ -164,7 +160,6 @@ async function renderPageContent(pageId) {
             break;
         case 'loyalty-management':
             await renderLoyaltyManagementPage();
-            console.log('Rendering Loyalty Management page...');
             break;
         case 'wastage-log':
             await renderWastageLogPage();

@@ -47,7 +47,6 @@ const LOCATION_STORAGE_KEY = 'fnb_selected_location_id';
  */
 export function saveSelectedLocation(locationId) {
     localStorage.setItem(LOCATION_STORAGE_KEY, locationId);
-    console.log(`Location saved: ${locationId}`);
 }
 
 /**
@@ -66,7 +65,6 @@ export function getSelectedLocation() {
  */
 export function clearSelectedLocation() {
     localStorage.removeItem(LOCATION_STORAGE_KEY);
-    console.log('Location cleared from storage.');
 }
 
 /**

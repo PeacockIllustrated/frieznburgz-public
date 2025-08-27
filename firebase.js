@@ -11,5 +11,3 @@ if (!firebase.apps.length) {
 export const auth = firebase.auth();
 export const db = firebase.firestore();
 export const functions = firebase.functions(); // Make sure this line is here
-
-console.log('Firebase initialized and services exported for ADMIN DASHBOARD.');

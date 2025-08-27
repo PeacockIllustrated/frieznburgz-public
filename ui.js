@@ -42,7 +42,6 @@ export function initSidebarNav(onNavLinkClickCallback) { // Now correctly accept
             }
         });
     });
-    console.log('Sidebar navigation initialized.');
 }
 
 /**
@@ -72,7 +71,6 @@ export function showPage(pageId) {
         // or if there's a mismatch between kebabToCamelCase and HTML IDs.
         console.warn(`UI Error: Attempted to show unknown page with ID: ${camelCasePageId}Page`);
     }
-    console.log(`Showing page: ${pageId}`); // Log the original pageId for clarity
 }
 
 /**
@@ -84,7 +82,6 @@ export function hideAllPages() {
         page.classList.remove('active-page');
         page.style.display = 'none';
     });
-    console.log('All content pages hidden.');
 }
 
 /**
@@ -107,7 +104,6 @@ function updateSidebarActiveState(activePageId) {
  */
 export function showDashboardContainer() {
     mainDashboardContainer.style.display = 'grid'; // Use grid for dashboard layout as defined in CSS
-    console.log('Main dashboard container shown.');
 }
 
 /**
@@ -116,5 +112,4 @@ export function showDashboardContainer() {
  */
 export function hideDashboardContainer() {
     mainDashboardContainer.style.display = 'none';
-    console.log('Main dashboard container hidden.');
 }

@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.dispatchEvent(new CustomEvent('userAuthenticated', { detail: { user } }));
         } else {
             // No user is logged in, redirect to the login page.
-            console.log('No user session found. Redirecting to login page.');
             window.location.href = 'login.html';
         }
     });

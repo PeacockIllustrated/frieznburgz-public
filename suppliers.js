@@ -112,7 +112,6 @@ export async function renderSuppliersPage() {
     allUniqueStockItemsCache = await getAllUniqueStockItems();
 
     await loadSuppliers(supplierListContainer);
-    console.log('Suppliers page rendered.');
 }
 
 /**
@@ -164,8 +163,6 @@ async function loadSuppliers(container) {
                 }
             });
         });
-
-        console.log(`Loaded ${suppliers.length} suppliers from Firestore.`);
 
     } catch (error) {
         console.error('Error loading suppliers from Firestore:', error);
@@ -280,11 +277,9 @@ async function handleSaveOrEditSupplier(originalSupplierData) {
         if (supplierId) {
             // Update existing supplier
             await db.collection('suppliers').doc(supplierId).update(supplierToSave);
-            console.log(`Supplier ${supplierId} updated in Firestore.`);
         } else {
             // Add new supplier
             await db.collection('suppliers').add(supplierToSave); // Firestore will generate ID
-            console.log('New supplier added to Firestore.');
         }
 
         modalMessage.textContent = 'Supplier saved successfully!';
@@ -321,7 +316,6 @@ async function handleDeleteSupplier(supplierId, supplierName) {
 
     try {
         await db.collection('suppliers').doc(supplierId).delete();
-        console.log(`Supplier ${supplierId} deleted from Firestore.`);
 
         modalMessage.textContent = 'Supplier deleted successfully!';
         setTimeout(() => {

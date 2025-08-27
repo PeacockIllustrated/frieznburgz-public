@@ -18,7 +18,6 @@ const currentLocationDisplay = document.getElementById('currentLocationDisplay')
 export function initLocationSelection() {
     populateLocationDropdown();
     confirmLocationBtn.addEventListener('click', handleLocationConfirmation);
-    console.log('Location selection event listeners initialized.');
 }
 
 /**
@@ -32,7 +31,6 @@ function populateLocationDropdown() {
         option.textContent = loc.name;
         locationSelect.appendChild(option);
     });
-    console.log('Location dropdown populated.');
 }
 
 /**
@@ -48,7 +46,6 @@ function handleLocationConfirmation() {
 
     saveSelectedLocation(selectedLocationId); // Save to local storage
     locationMessage.textContent = ''; // Clear message
-    console.log(`Location confirmed: ${selectedLocationId}`);
 
     // Call a function from main.js or an orchestrator to proceed to dashboard
     // This is a direct call for simplicity, but in a larger app might be an event.
@@ -68,7 +65,6 @@ export function showLocationSelection() {
     } else {
         locationSelect.value = ''; // Reset to placeholder
     }
-    console.log('Location selection screen shown.');
 }
 
 /**
@@ -76,7 +72,6 @@ export function showLocationSelection() {
  */
 export function hideLocationSelection() {
     locationSelectionContainer.style.display = 'none';
-    console.log('Location selection screen hidden.');
 }
 
 /**
@@ -85,5 +80,4 @@ export function hideLocationSelection() {
  */
 export function updateLocationDisplay(locationId) {
     currentLocationDisplay.textContent = `Location: ${getLocationDisplayName(locationId)}`;
-    console.log(`Current location display updated to: ${getLocationDisplayName(locationId)}`);
 }

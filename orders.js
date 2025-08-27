@@ -83,7 +83,6 @@ function hideCustomTooltip() {
  * Renders the Orders page content.
  */
 export async function renderOrdersPage() {
-    console.log('orders.js: renderOrdersPage called.');
 
     const selectedLocationId = getSelectedLocation();
     if (!selectedLocationId) {
@@ -117,7 +116,6 @@ export async function renderOrdersPage() {
     allSuppliersCache = await getSuppliers();
 
     await loadOrders(ordersListContainer);
-    console.log(`orders.js: Orders page rendered for ${locationDisplayName}.`);
 }
 
 /**
@@ -177,7 +175,6 @@ async function loadOrders(container) {
             });
         });
 
-        console.log(`orders.js: Loaded ${orders.length} orders from Firestore.`);
 
     } catch (error) {
         console.error('orders.js: Error loading orders from Firestore:', error);
@@ -473,10 +470,8 @@ async function handleSaveOrder(originalOrderData) {
     try {
         if (originalOrderData && originalOrderData.id) {
             await db.collection('locations').doc(selectedLocationId).collection('orders').doc(originalOrderData.id).update(orderToSave);
-            console.log(`Order ${originalOrderData.id} updated in Firestore.`);
         } else {
             await db.collection('locations').doc(selectedLocationId).collection('orders').add(orderToSave);
-            console.log('New order created in Firestore.');
         }
 
         modalMessage.textContent = 'Order saved successfully!';
@@ -521,7 +516,6 @@ async function handleReceiveOrder(orderData) {
     try {
         await batch.commit();
         alert(`Order from ${orderData.supplierName} successfully marked as Received. Stock updated!`);
-        console.log(`Order ${orderData.id} received and stock updated.`);
 
         closeModal();
         renderOrdersPage();
@@ -554,7 +548,6 @@ async function handleCancelOrder(orderData) {
             timestampReceived: firebase.firestore.FieldValue.serverTimestamp() // Log cancellation time
         });
         alert(`Order from ${orderData.supplierName} successfully cancelled.`);
-        console.log(`Order ${orderData.id} cancelled.`);
 
         closeModal();
         renderOrdersPage();

@@ -22,4 +22,3 @@ export const auth = firebase.auth();
 export const db = firebase.firestore();
 export const functions = firebase.functions(); // Export functions instance
 
-console.log('Firebase Loyalty App initialized and services exported.');
