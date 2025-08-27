@@ -1,0 +1,186 @@
+/* public/employee-flow.css */
+
+/* Re-using variables and base styles from the main stylesheet for consistency */
+:root {
+    --charcoal: #333333;
+    --dim-grey: #6c757d;
+    --light-grey: #f8f9fa;
+    --border-grey: #dee2e6;
+    --white: #ffffff;
+    --red: #dc3545;
+    --salmon: #e58c7F;
+    --peach: #F2D492;
+    --blue: #007bff;
+    --success-green: #28a745;
+    --sans-serif: 'Futura', 'Montserrat', sans-serif;
+    --serif: 'Fraunces', serif;
+}
+
+body {
+    font-family: var(--sans-serif);
+    background-color: var(--light-grey);
+    color: var(--charcoal);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* --- Authentication Card Styling (re-used from main app) --- */
+.auth-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-card {
+    background-color: var(--white);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.auth-logo {
+    max-width: 100px;
+    margin-bottom: 20px;
+}
+
+.auth-title {
+    font-family: var(--serif);
+    font-size: 28px;
+    color: var(--charcoal);
+    margin-bottom: 10px;
+}
+
+.form-intro {
+    font-size: 16px;
+    color: var(--dim-grey);
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-grey);
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.auth-button {
+    background-color: var(--salmon);
+    color: var(--white);
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.auth-button:hover {
+    background-color: #d47a6a;
+}
+
+.auth-message {
+    color: var(--red);
+    margin-top: 15px;
+    min-height: 20px;
+}
+
+/* --- Information Container Styling --- */
+.info-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    overflow: hidden; /* Ensures footer is contained by the border-radius */
+}
+
+.info-header {
+    background-color: var(--charcoal);
+    color: var(--white);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+}
+
+.header-logo {
+    max-width: 60px;
+    margin-right: 20px;
+}
+
+.app-name {
+    font-family: var(--serif);
+    font-size: 32px;
+    margin: 0;
+}
+
+.info-content {
+    padding: 40px;
+}
+
+.info-content h2 {
+    font-family: var(--serif);
+    font-size: 24px;
+    color: var(--salmon);
+    border-bottom: 2px solid var(--peach);
+    padding-bottom: 10px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.info-content h2:first-child {
+    margin-top: 0;
+}
+
+.info-content p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--dim-grey);
+}
+
+.info-content ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+.info-content li {
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.info-content li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--salmon);
+    font-weight: bold;
+}
+
+.info-content code {
+    background-color: var(--light-grey);
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.info-footer {
+    background-color: var(--light-grey);
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+    color: var(--dim-grey);
+    border-top: 1px solid var(--border-grey);
+}

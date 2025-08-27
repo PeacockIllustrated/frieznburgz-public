@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friez n Burgz | Employee User Flow</title>
+    <link rel="stylesheet" href="employee-flow.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@800;900&family=Futura:wght@400&family=Montserrat:wght@800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container" id="password-container">
+        <div class="auth-card">
+            <img src="../assets/logo-alt.png" alt="Friez n Burgz Logo" class="auth-logo">
+            <h2 class="auth-title">Employee Flow Documentation</h2>
+            <p class="form-intro">This page is restricted. Please enter the password to view the documentation.</p>
+            <form id="password-form">
+                <div class="form-group">
+                    <input type="password" id="gatekeeper-password" class="auth-input" placeholder="Password" autocomplete="off">
+                </div>
+                <button type="submit" class="auth-button">View Documentation</button>
+                <p id="gatekeeper-message" class="auth-message"></p>
+            </form>
+        </div>
+    </div>
+
+    <div class="info-container" id="info-container" style="display: none;">
+        <header class="info-header">
+            <img src="../assets/logo.png" alt="Friez n Burgz Logo" class="header-logo">
+            <h1 class="app-name">Employee User Flow</h1>
+        </header>
+        <main class="info-content">
+            <h2>1. New Employee Registration</h2>
+            <p>The first step for any new team member is to register their profile. This is done through the Staff Training portal.</p>
+            <ul>
+                <li><strong>Access the Registration Page:</strong> Navigate to <code>staff-training/register-profile.html</code>.</li>
+                <li><strong>Company Password:</strong> You will first be prompted to enter a company-wide password (<code>FNB-STAFF!</code>) to ensure only authorized personnel can register.</li>
+                <li><strong>Profile Creation:</strong> After verification, you will fill out your personal details, including name, email, a personal password for your account, phone number, primary store location, and start date.</li>
+                <li><strong>Account Activation:</strong> Upon submission, your account is created in the system, and you are redirected to the training login page.</li>
+            </ul>
+
+            <h2>2. Staff Training Module</h2>
+            <p>After registering, all employees must complete the mandatory training module.</p>
+            <ul>
+                <li><strong>Login:</strong> Use your newly created email and password to log in at <code>staff-training/login.html</code>.</li>
+                <li><strong>Training Content:</strong> The training module consists of several sections covering company policies, food safety, and customer service standards.</li>
+                <li><strong>Quiz Assessment:</strong> At the end of the training, you must pass a quiz to demonstrate your understanding of the material. Your quiz history is recorded.</li>
+            </ul>
+
+            <h2>3. Main Admin Dashboard</h2>
+            <p>The Admin Dashboard is the central hub for daily operations.</p>
+            <ul>
+                <li><strong>Login:</strong> Access the dashboard via the main <code>index.html</code> page. Log in using the same credentials you created during registration.</li>
+                <li><strong>Location Selection:</strong> After logging in, you must select your current store location to see the relevant data.</li>
+                <li><strong>Dashboard Features:</strong> From the dashboard, you can access various modules:
+                    <ul>
+                        <li><strong>Stock Management:</strong> Track inventory levels and manage stock.</li>
+                        <li><strong>Wastage Log:</strong> Record any food wastage.</li>
+                        <li><strong>Loyalty Management:</strong> Assist customers with the loyalty program.</li>
+                        <li><strong>Orders:</strong> View and manage incoming orders.</li>
+                        <li><strong>Suppliers:</strong> Access information about suppliers.</li>
+                    </ul>
+                </li>
+            </ul>
+
+        </main>
+        <footer class="info-footer">
+            <p>&copy; 2024 Friez n Burgz. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    <script src="employee-flow.js"></script>
+</body>
+</html>
