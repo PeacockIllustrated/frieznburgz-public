@@ -1,25 +1,19 @@
 /* public/employee-flow.css */
 
-/* Re-using variables and base styles from the main stylesheet for consistency */
+/* Using the color variables from the main style.css */
 :root {
-    --charcoal: #333333;
-    --dim-grey: #6c757d;
-    --light-grey: #f8f9fa;
-    --border-grey: #dee2e6;
-    --white: #ffffff;
-    --red: #dc3545;
-    --salmon: #e58c7F;
-    --peach: #F2D492;
-    --blue: #007bff;
-    --success-green: #28a745;
-    --sans-serif: 'Futura', 'Montserrat', sans-serif;
-    --serif: 'Fraunces', serif;
+    --red: #e71e26;
+    --yellow: white;
+    --dim-grey: #2f2f2f;
+    --khaki: #fbae29;
+    --salmon: #ff9686;
+    --dark-slate-grey: #050505;
 }
 
 body {
-    font-family: var(--sans-serif);
-    background-color: var(--light-grey);
-    color: var(--charcoal);
+    font-family: 'Futura', Arial, sans-serif;
+    background-color: var(--dark-slate-grey);
+    color: var(--red);
     margin: 0;
     padding: 20px;
     display: flex;
@@ -28,33 +22,37 @@ body {
     min-height: 100vh;
 }
 
-/* --- Authentication Card Styling (re-used from main app) --- */
+/* --- Authentication Card Styling (adapted from main app) --- */
 .auth-container {
     width: 100%;
-    max-width: 400px;
+    max-width: 450px;
 }
 
 .auth-card {
-    background-color: var(--white);
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    background-color: var(--yellow);
+    border: 5px solid var(--khaki);
+    border-radius: 20px;
+    padding: 40px 30px;
     text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
 }
 
 .auth-logo {
-    max-width: 100px;
-    margin-bottom: 20px;
+    max-width: 180px;
+    margin-bottom: 25px;
 }
 
 .auth-title {
-    font-family: var(--serif);
-    font-size: 28px;
-    color: var(--charcoal);
-    margin-bottom: 10px;
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 30px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 25px;
 }
 
 .form-intro {
+    font-family: 'Futura', Arial, sans-serif;
     font-size: 16px;
     color: var(--dim-grey);
     margin-bottom: 25px;
@@ -66,33 +64,41 @@ body {
 }
 
 .auth-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--border-grey);
-    border-radius: 6px;
+    width: calc(100% - 20px);
+    padding: 12px 10px;
+    margin-bottom: 15px;
+    border: 2px solid var(--red);
+    border-radius: 8px;
+    font-family: 'Futura', Arial, sans-serif;
     font-size: 16px;
-    box-sizing: border-box;
+    color: var(--dim-grey);
+    background-color: var(--yellow);
 }
 
 .auth-button {
-    background-color: var(--salmon);
-    color: var(--white);
-    padding: 12px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: bold;
+    background-color: var(--red);
+    color: var(--yellow);
+    border: 2px solid var(--yellow);
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.2s ease;
     width: 100%;
 }
 
 .auth-button:hover {
-    background-color: #d47a6a;
+    background-color: var(--yellow);
+    color: var(--red);
+    border-color: var(--red);
 }
 
 .auth-message {
     color: var(--red);
+    font-size: 14px;
     margin-top: 15px;
     min-height: 20px;
 }
@@ -100,41 +106,48 @@ body {
 /* --- Information Container Styling --- */
 .info-container {
     width: 100%;
-    max-width: 800px;
-    background-color: var(--white);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    overflow: hidden; /* Ensures footer is contained by the border-radius */
+    max-width: 900px;
+    background-color: var(--yellow);
+    border: 5px solid var(--khaki);
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
 }
 
 .info-header {
-    background-color: var(--charcoal);
-    color: var(--white);
+    background-color: var(--red);
+    color: var(--yellow);
     padding: 20px 40px;
     display: flex;
     align-items: center;
+    border-bottom: 5px solid var(--yellow);
 }
 
 .header-logo {
-    max-width: 60px;
+    max-width: 100px;
     margin-right: 20px;
 }
 
 .app-name {
-    font-family: var(--serif);
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
     font-size: 32px;
+    text-transform: uppercase;
     margin: 0;
 }
 
 .info-content {
     padding: 40px;
+    color: var(--dim-grey);
 }
 
 .info-content h2 {
-    font-family: var(--serif);
-    font-size: 24px;
-    color: var(--salmon);
-    border-bottom: 2px solid var(--peach);
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 28px;
+    color: var(--red);
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--salmon);
     padding-bottom: 10px;
     margin-top: 30px;
     margin-bottom: 20px;
@@ -145,42 +158,47 @@ body {
 }
 
 .info-content p {
+    font-family: 'Futura', Arial, sans-serif;
     font-size: 16px;
     line-height: 1.6;
-    color: var(--dim-grey);
 }
 
 .info-content ul {
     list-style-type: none;
-    padding-left: 20px;
+    padding-left: 0;
+    margin-top: 20px;
 }
 
 .info-content li {
-    margin-bottom: 10px;
-    padding-left: 20px;
-    position: relative;
+    background-color: #fffbeb;
+    padding: 15px;
+    border-left: 5px solid var(--salmon);
+    margin-bottom: 15px;
+    border-radius: 0 8px 8px 0;
 }
 
-.info-content li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: var(--salmon);
-    font-weight: bold;
+.info-content li strong {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: var(--red);
+    display: block;
+    margin-bottom: 5px;
 }
 
 .info-content code {
-    background-color: var(--light-grey);
-    padding: 2px 5px;
+    background-color: var(--dark-slate-grey);
+    color: var(--yellow);
+    padding: 3px 6px;
     border-radius: 4px;
     font-family: monospace;
+    font-size: 14px;
 }
 
 .info-footer {
-    background-color: var(--light-grey);
+    background-color: var(--dark-slate-grey);
     text-align: center;
     padding: 15px;
     font-size: 14px;
-    color: var(--dim-grey);
-    border-top: 1px solid var(--border-grey);
+    color: var(--yellow);
+    border-top: 5px solid var(--khaki);
 }
