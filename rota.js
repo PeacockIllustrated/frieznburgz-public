@@ -57,10 +57,11 @@ async function renderRota() {
         const rotaDoc = await db.collection('rota').doc(weekId).get();
         rotaData = rotaDoc.exists ? rotaDoc.data() : {};
 
-        // Ensure every day has an array, even if empty
+        // Ensure every day has an array, even if empty. This also handles legacy data
+        // where the day's value might be an object instead of an array.
         const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
         days.forEach(day => {
-            if (!rotaData[day]) {
+            if (!Array.isArray(rotaData[day])) {
                 rotaData[day] = [];
             }
         });
