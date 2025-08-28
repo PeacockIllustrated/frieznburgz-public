@@ -4,11 +4,13 @@ import {
     createRotaContainerHtml,
     createRotaGridHtml,
     createRotaMobileHtml,
+    createShiftModalHtml,
     createAssignStaffModalHtml
 } from './rota-template.js';
 
 let currentWeekStartDate;
 let allStaff = [];
+let rotaData = {};
 
 /**
  * Main function to render the entire rota page.
@@ -17,12 +19,11 @@ export async function renderRotaPage() {
     const rotaContent = document.getElementById('rotaContent');
     rotaContent.innerHTML = `<div id="rotaContainer"></div>`;
 
-    // Set initial date to the start of the current week (Monday)
     const today = new Date();
-    const dayOfWeek = today.getDay(); // Sunday = 0, Monday = 1...
-    const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust for Sunday
+    const dayOfWeek = today.getDay();
+    const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
     currentWeekStartDate = new Date(today.setDate(diff));
-    currentWeekStartDate.setHours(0, 0, 0, 0); // Normalize to midnight
+    currentWeekStartDate.setHours(0, 0, 0, 0);
 
     await loadAllStaff();
     await renderRota();
@@ -41,7 +42,7 @@ async function loadAllStaff() {
 }
 
 /**
- * Renders the weekly rota section.
+ * Renders the weekly rota section, including fetching data.
  */
 async function renderRota() {
     const rotaContainer = document.getElementById('rotaContainer');
@@ -54,10 +55,17 @@ async function renderRota() {
     const rotaGridContainer = document.getElementById('rotaGridContainer');
     try {
         const rotaDoc = await db.collection('rota').doc(weekId).get();
-        const rotaData = rotaDoc.exists ? rotaDoc.data() : {};
+        rotaData = rotaDoc.exists ? rotaDoc.data() : {};
+
+        // Ensure every day has an array, even if empty
+        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        days.forEach(day => {
+            if (!rotaData[day]) {
+                rotaData[day] = [];
+            }
+        });
 
         rotaGridContainer.innerHTML = createRotaGridHtml(rotaData, allStaff) + createRotaMobileHtml(rotaData, allStaff);
-
         attachRotaActionListeners();
     } catch (error) {
         console.error("Error rendering rota:", error);
@@ -65,33 +73,113 @@ async function renderRota() {
     }
 }
 
+// --- SHIFT MANAGEMENT ---
+
+/**
+ * Opens a modal to add a new shift or edit an existing one.
+ */
+function openShiftModal(day, shiftId = null) {
+    const shift = shiftId ? rotaData[day].find(s => s.id === shiftId) : null;
+    const title = shiftId ? 'Edit Shift' : 'Add New Shift';
+    const bodyHtml = createShiftModalHtml(shift);
+    const footerHtml = `<button id="saveShiftBtn" class="auth-button">Save Shift</button>`;
+
+    window.mainApp.openModal(title, bodyHtml, footerHtml);
+
+    document.getElementById('saveShiftBtn').addEventListener('click', () => handleSaveShift(day, shiftId));
+}
+
+/**
+ * Saves a new shift or updates an existing one in Firestore.
+ */
+async function handleSaveShift(day, shiftId = null) {
+    const startTime = document.getElementById('shiftStartTime').value;
+    const endTime = document.getElementById('shiftEndTime').value;
+    if (!startTime || !endTime) {
+        alert("Please select both a start and end time.");
+        return;
+    }
+
+    const weekId = getWeekId(currentWeekStartDate);
+    const rotaRef = db.collection('rota').doc(weekId);
+    let dayShifts = rotaData[day] || [];
+
+    if (shiftId) { // Editing existing shift
+        dayShifts = dayShifts.map(shift =>
+            shift.id === shiftId ? { ...shift, startTime, endTime } : shift
+        );
+    } else { // Adding new shift
+        const newShift = {
+            id: `shift_${Date.now()}`,
+            startTime,
+            endTime,
+            staff: []
+        };
+        dayShifts.push(newShift);
+    }
+
+    try {
+        await rotaRef.set({ [day]: dayShifts }, { merge: true });
+        window.mainApp.closeModal();
+        renderRota();
+    } catch (error) {
+        console.error("Error saving shift:", error);
+        alert("Failed to save shift.");
+    }
+}
+
+/**
+ * Deletes a shift from a day.
+ */
+async function handleDeleteShift(day, shiftId) {
+    if (!confirm("Are you sure you want to delete this entire shift?")) return;
+
+    const weekId = getWeekId(currentWeekStartDate);
+    const rotaRef = db.collection('rota').doc(weekId);
+    const updatedShifts = rotaData[day].filter(shift => shift.id !== shiftId);
+
+    try {
+        await rotaRef.set({ [day]: updatedShifts }, { merge: true });
+        renderRota();
+    } catch (error) {
+        console.error("Error deleting shift:", error);
+        alert("Failed to delete shift.");
+    }
+}
+
+// --- STAFF ASSIGNMENT ---
+
 /**
  * Opens the modal to assign staff to a specific shift.
  */
-async function openAssignStaffModal(day, shift) {
-    const weekId = getWeekId(currentWeekStartDate);
-    const rotaDoc = await db.collection('rota').doc(weekId).get();
-    const assignedUids = rotaDoc.exists ? rotaDoc.data()[day]?.[shift] || [] : [];
+function openAssignStaffModal(day, shiftId) {
+    const shift = rotaData[day].find(s => s.id === shiftId);
+    if (!shift) return;
 
+    const assignedUids = shift.staff || [];
     const bodyHtml = createAssignStaffModalHtml(allStaff, assignedUids);
     const footerHtml = `<button id="saveRotaAssignmentBtn" class="auth-button">Save</button>`;
 
-    window.mainApp.openModal(`Assign Staff: ${day.charAt(0).toUpperCase() + day.slice(1)} (${shift})`, bodyHtml, footerHtml);
+    window.mainApp.openModal(`Assign Staff: ${shift.startTime}-${shift.endTime}`, bodyHtml, footerHtml);
 
-    document.getElementById('saveRotaAssignmentBtn').addEventListener('click', () => handleSaveRotaAssignment(day, shift));
+    document.getElementById('saveRotaAssignmentBtn').addEventListener('click', () => handleSaveRotaAssignment(day, shiftId));
 }
 
 /**
  * Saves the selected staff for a shift to Firestore.
  */
-async function handleSaveRotaAssignment(day, shift) {
-    const weekId = getWeekId(currentWeekStartDate);
+async function handleSaveRotaAssignment(day, shiftId) {
     const form = document.getElementById('assignStaffForm');
     const checkedUids = Array.from(form.querySelectorAll('input[name="assignedStaff"]:checked')).map(cb => cb.value);
 
+    const updatedShifts = rotaData[day].map(shift =>
+        shift.id === shiftId ? { ...shift, staff: checkedUids } : shift
+    );
+
+    const weekId = getWeekId(currentWeekStartDate);
     const rotaRef = db.collection('rota').doc(weekId);
     try {
-        await rotaRef.set({ [day]: { [shift]: checkedUids } }, { merge: true });
+        await rotaRef.set({ [day]: updatedShifts }, { merge: true });
         window.mainApp.closeModal();
         renderRota();
     } catch (error) {
@@ -103,16 +191,22 @@ async function handleSaveRotaAssignment(day, shift) {
 /**
  * Removes a staff member from a specific shift.
  */
-async function handleRemoveStaffFromShift(day, shift, uid) {
+async function handleRemoveStaffFromShift(day, shiftId, uid) {
+    const shift = rotaData[day].find(s => s.id === shiftId);
+    if (!shift) return;
+
     const staffName = allStaff.find(s => s.uid === uid)?.name || 'this staff member';
     if (!confirm(`Are you sure you want to remove ${staffName} from this shift?`)) return;
+
+    const updatedStaff = shift.staff.filter(staffUid => staffUid !== uid);
+    const updatedShifts = rotaData[day].map(s =>
+        s.id === shiftId ? { ...s, staff: updatedStaff } : s
+    );
 
     const weekId = getWeekId(currentWeekStartDate);
     const rotaRef = db.collection('rota').doc(weekId);
     try {
-        await rotaRef.update({
-            [`${day}.${shift}`]: firebase.firestore.FieldValue.arrayRemove(uid)
-        });
+        await rotaRef.set({ [day]: updatedShifts }, { merge: true });
         renderRota();
     } catch(error) {
         console.error("Error removing staff from shift:", error);
@@ -143,15 +237,25 @@ function attachRotaNavListeners() {
 
 function attachRotaActionListeners() {
     document.getElementById('rotaGridContainer').addEventListener('click', (event) => {
-        const addBtn = event.target.closest('.add-staff-btn');
-        const staffTag = event.target.closest('.staff-tag');
+        const addShiftBtn = event.target.closest('.add-shift-btn');
+        const editShiftBtn = event.target.closest('.edit-shift-btn');
+        const deleteShiftBtn = event.target.closest('.delete-shift-btn');
+        const assignStaffBtn = event.target.closest('.assign-staff-btn');
+        const staffTag = event.target.closest('.staff-tag-small');
 
-        if (addBtn) {
-            const { day, shift } = addBtn.dataset;
-            openAssignStaffModal(day, shift);
+        if (addShiftBtn) {
+            openShiftModal(addShiftBtn.dataset.day);
+        } else if (editShiftBtn) {
+            const shiftCard = editShiftBtn.closest('.shift-card');
+            openShiftModal(shiftCard.dataset.day, shiftCard.dataset.shiftId);
+        } else if (deleteShiftBtn) {
+            const shiftCard = deleteShiftBtn.closest('.shift-card');
+            handleDeleteShift(shiftCard.dataset.day, shiftCard.dataset.shiftId);
+        } else if (assignStaffBtn) {
+            const shiftCard = assignStaffBtn.closest('.shift-card');
+            openAssignStaffModal(shiftCard.dataset.day, shiftCard.dataset.shiftId);
         } else if (staffTag) {
-            const { day, shift, uid } = staffTag.dataset;
-            handleRemoveStaffFromShift(day, shift, uid);
+            handleRemoveStaffFromShift(staffTag.dataset.day, staffTag.dataset.shiftId, staffTag.dataset.uid);
         }
     });
 }

@@ -1,7 +1,12 @@
 // --- rota-template.js ---
-// Provides HTML templates for the Rota page.
+// Provides HTML templates for the new, redesigned Rota page.
 
-// --- ROTA TEMPLATES ---
+// --- HELPER FUNCTIONS ---
+
+// Helper to get staff name safely
+const getStaffName = (uid, staffList) => staffList.find(s => s.uid === uid)?.name || 'Unknown User';
+
+// --- ROTA CONTAINER TEMPLATE ---
 
 /**
  * Generates the main HTML structure for the rota section.
@@ -24,48 +29,75 @@ export function createRotaContainerHtml(weekStartDate) {
                     <button id="rotaNextWeekBtn" class="auth-button small-btn secondary-btn">Next ></button>
                 </div>
             </div>
-            <div id="rotaGridContainer" class="rota-grid-container">
+            <div id="rotaGridContainer" class="rota-grid-container-professional">
                 <p>Loading rota...</p>
             </div>
         </div>
     `;
 }
 
-// Helper to get staff name safely
-const getStaffName = (uid, staffList) => staffList.find(s => s.uid === uid)?.name || 'Unknown User';
+// --- ROTA GRID AND SHIFT CARD TEMPLATES (DESKTOP) ---
 
 /**
- * Generates the HTML for the rota grid (desktop view).
+ * Generates the HTML for the professional rota grid (desktop view).
  * @param {Object} rotaData - The rota data for the week from Firestore.
  * @param {Array} staffList - The full list of staff members.
- * @returns {string} The HTML for the rota table.
+ * @returns {string} The HTML for the rota grid.
  */
 export function createRotaGridHtml(rotaData = {}, staffList = []) {
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    const shifts = ['morning', 'afternoon'];
 
-    let tableHtml = `<div class="rota-desktop-view"><table class="rota-table"><thead><tr><th>Shift</th>`;
-    days.forEach(day => tableHtml += `<th>${day.charAt(0).toUpperCase() + day.slice(1)}</th>`);
-    tableHtml += `</tr></thead><tbody>`;
+    let gridHtml = `<div class="rota-desktop-view-professional">`;
+    days.forEach(day => {
+        const shifts = rotaData[day] || [];
+        const shiftCardsHtml = shifts.map(shift => createShiftCardHtml(day, shift, staffList)).join('');
 
-    shifts.forEach(shift => {
-        tableHtml += `<tr><td class="shift-label">${shift.charAt(0).toUpperCase() + shift.slice(1)}</td>`;
-        days.forEach(day => {
-            const assignedUids = rotaData[day]?.[shift] || [];
-            const staffHtml = assignedUids.map(uid =>
-                `<div class="staff-tag" data-day="${day}" data-shift="${shift}" data-uid="${uid}">
-                    ${getStaffName(uid, staffList)}<span class="remove-staff-icon">×</span>
-                 </div>`
-            ).join('');
-
-            tableHtml += `<td class="rota-cell"><div class="assigned-staff">${staffHtml}</div><button class="add-staff-btn" data-day="${day}" data-shift="${shift}">+ Add</button></td>`;
-        });
-        tableHtml += `</tr>`;
+        gridHtml += `
+            <div class="day-column">
+                <div class="day-header">${day.charAt(0).toUpperCase() + day.slice(1)}</div>
+                <div class="shifts-container">
+                    ${shiftCardsHtml}
+                </div>
+                <button class="add-shift-btn auth-button small-btn" data-day="${day}">+ Add Shift</button>
+            </div>
+        `;
     });
-
-    tableHtml += `</tbody></table></div>`;
-    return tableHtml;
+    gridHtml += `</div>`;
+    return gridHtml;
 }
+
+/**
+ * Generates the HTML for a single shift card.
+ * @param {string} day - The day of the week.
+ * @param {Object} shift - The shift object.
+ * @param {Array} staffList - The full list of staff members.
+ * @returns {string} The HTML for the shift card.
+ */
+function createShiftCardHtml(day, shift, staffList) {
+    const staffHtml = shift.staff.map(uid =>
+        `<div class="staff-tag-small" data-day="${day}" data-shift-id="${shift.id}" data-uid="${uid}">
+            ${getStaffName(uid, staffList)}<span class="remove-staff-icon">×</span>
+        </div>`
+    ).join('');
+
+    return `
+        <div class="shift-card" data-day="${day}" data-shift-id="${shift.id}">
+            <div class="shift-card-header">
+                <span class="shift-time">${shift.startTime} - ${shift.endTime}</span>
+                <div class="shift-actions">
+                    <button class="edit-shift-btn" title="Edit shift time"><i class="fas fa-edit"></i></button>
+                    <button class="delete-shift-btn" title="Delete shift"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            <div class="shift-card-body">
+                <div class="assigned-staff-list">${staffHtml}</div>
+                <button class="assign-staff-btn auth-button tiny-btn" data-day="${day}" data-shift-id="${shift.id}">+ Assign</button>
+            </div>
+        </div>
+    `;
+}
+
+// --- MOBILE VIEW TEMPLATES ---
 
 /**
  * Generates the HTML for the mobile-friendly rota list.
@@ -75,40 +107,52 @@ export function createRotaGridHtml(rotaData = {}, staffList = []) {
  */
 export function createRotaMobileHtml(rotaData = {}, staffList = []) {
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    const shifts = ['morning', 'afternoon'];
 
     let mobileHtml = `<div class="rota-mobile-view">`;
     days.forEach(day => {
-        mobileHtml += `<div class="mobile-day-card">
-            <div class="mobile-day-header">${day.charAt(0).toUpperCase() + day.slice(1)}</div>`;
+        const shifts = rotaData[day] || [];
+        const shiftCardsHtml = shifts.map(shift => createShiftCardHtml(day, shift, staffList)).join('');
 
-        shifts.forEach(shift => {
-            const assignedUids = rotaData[day]?.[shift] || [];
-            const staffHtml = assignedUids.map(uid =>
-                `<div class="staff-tag" data-day="${day}" data-shift="${shift}" data-uid="${uid}">
-                    ${getStaffName(uid, staffList)}<span class="remove-staff-icon">×</span>
-                 </div>`
-            ).join('');
-
-            mobileHtml += `<div class="mobile-shift-section">
-                <div class="mobile-shift-header">${shift.charAt(0).toUpperCase() + shift.slice(1)}</div>
-                <div class="mobile-shift-body">
-                    ${staffHtml || '<p class="no-staff-msg">No staff assigned</p>'}
-                    <button class="add-staff-btn" data-day="${day}" data-shift="${shift}">+ Assign Staff</button>
-                </div>
-            </div>`;
-        });
-        mobileHtml += `</div>`;
+        mobileHtml += `
+            <div class="mobile-day-card-professional">
+                <div class="mobile-day-header">${day.charAt(0).toUpperCase() + day.slice(1)}</div>
+                ${shiftCardsHtml}
+                <button class="add-shift-btn auth-button small-btn" data-day="${day}">+ Add Shift</button>
+            </div>
+        `;
     });
     mobileHtml += `</div>`;
     return mobileHtml;
+}
+
+// --- MODAL TEMPLATES ---
+
+/**
+ * Generates the HTML for the "Add/Edit Shift" modal.
+ * @param {Object} shift - The existing shift data, or null for a new shift.
+ * @returns {string} The HTML for the modal's body.
+ */
+export function createShiftModalHtml(shift = null) {
+    const startTime = shift ? shift.startTime : '09:00';
+    const endTime = shift ? shift.endTime : '17:00';
+    return `
+        <form id="shiftForm" class="modal-form">
+            <div class="form-field">
+                <label for="shiftStartTime">Start Time</label>
+                <input type="time" id="shiftStartTime" value="${startTime}" required>
+            </div>
+            <div class="form-field">
+                <label for="shiftEndTime">End Time</label>
+                <input type="time" id="shiftEndTime" value="${endTime}" required>
+            </div>
+        </form>
+    `;
 }
 
 /**
  * Generates the HTML for the "Assign Staff" modal.
  * @param {Array} staffList - The full list of staff members.
  * @param {Array} assignedUids - An array of UIDs for staff already assigned to this shift.
-_
  * @returns {string} The HTML for the modal's body.
  */
 export function createAssignStaffModalHtml(staffList, assignedUids = []) {

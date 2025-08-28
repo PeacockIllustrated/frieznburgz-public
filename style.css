@@ -3207,3 +3207,183 @@ body {
     font-size: 14px;
     flex-shrink: 0;
 }
+
+/* --- NEW: Professional Rota Styles --- */
+
+.rota-grid-container-professional {
+    width: 100%;
+    min-height: 200px; /* Ensure it has some height for visibility */
+}
+
+.rota-desktop-view-professional {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    width: 100%;
+}
+
+.day-column {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border: 1px solid #eee;
+}
+
+.day-header {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--red);
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--salmon);
+}
+
+.shifts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-grow: 1;
+    min-height: 100px; /* Ensure space even if no shifts */
+}
+
+.add-shift-btn {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+}
+
+.shift-card {
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.shift-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--dim-grey);
+    color: var(--yellow);
+    padding: 8px 12px;
+    border-radius: 8px 8px 0 0;
+}
+
+.shift-time {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+}
+
+.shift-actions button {
+    background: none;
+    border: none;
+    color: var(--yellow);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 5px;
+    transition: color 0.2s;
+}
+
+.shift-actions button:hover {
+    color: var(--khaki);
+}
+
+.shift-card-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.assigned-staff-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-height: 20px;
+}
+
+.staff-tag-small {
+    background-color: var(--khaki);
+    color: var(--yellow);
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remove-staff-icon {
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 8px;
+    padding: 0 4px;
+}
+.remove-staff-icon:hover {
+    color: var(--red);
+}
+
+.assign-staff-btn {
+    align-self: flex-start;
+}
+
+.auth-button.tiny-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* Rota Mobile View */
+.rota-mobile-view {
+    display: none; /* Hidden on desktop */
+}
+
+@media screen and (max-width: 1024px) {
+    .rota-desktop-view-professional {
+        display: none;
+    }
+    .rota-mobile-view {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .mobile-day-card-professional {
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        padding: 15px;
+        border: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Modal form for shift times */
+#shiftForm .form-field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    width: 100%;
+}
+#shiftForm label {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--dim-grey);
+}
+#shiftForm input[type="time"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--red);
+    border-radius: 8px;
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 16px;
+    box-sizing: border-box;
+}
