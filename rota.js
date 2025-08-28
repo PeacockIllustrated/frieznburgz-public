@@ -5,12 +5,15 @@ import {
     createRotaGridHtml,
     createRotaMobileHtml,
     createShiftModalHtml,
-    createAssignStaffModalHtml
+    createAssignStaffModalHtml,
+    createCalendarHtml
 } from './rota-template.js';
 
 let currentWeekStartDate;
 let allStaff = [];
 let rotaData = {};
+let isCalendarOpen = false;
+let calendarDate;
 
 /**
  * Main function to render the entire rota page.
@@ -24,6 +27,7 @@ export async function renderRotaPage() {
     const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
     currentWeekStartDate = new Date(today.setDate(diff));
     currentWeekStartDate.setHours(0, 0, 0, 0);
+    calendarDate = new Date(currentWeekStartDate);
 
     await loadAllStaff();
     await renderRota();
@@ -57,8 +61,6 @@ async function renderRota() {
         const rotaDoc = await db.collection('rota').doc(weekId).get();
         rotaData = rotaDoc.exists ? rotaDoc.data() : {};
 
-        // Ensure every day has an array, even if empty. This also handles legacy data
-        // where the day's value might be an object instead of an array.
         const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
         days.forEach(day => {
             if (!Array.isArray(rotaData[day])) {
@@ -74,25 +76,74 @@ async function renderRota() {
     }
 }
 
-// --- SHIFT MANAGEMENT ---
+// --- CALENDAR MANAGEMENT ---
 
 /**
- * Opens a modal to add a new shift or edit an existing one.
+ * Toggles the visibility of the calendar popup.
  */
+function toggleCalendar() {
+    isCalendarOpen = !isCalendarOpen;
+    const popup = document.getElementById('calendarPopup');
+    if (isCalendarOpen) {
+        calendarDate = new Date(currentWeekStartDate);
+        popup.style.display = 'block';
+        renderCalendar();
+    } else {
+        popup.style.display = 'none';
+    }
+}
+
+/**
+ * Renders the calendar for the current `calendarDate`.
+ */
+function renderCalendar() {
+    const popup = document.getElementById('calendarPopup');
+    if (!popup) return;
+    popup.innerHTML = createCalendarHtml(calendarDate, currentWeekStartDate);
+
+    document.getElementById('calendarPrevMonthBtn').addEventListener('click', () => changeMonth(-1));
+    document.getElementById('calendarNextMonthBtn').addEventListener('click', () => changeMonth(1));
+    popup.querySelectorAll('.calendar-day:not(.empty)').forEach(dayEl => {
+        dayEl.addEventListener('click', (e) => selectDate(e.target.dataset.date));
+    });
+}
+
+/**
+ * Changes the displayed month in the calendar.
+ * @param {number} monthOffset - -1 for previous, 1 for next.
+ */
+function changeMonth(monthOffset) {
+    calendarDate.setMonth(calendarDate.getMonth() + monthOffset);
+    renderCalendar();
+}
+
+/**
+ * Handles the selection of a date from the calendar.
+ * @param {string} dateString - The selected date in 'YYYY-MM-DD' format.
+ */
+function selectDate(dateString) {
+    const selectedDate = new Date(dateString);
+    const dayOfWeek = selectedDate.getDay();
+    const diff = selectedDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+    currentWeekStartDate = new Date(selectedDate.setDate(diff));
+    currentWeekStartDate.setHours(0, 0, 0, 0);
+
+    toggleCalendar();
+    renderRota();
+}
+
+
+// --- SHIFT MANAGEMENT ---
+
 function openShiftModal(day, shiftId = null) {
     const shift = shiftId ? rotaData[day].find(s => s.id === shiftId) : null;
     const title = shiftId ? 'Edit Shift' : 'Add New Shift';
     const bodyHtml = createShiftModalHtml(shift);
     const footerHtml = `<button id="saveShiftBtn" class="auth-button">Save Shift</button>`;
-
     window.mainApp.openModal(title, bodyHtml, footerHtml);
-
     document.getElementById('saveShiftBtn').addEventListener('click', () => handleSaveShift(day, shiftId));
 }
 
-/**
- * Saves a new shift or updates an existing one in Firestore.
- */
 async function handleSaveShift(day, shiftId = null) {
     const startTime = document.getElementById('shiftStartTime').value;
     const endTime = document.getElementById('shiftEndTime').value;
@@ -105,18 +156,10 @@ async function handleSaveShift(day, shiftId = null) {
     const rotaRef = db.collection('rota').doc(weekId);
     let dayShifts = rotaData[day] || [];
 
-    if (shiftId) { // Editing existing shift
-        dayShifts = dayShifts.map(shift =>
-            shift.id === shiftId ? { ...shift, startTime, endTime } : shift
-        );
-    } else { // Adding new shift
-        const newShift = {
-            id: `shift_${Date.now()}`,
-            startTime,
-            endTime,
-            staff: []
-        };
-        dayShifts.push(newShift);
+    if (shiftId) {
+        dayShifts = dayShifts.map(shift => shift.id === shiftId ? { ...shift, startTime, endTime } : shift);
+    } else {
+        dayShifts.push({ id: `shift_${Date.now()}`, startTime, endTime, staff: [] });
     }
 
     try {
@@ -129,16 +172,11 @@ async function handleSaveShift(day, shiftId = null) {
     }
 }
 
-/**
- * Deletes a shift from a day.
- */
 async function handleDeleteShift(day, shiftId) {
     if (!confirm("Are you sure you want to delete this entire shift?")) return;
-
     const weekId = getWeekId(currentWeekStartDate);
     const rotaRef = db.collection('rota').doc(weekId);
     const updatedShifts = rotaData[day].filter(shift => shift.id !== shiftId);
-
     try {
         await rotaRef.set({ [day]: updatedShifts }, { merge: true });
         renderRota();
@@ -150,33 +188,20 @@ async function handleDeleteShift(day, shiftId) {
 
 // --- STAFF ASSIGNMENT ---
 
-/**
- * Opens the modal to assign staff to a specific shift.
- */
 function openAssignStaffModal(day, shiftId) {
     const shift = rotaData[day].find(s => s.id === shiftId);
     if (!shift) return;
-
     const assignedUids = shift.staff || [];
     const bodyHtml = createAssignStaffModalHtml(allStaff, assignedUids);
     const footerHtml = `<button id="saveRotaAssignmentBtn" class="auth-button">Save</button>`;
-
     window.mainApp.openModal(`Assign Staff: ${shift.startTime}-${shift.endTime}`, bodyHtml, footerHtml);
-
     document.getElementById('saveRotaAssignmentBtn').addEventListener('click', () => handleSaveRotaAssignment(day, shiftId));
 }
 
-/**
- * Saves the selected staff for a shift to Firestore.
- */
 async function handleSaveRotaAssignment(day, shiftId) {
     const form = document.getElementById('assignStaffForm');
     const checkedUids = Array.from(form.querySelectorAll('input[name="assignedStaff"]:checked')).map(cb => cb.value);
-
-    const updatedShifts = rotaData[day].map(shift =>
-        shift.id === shiftId ? { ...shift, staff: checkedUids } : shift
-    );
-
+    const updatedShifts = rotaData[day].map(shift => shift.id === shiftId ? { ...shift, staff: checkedUids } : shift);
     const weekId = getWeekId(currentWeekStartDate);
     const rotaRef = db.collection('rota').doc(weekId);
     try {
@@ -189,21 +214,13 @@ async function handleSaveRotaAssignment(day, shiftId) {
     }
 }
 
-/**
- * Removes a staff member from a specific shift.
- */
 async function handleRemoveStaffFromShift(day, shiftId, uid) {
     const shift = rotaData[day].find(s => s.id === shiftId);
     if (!shift) return;
-
     const staffName = allStaff.find(s => s.uid === uid)?.name || 'this staff member';
     if (!confirm(`Are you sure you want to remove ${staffName} from this shift?`)) return;
-
     const updatedStaff = shift.staff.filter(staffUid => staffUid !== uid);
-    const updatedShifts = rotaData[day].map(s =>
-        s.id === shiftId ? { ...s, staff: updatedStaff } : s
-    );
-
+    const updatedShifts = rotaData[day].map(s => s.id === shiftId ? { ...s, staff: updatedStaff } : s);
     const weekId = getWeekId(currentWeekStartDate);
     const rotaRef = db.collection('rota').doc(weekId);
     try {
@@ -234,6 +251,7 @@ function attachRotaNavListeners() {
         currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7);
         renderRota();
     });
+    document.getElementById('rotaWeekDisplay').addEventListener('click', toggleCalendar);
 }
 
 function attachRotaActionListeners() {

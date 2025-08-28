@@ -25,7 +25,10 @@ export function createRotaContainerHtml(weekStartDate) {
                 <h3 class="subsection-title">Weekly Rota</h3>
                 <div class="rota-nav">
                     <button id="rotaPrevWeekBtn" class="auth-button small-btn secondary-btn">< Prev</button>
-                    <span class="rota-week-display">${weekDisplay}</span>
+                    <div class="week-selector-container">
+                        <span id="rotaWeekDisplay" class="rota-week-display">${weekDisplay} <i class="fas fa-calendar-day"></i></span>
+                        <div id="calendarPopup" class="calendar-popup"></div>
+                    </div>
                     <button id="rotaNextWeekBtn" class="auth-button small-btn secondary-btn">Next ></button>
                 </div>
             </div>
@@ -34,6 +37,63 @@ export function createRotaContainerHtml(weekStartDate) {
             </div>
         </div>
     `;
+}
+
+/**
+ * Generates the HTML for the calendar popup.
+ * @param {Date} dateForMonth - A date within the month to be displayed.
+ * @param {Date} currentWeekStartDate - The start date of the currently selected week.
+ * @returns {string} The HTML for the calendar.
+ */
+export function createCalendarHtml(dateForMonth, currentWeekStartDate) {
+    const month = dateForMonth.getMonth();
+    const year = dateForMonth.getFullYear();
+    const monthName = dateForMonth.toLocaleString('default', { month: 'long' });
+
+    let html = `
+        <div class="calendar-header">
+            <button id="calendarPrevMonthBtn">&lt;</button>
+            <span class="calendar-month-year">${monthName} ${year}</span>
+            <button id="calendarNextMonthBtn">&gt;</button>
+        </div>
+        <div class="calendar-grid">
+            <div class="day-name">Mon</div>
+            <div class="day-name">Tue</div>
+            <div class="day-name">Wed</div>
+            <div class="day-name">Thu</div>
+            <div class="day-name">Fri</div>
+            <div class="day-name">Sat</div>
+            <div class="day-name">Sun</div>
+    `;
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+
+    // Adjust to start the week on Monday
+    let dayOfWeek = firstDay.getDay(); // 0=Sun, 1=Mon...
+    dayOfWeek = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+
+    for (let i = 0; i < dayOfWeek; i++) {
+        html += `<div class="calendar-day empty"></div>`;
+    }
+
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+        const date = new Date(year, month, day);
+        const dateString = date.toISOString().split('T')[0];
+
+        let classes = 'calendar-day';
+        if (date.getTime() >= currentWeekStartDate.getTime() && date.getTime() < currentWeekStartDate.getTime() + 7 * 24 * 60 * 60 * 1000) {
+            classes += ' in-week';
+        }
+        if (date.getMonth() !== month) {
+            classes += ' other-month';
+        }
+
+        html += `<div class="${classes}" data-date="${dateString}">${day}</div>`;
+    }
+
+    html += `</div>`;
+    return html;
 }
 
 // --- ROTA GRID AND SHIFT CARD TEMPLATES (DESKTOP) ---
