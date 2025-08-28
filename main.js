@@ -24,6 +24,7 @@ import { renderOrdersPage } from './orders.js';
 import { renderStaffPage } from './staff.js';
 import { renderSettingsPage } from './settings.js';
 import { renderLoyaltyManagementPage } from './loyaltyManagement.js';
+import { renderRotaPage } from './rota.js';
 
 // --- DOM Elements (centralized for main.js's direct use) ---
 const logoutBtn = document.getElementById('logoutBtn');
@@ -157,6 +158,9 @@ async function renderPageContent(pageId) {
             break;
         case 'staff':
             await renderStaffPage();
+            break;
+        case 'rota':
+            await renderRotaPage();
             break;
         case 'loyalty-management':
             await renderLoyaltyManagementPage();
