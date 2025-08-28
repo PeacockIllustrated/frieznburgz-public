@@ -26,7 +26,7 @@ export function createRotaContainerHtml(weekStartDate) {
                 <div class="rota-nav">
                     <button id="rotaPrevWeekBtn" class="auth-button small-btn secondary-btn">< Prev</button>
                     <div class="week-selector-container">
-                        <span id="rotaWeekDisplay" class="rota-week-display">${weekDisplay} <i class="fas fa-calendar-day"></i></span>
+                        <span id="rotaWeekDisplay" class="rota-week-display" title="Click to select a week">${weekDisplay} <i class="fas fa-calendar-day"></i></span>
                         <div id="calendarPopup" class="calendar-popup"></div>
                     </div>
                     <button id="rotaNextWeekBtn" class="auth-button small-btn secondary-btn">Next ></button>
