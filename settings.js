@@ -95,11 +95,7 @@ export async function renderSettingsPage() {
     const viewStaffTrainingBtn = document.getElementById('viewStaffTrainingBtn');
     if (viewStaffTrainingBtn) {
         viewStaffTrainingBtn.addEventListener('click', () => {
-            if (window.mainApp && typeof window.mainApp.handleNavigationClick === 'function') {
-                window.mainApp.handleNavigationClick('staff-training'); // Navigate to staff training page
-            } else {
-                console.error('Navigation handler not available.');
-            }
+            window.open('staff-training/index.html', '_blank');
         });
     }
 
