@@ -1,6 +1,6 @@
 // --- allergens.js ---
 // Manages the rendering and logic for all allergen-related pages.
-import { db, firebase } from './firebase.js';
+import { db } from './firebase.js';
 import { getCurrentUser } from './user.js';
 import { showToast } from './ui.js';
 import { createPageHtml } from './allergens-template.js';
