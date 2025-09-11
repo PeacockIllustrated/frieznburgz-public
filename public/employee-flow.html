@@ -6,6 +6,31 @@
     <title>Friez n Burgz | Employee User Flow</title>
     <link rel="stylesheet" href="employee-flow.css">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@800;900&family=Futura:wght@400&family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    <style>
+        .button-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .info-button {
+            background-color: var(--red);
+            color: var(--yellow);
+            border: 2px solid var(--red);
+            border-radius: 8px;
+            padding: 15px 30px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .info-button:hover {
+            background-color: var(--yellow);
+            color: var(--red);
+        }
+    </style>
 </head>
 <body>
     <div class="auth-container" id="password-container">
@@ -32,7 +57,7 @@
             <h2>1. New Employee Registration</h2>
             <p>Welcome to the team! The first step on your journey with Friez n Burgz is to create your personal staff profile. This is all handled through our dedicated Staff Training portal, ensuring you have everything you need to get started.</p>
             <ul>
-                <li><strong>Accessing the Registration Page:</strong> To begin, simply navigate to the registration page located at <code>friez-burgz-stock.netlify.app/staff-training/register-profile.html</code> in your browser.</li>
+                <li><strong>Accessing the Registration Page:</strong> To begin, you can access the registration page by <a href="../staff-training/register-profile.html" target="_blank">clicking here</a>.</li>
                 <li><strong>Company-Wide Password:</strong> To make sure our system stays secure and is just for our awesome staff, you'll first be asked to enter a company-wide password. This is a one-time step to get you into the registration area. The password is <code>FNB-STAFF!</code>.</li>
                 <li><strong>Creating Your Profile:</strong> Once you're through the gate, you can set up your account. You'll fill in your full name, a login email, a unique password that you create, your phone number, your primary store, and your start date. This helps us get you set up in the system correctly.</li>
                 <li><strong>Activating Your Account:</strong> After you submit your details, your account is instantly created! You'll then be guided directly to the staff training login page to start the next step.</li>
@@ -62,6 +87,9 @@
                 </li>
             </ul>
 
+            <div class="button-container">
+                <a href="../staff-training/register-profile.html" class="info-button" target="_blank">Register Profile</a>
+            </div>
         </main>
         <footer class="info-footer">
             <p>&copy; 2025 Friez n Burgz. All Rights Reserved.</p>
