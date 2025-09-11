@@ -2,7 +2,7 @@
 // Manages the rendering and logic for the Settings page.
 
 import { getSelectedLocation } from './config.js'; // For location display
-// No specific Firebase imports needed for static content, but keep if future settings need DB interaction
+import { seedAllergens } from './seed.js'; // Import the seeder function
 
 // DOM Element for the settings page
 const settingsPage = document.getElementById('settingsPage');
@@ -75,6 +75,19 @@ export async function renderSettingsPage() {
                 </div>
             </div>
 
+            <!-- Data Management -->
+            <div class="settings-card">
+                <div class="settings-header">
+                    <h3 class="settings-section-title">Data Management</h3>
+                </div>
+                <div class="settings-content">
+                    <p>Seed essential data for the application.</p>
+                    <button id="seedAllergensBtn" class="auth-button quick-action-btn small-btn">
+                        <i class="fas fa-seedling"></i> Seed Allergens
+                    </button>
+                </div>
+            </div>
+
             <!-- Future Settings (Example) -->
             <div class="settings-card">
                 <div class="settings-header">
@@ -92,6 +105,8 @@ export async function renderSettingsPage() {
     `;
 
     // Attach event listeners after content is rendered
+    document.getElementById('seedAllergensBtn').addEventListener('click', seedAllergens);
+
     const viewStaffTrainingBtn = document.getElementById('viewStaffTrainingBtn');
     if (viewStaffTrainingBtn) {
         viewStaffTrainingBtn.addEventListener('click', () => {

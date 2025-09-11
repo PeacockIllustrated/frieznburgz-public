@@ -1,6 +1,8 @@
 // --- ui.js ---
 // General UI utility functions for managing page visibility and navigation.
 
+import { getCurrentUser } from './user.js';
+
 // --- DOM Elements ---
 const mainDashboardContainer = document.getElementById('mainDashboardContainer');
 const sidebarNavItems = document.querySelectorAll('.nav-item'); // All sidebar navigation links
@@ -102,6 +104,35 @@ function updateSidebarActiveState(activePageId) {
  * Shows the main dashboard container.
  * This utility function is called by main.js when the user logs in and selects a location.
  */
+/**
+ * Updates the visibility of navigation groups based on the current user's role.
+ */
+export function updateNavVisibility() {
+    const user = getCurrentUser();
+    const handbookNav = document.getElementById('handbookNavGroup');
+    const adminNav = document.getElementById('adminNavGroup');
+
+    // Hide all role-based navs by default
+    if (handbookNav) handbookNav.style.display = 'none';
+    if (adminNav) adminNav.style.display = 'none';
+
+    if (!user || !user.role) {
+        return; // No user or role, so keep everything hidden
+    }
+
+    const role = user.role.toLowerCase();
+
+    // Staff, Managers, and Admins see the Handbook
+    if (['staff', 'manager', 'admin'].includes(role)) {
+        if (handbookNav) handbookNav.style.display = 'block';
+    }
+
+    // Only Managers and Admins see the Admin section
+    if (['manager', 'admin'].includes(role)) {
+        if (adminNav) adminNav.style.display = 'block';
+    }
+}
+
 export function showDashboardContainer() {
     mainDashboardContainer.style.display = 'grid'; // Use grid for dashboard layout as defined in CSS
 }

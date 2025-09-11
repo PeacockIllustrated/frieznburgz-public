@@ -39,7 +39,7 @@ export async function importAdminUser() {
       phone: "07494860722",
       locationId: "all_locations", // Special identifier for admin with access to all
       startDate: "October 2023",
-      role: "Admin"
+      role: "admin"
     };
 
     // --- Firestore Document References ---

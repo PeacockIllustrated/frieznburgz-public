@@ -1,7 +1,10 @@
 // --- main.js ---
 import { importAdminUser } from './import-admin.js';
 // Import Firebase authentication instance
-import { auth } from './firebase.js';
+import { auth, db } from './firebase.js';
+
+// Import user session management
+import { setCurrentUser, clearCurrentUser } from './user.js';
 
 // Import configuration values and location management functions
 import { getSelectedLocation, clearSelectedLocation, getLocationDisplayName, locations } from './config.js';
@@ -13,9 +16,18 @@ import { initAuth, showAuth, hideAuth } from './auth.js';
 import { initLocationSelection, showLocationSelection, hideLocationSelection, updateLocationDisplay } from './location.js';
 
 // Import general UI utility functions
-import { showPage, hideAllPages, initSidebarNav, showDashboardContainer, hideDashboardContainer } from './ui.js';
+import { showPage, hideAllPages, initSidebarNav, showDashboardContainer, hideDashboardContainer, updateNavVisibility } from './ui.js';
 
 // Import specific page rendering functions
+import {
+    renderAllergenMatrixPage,
+    renderAllergenProceduresPage,
+    renderAllergenTrainingPage,
+    renderAllergenPrintPage,
+    renderAllergenEditorPage,
+    renderAllergenVersionsPage,
+    renderAllergenImportPage
+} from './allergens.js';
 import { renderStockManagementPage, getAllUniqueStockItems } from './stock.js';
 import { renderWastageLogPage } from './wastage.js';
 import { renderDashboardOverviewPage, showQuickAdjustmentModal, openModal, closeModal } from './dashboard.js';
@@ -62,26 +74,45 @@ function initializeApp() {
  */
 async function handleAuthStateChange(user) {
     if (user) {
-        // User is signed in
-        hideAuth(); // Hide the login screen
+        // User is signed in, fetch their profile from 'staff' collection
+        try {
+            const staffDoc = await db.collection('staff').doc(user.uid).get();
+            if (staffDoc.exists) {
+                // User exists in the staff collection, proceed
+                setCurrentUser({
+                    uid: user.uid,
+                    email: user.email,
+                    ...staffDoc.data()
+                });
 
-        let selectedLocation = getSelectedLocation();
+                hideAuth(); // Hide the login screen
 
-        if (selectedLocation) {
-            // If a location is already selected, proceed directly to dashboard
-            showDashboard(selectedLocation);
-        } else {
-            // If no location is selected, prompt the user to choose one
-            hideDashboardContainer(); // Ensure dashboard is hidden
-            showLocationSelection(); // Show location selection screen
+                let selectedLocation = getSelectedLocation();
+                if (selectedLocation) {
+                    showDashboard(selectedLocation);
+                } else {
+                    hideDashboardContainer();
+                    showLocationSelection();
+                }
+            } else {
+                // User is not in the staff collection, treat as unauthorized
+                console.warn(`User ${user.email} is not in the staff collection.`);
+                alert("You are not authorized to access this application.");
+                await auth.signOut(); // Sign them out
+            }
+        } catch (error) {
+            console.error("Error fetching user profile:", error);
+            alert("There was an error logging you in. Please try again.");
+            await auth.signOut();
         }
     } else {
         // User is signed out
-        hideLocationSelection();   // Hide location selection if it was visible
-        hideDashboardContainer();  // Hide the main dashboard
-        showAuth();                // Show the login screen
-        updateLocationDisplay('Not Selected'); // Reset location display in header
-        clearSelectedLocation();   // Clear any saved location from local storage
+        clearCurrentUser(); // Clear the user session data
+        hideLocationSelection();
+        hideDashboardContainer();
+        showAuth();
+        updateLocationDisplay('Not Selected');
+        clearSelectedLocation();
     }
 }
 
@@ -91,15 +122,14 @@ async function handleAuthStateChange(user) {
  * @param {string} locationId - The ID of the selected location.
  */
 function showDashboard(locationId) {
-    hideLocationSelection();     // Hide location selection screen
-    showDashboardContainer();    // Show the main dashboard container (from ui.js)
-    updateLocationDisplay(locationId); // Update header display (from location.js)
+    hideLocationSelection();
+    showDashboardContainer();
+    updateLocationDisplay(locationId);
+    updateNavVisibility(); // Update nav based on user role
 
-    // Set the initial active page (e.g., Dashboard overview)
-    showPage('dashboard'); // From ui.js
-    // Automatically render content for the default dashboard page
+    // Set the initial active page to dashboard
+    showPage('dashboard');
     renderPageContent('dashboard');
-
 }
 
 /**
@@ -108,6 +138,7 @@ function showDashboard(locationId) {
 async function handleLogout() {
     try {
         await auth.signOut();
+        // The handleAuthStateChange observer will handle the rest of the cleanup
     } catch (error) {
         console.error('Logout error:', error);
         alert('Failed to log out. Please try again.');
@@ -177,6 +208,32 @@ async function renderPageContent(pageId) {
         case 'settings':
             await renderSettingsPage();
             break;
+
+        // Allergen Handbook Pages
+        case 'allergen-matrix':
+            await renderAllergenMatrixPage();
+            break;
+        case 'allergen-procedures':
+            await renderAllergenProceduresPage();
+            break;
+        case 'allergen-training':
+            await renderAllergenTrainingPage();
+            break;
+        case 'allergen-print':
+            await renderAllergenPrintPage();
+            break;
+
+        // Allergen Admin Pages
+        case 'allergen-editor':
+            await renderAllergenEditorPage();
+            break;
+        case 'allergen-versions':
+            await renderAllergenVersionsPage();
+            break;
+        case 'allergen-import':
+            await renderAllergenImportPage();
+            break;
+
         default:
             console.warn(`No rendering function defined for page: ${pageId}`);
             break;

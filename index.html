@@ -73,7 +73,7 @@
         <a href="#" class="nav-item" data-page="wastage-log">
             <i class="fas fa-dumpster"></i> Wastage Log
         </a>
-        <a href="#" class="nav-item" data-page="loyalty-management"> <!-- NEW LOYALTY NAV ITEM -->
+        <a href="#" class="nav-item" data-page="loyalty-management">
             <i class="fas fa-star"></i> Loyalty Management
         </a>
         <a href="#" class="nav-item" data-page="staff">
@@ -86,6 +86,38 @@
         <a href="#" class="nav-item" data-page="suppliers">
             <i class="fas fa-handshake"></i> Suppliers
         </a>
+
+        <!-- Handbook Nav Group - Visible to all staff -->
+        <div class="nav-group" id="handbookNavGroup" style="display: none;">
+            <h4 class="nav-group-title">Handbook</h4>
+            <a href="#" class="nav-item" data-page="allergen-matrix">
+                <i class="fas fa-allergies"></i> Allergen Matrix
+            </a>
+            <a href="#" class="nav-item" data-page="allergen-procedures">
+                <i class="fas fa-book-open"></i> Procedures
+            </a>
+            <a href="#" class="nav-item" data-page="allergen-training">
+                <i class="fas fa-graduation-cap"></i> Training
+            </a>
+            <a href="#" class="nav-item" data-page="allergen-print">
+                <i class="fas fa-print"></i> Print
+            </a>
+        </div>
+
+        <!-- Admin Nav Group - Visible to managers/admins -->
+        <div class="nav-group" id="adminNavGroup" style="display: none;">
+            <h4 class="nav-group-title">Admin</h4>
+            <a href="#" class="nav-item" data-page="allergen-editor">
+                <i class="fas fa-edit"></i> Allergen Editor
+            </a>
+            <a href="#" class="nav-item" data-page="allergen-versions">
+                <i class="fas fa-history"></i> Versions
+            </a>
+            <a href="#" class="nav-item" data-page="allergen-import">
+                <i class="fas fa-file-import"></i> Import
+            </a>
+        </div>
+
         <a href="#" class="nav-item" data-page="settings">
             <i class="fas fa-cog"></i> Settings
         </a>
@@ -137,6 +169,18 @@
                 <h2 class="page-title">Settings</h2>
                 <p>App settings and user management.</p>
             </section>
+
+            <!-- Allergen Handbook Pages -->
+            <section id="allergenMatrixPage" class="content-page"></section>
+            <section id="allergenProceduresPage" class="content-page"></section>
+            <section id="allergenTrainingPage" class="content-page"></section>
+            <section id="allergenPrintPage" class="content-page"></section>
+
+            <!-- Allergen Admin Pages -->
+            <section id="allergenEditorPage" class="content-page"></section>
+            <section id="allergenVersionsPage" class="content-page"></section>
+            <section id="allergenImportPage" class="content-page"></section>
+
         </main>
     </div>
 
