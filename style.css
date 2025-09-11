@@ -3509,6 +3509,36 @@ body {
     cursor: default;
 }
 
+/* --- Toast Notification Styles --- */
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    background-color: #333;
+    color: white;
+    font-weight: bold;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out, bottom 0.5s ease-in-out;
+    opacity: 1;
+    bottom: 30px;
+}
+
+.toast-notification.success {
+    background-color: #4CAF50; /* Green */
+}
+
+.toast-notification.error {
+    background-color: #f44336; /* Red */
+}
+
+.toast-notification.info {
+    background-color: #2196F3; /* Blue */
+}
+
 @media screen and (max-width: 480px) {
     .rota-nav {
         flex-direction: column;

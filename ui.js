@@ -101,6 +101,34 @@ function updateSidebarActiveState(activePageId) {
 }
 
 /**
+ * Displays a toast notification at the bottom of the screen.
+ * @param {string} message - The message to display.
+ * @param {string} [type='success'] - The type of toast ('success', 'error', 'info').
+ * @param {number} [duration=3000] - How long the toast should be visible in ms.
+ */
+export function showToast(message, type = 'success', duration = 3000) {
+    // Remove any existing toasts
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type}`;
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    // Center the toast
+    toast.style.left = `calc(50% - ${toast.offsetWidth / 2}px)`;
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.addEventListener('transitionend', () => toast.remove());
+    }, duration);
+}
+
+/**
  * Shows the main dashboard container.
  * This utility function is called by main.js when the user logs in and selects a location.
  */
