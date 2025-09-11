@@ -3,7 +3,7 @@
 import { db } from './firebase.js';
 import { getCurrentUser } from './user.js';
 import { showToast } from './ui.js';
-import { createPageHtml } from './allergens-template.js';
+import { createPageHtml, createAllergenMatrixForStaff } from './allergens-template.js';
 import { createAllergenEditorLayout, createAllergenGrid, createNotesSection } from './allergens-editor-template.js';
 import { FSA_ALLERGENS, ALLERGEN_STATUS } from './constants.js';
 
@@ -11,8 +11,42 @@ import { FSA_ALLERGENS, ALLERGEN_STATUS } from './constants.js';
 // --- Page Rendering Functions ---
 
 export async function renderAllergenMatrixPage() {
-    const content = '<h2>Allergen Matrix</h2><p>Detailed grid of menu items and their allergens.</p>';
-    document.getElementById('allergenMatrixPage').innerHTML = createPageHtml('Allergen Matrix', content);
+    const pageContainer = document.getElementById('allergenMatrixPage');
+    pageContainer.innerHTML = createPageHtml('Allergen Matrix', '<p>Loading latest allergen matrix...</p>');
+
+    try {
+        const versionsSnapshot = await db.collection('allergenVersions')
+            .orderBy('publishedAt', 'desc')
+            .limit(1)
+            .get();
+
+        if (versionsSnapshot.empty) {
+            pageContainer.innerHTML = createPageHtml('Allergen Matrix', '<p>No published allergen matrix found. Please ask an admin to publish a version.</p>');
+            return;
+        }
+
+        const latestVersion = versionsSnapshot.docs[0].data();
+        const publishedAt = latestVersion.publishedAt ? new Date(latestVersion.publishedAt.seconds * 1000).toLocaleString() : 'N/A';
+        const publishedBy = latestVersion.publishedBy || 'N/A';
+
+        const content = `
+            <div class="version-info">
+                <h3>${latestVersion.title}</h3>
+                <p><strong>Published on:</strong> ${publishedAt}</p>
+                <p><strong>Published by:</strong> ${publishedBy}</p>
+                ${latestVersion.changeLog ? `<p><strong>Notes:</strong> ${latestVersion.changeLog}</p>` : ''}
+            </div>
+            <div class="allergen-matrix-grid">
+                ${createAllergenMatrixForStaff(latestVersion.matrixSnapshot)}
+            </div>
+        `;
+
+        pageContainer.innerHTML = createPageHtml('Allergen Matrix', content);
+
+    } catch (error) {
+        console.error("Error fetching latest allergen version:", error);
+        pageContainer.innerHTML = createPageHtml('Allergen Matrix', '<p class="error-message">Could not load the allergen matrix.</p>');
+    }
 }
 
 export async function renderAllergenProceduresPage() {
@@ -154,6 +188,11 @@ function renderEditorPane(itemId) {
     newSaveBtn.addEventListener('click', handleSaveChanges);
 
     // Toolbar buttons
+    const publishBtn = document.getElementById('publishMatrixBtn');
+    const newPublishBtn = publishBtn.cloneNode(true);
+    publishBtn.parentNode.replaceChild(newPublishBtn, publishBtn);
+    newPublishBtn.addEventListener('click', handlePublishMatrix);
+
     const duplicateBtn = document.getElementById('duplicateMenuItemBtn');
     const newDuplicateBtn = duplicateBtn.cloneNode(true);
     duplicateBtn.parentNode.replaceChild(newDuplicateBtn, duplicateBtn);
@@ -163,6 +202,78 @@ function renderEditorPane(itemId) {
     const newDeactivateBtn = deactivateBtn.cloneNode(true);
     deactivateBtn.parentNode.replaceChild(newDeactivateBtn, deactivateBtn);
     newDeactivateBtn.addEventListener('click', () => handleDeactivateMenuItem(itemId));
+}
+
+async function handlePublishMatrix() {
+    const modalTitle = 'Publish New Allergen Matrix Version';
+    const modalBody = `
+        <p>Enter a title and any relevant notes for this new version. This will capture the current state of all active menu items.</p>
+        <div class="modal-input-group">
+            <label for="versionTitle">Version Title</label>
+            <input type="text" id="versionTitle" class="modal-input" placeholder="e.g., Autumn 2025 v1">
+        </div>
+        <div class="modal-input-group">
+            <label for="versionChangeLog">Change Log</label>
+            <textarea id="versionChangeLog" class="modal-textarea" placeholder="Describe the key changes in this version..."></textarea>
+        </div>
+    `;
+    const modalFooter = '<button id="confirmPublishBtn" class="auth-button">Publish Version</button>';
+
+    window.mainApp.openModal(modalTitle, modalBody, modalFooter);
+
+    document.getElementById('confirmPublishBtn').addEventListener('click', async () => {
+        const title = document.getElementById('versionTitle').value.trim();
+        const changeLog = document.getElementById('versionChangeLog').value.trim();
+
+        if (!title) {
+            showToast("Version title is required.", "error");
+            return;
+        }
+
+        const currentUser = getCurrentUser();
+        if (!currentUser) {
+            showToast("You must be logged in to publish.", "error");
+            return;
+        }
+
+        showToast("Publishing new version...", "info");
+
+        try {
+            // 1. Fetch all active menu items
+            const activeItemsSnapshot = await db.collection('menuItems').where('active', '==', true).get();
+
+            // 2. Create the snapshot
+            const matrixSnapshot = activeItemsSnapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    name: data.name,
+                    category: data.category,
+                    allergens: data.allergens,
+                    notes: data.notes
+                };
+            });
+
+            // 3. Create the version object
+            const newVersion = {
+                title,
+                changeLog,
+                publishedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                publishedBy: currentUser.displayName || currentUser.email,
+                matrixSnapshot
+            };
+
+            // 4. Save to the new collection
+            await db.collection('allergenVersions').add(newVersion);
+
+            showToast("New version published successfully!", "success");
+            window.mainApp.closeModal();
+
+        } catch (error) {
+            console.error("Error publishing new version:", error);
+            showToast(`Publishing failed: ${error.message}`, "error");
+        }
+    });
 }
 
 async function handleSaveChanges() {

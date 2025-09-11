@@ -1,5 +1,6 @@
 // --- allergens-template.js ---
 // Contains HTML template functions for the Allergens module.
+import { FSA_ALLERGENS } from './constants.js';
 
 /**
  * Creates the basic HTML structure for a content page.
@@ -14,4 +15,53 @@ export function createPageHtml(title, contentHtml) {
             ${contentHtml}
         </div>
     `;
+}
+
+export function createAllergenMatrixForStaff(matrixSnapshot) {
+    if (!matrixSnapshot || matrixSnapshot.length === 0) {
+        return '<p>No menu items available in this version.</p>';
+    }
+
+    // Create a set of all allergens present in the snapshot for the header
+    const allAllergens = new Set();
+    matrixSnapshot.forEach(item => {
+        Object.keys(item.allergens).forEach(allergenId => {
+            allAllergens.add(allergenId);
+        });
+    });
+
+    const sortedAllergens = Array.from(allAllergens).sort();
+
+    const allergenNameMap = FSA_ALLERGENS.reduce((acc, allergen) => {
+        acc[allergen.id] = allergen.name;
+        return acc;
+    }, {});
+
+    let tableHtml = `
+        <table class="staff-allergen-table">
+            <thead>
+                <tr>
+                    <th>Menu Item</th>
+                    ${sortedAllergens.map(allergenId => `<th>${allergenNameMap[allergenId] || allergenId}</th>`).join('')}
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    matrixSnapshot.forEach(item => {
+        tableHtml += `
+            <tr>
+                <td>${item.name}</td>
+                ${sortedAllergens.map(allergenId => {
+                    const status = item.allergens[allergenId] || 'unknown';
+                    return `<td class="status-${status}">${status.replace(/_/g, ' ')}</td>`;
+                }).join('')}
+                <td>${item.notes || ''}</td>
+            </tr>
+        `;
+    });
+
+    tableHtml += '</tbody></table>';
+    return tableHtml;
 }

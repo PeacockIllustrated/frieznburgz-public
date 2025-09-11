@@ -38,6 +38,7 @@ export function createAllergenEditorLayout() {
                     <div class="editor-toolbar">
                         <h2 id="editorItemName" class="item-name-display"></h2>
                         <div class="toolbar-actions">
+                             <button id="publishMatrixBtn" class="toolbar-button primary"><i class="fas fa-cloud-upload-alt"></i> Publish Matrix</button>
                              <button id="duplicateMenuItemBtn" class="toolbar-button"><i class="fas fa-copy"></i> Duplicate</button>
                              <button id="deactivateMenuItemBtn" class="toolbar-button danger"><i class="fas fa-ban"></i> Deactivate</button>
                         </div>
