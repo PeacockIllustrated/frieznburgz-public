@@ -359,6 +359,304 @@ export async function renderAllergenVersionsPage() {
 }
 
 export async function renderAllergenImportPage() {
-    const content = '<h2>Import Allergens</h2><p>Admin-only: Bulk import or update allergen data.</p>';
-    document.getElementById('allergenImportPage').innerHTML = createPageHtml('Import Allergens', content);
+    const importPageContent = `
+        <div class="import-container">
+            <p>Upload a CSV file to bulk update allergen information for menu items.</p>
+
+            <div class="import-step">
+                <h3>Step 1: Upload CSV</h3>
+                <input type="file" id="csvFileInput" accept=".csv">
+                <button id="loadCsvBtn" class="button">Load Data</button>
+            </div>
+
+            <div class="import-step" id="previewContainer" style="display: none;">
+                <h3>Step 2: Preview and Confirm</h3>
+                <div id="importPreviewGrid"></div>
+                <div class="import-actions">
+                    <button id="confirmImportBtn" class="button-primary">Confirm and Save Changes</button>
+                    <button id="cancelImportBtn" class="button-secondary">Cancel</button>
+                </div>
+            </div>
+             <div class="import-step" id="bulkToolsContainer" style="display: none;">
+                <h3>Bulk Tools</h3>
+                <div class="bulk-tool">
+                    <label for="bulkSetColumn">Set column for selected items:</label>
+                    <select id="bulkSetColumn">
+                        ${FSA_ALLERGENS.map(allergen => `<option value="${allergen.id}">${allergen.name}</option>`).join('')}
+                    </select>
+                    <select id="bulkSetStatus">
+                        ${ALLERGEN_STATUS.map(status => `<option value="${status}">${status}</option>`).join('')}
+                    </select>
+                    <button id="bulkSetBtn" class="button">Apply</button>
+                </div>
+                <div class="bulk-tool">
+                    <button id="copyStatusBtn" class="button">Copy Statuses</button>
+                    <button id="pasteStatusBtn" class="button">Paste Statuses</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('allergenImportPage').innerHTML = createPageHtml('Import Allergens', importPageContent);
+
+    // Add event listener for the new button
+    document.getElementById('loadCsvBtn').addEventListener('click', handleCsvLoad);
+
+    document.getElementById('bulkSetBtn').addEventListener('click', handleBulkSet);
+    document.getElementById('copyStatusBtn').addEventListener('click', handleCopyStatus);
+    document.getElementById('pasteStatusBtn').addEventListener('click', handlePasteStatus);
+    document.getElementById('confirmImportBtn').addEventListener('click', handleConfirmImport);
+    document.getElementById('cancelImportBtn').addEventListener('click', () => {
+        // Simply hide the containers and clear the data
+        document.getElementById('previewContainer').style.display = 'none';
+        document.getElementById('bulkToolsContainer').style.display = 'none';
+        document.getElementById('csvFileInput').value = '';
+        parsedCsvData = [];
+    });
+
+    const gridContainer = document.getElementById('importPreviewGrid');
+    gridContainer.addEventListener('click', (e) => {
+        if (e.target.tagName === 'TD') {
+            e.target.parentElement.classList.toggle('selected');
+        }
+    });
+}
+
+let parsedCsvData = [];
+
+/**
+ * Handles the CSV file upload and parsing.
+ */
+function handleCsvLoad() {
+    const fileInput = document.getElementById('csvFileInput');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        showToast("Please select a CSV file to upload.", "error");
+        return;
+    }
+
+    Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            if (results.errors.length) {
+                showToast("Errors found while parsing the CSV. Please check the file format.", "error");
+                console.error("CSV Parsing Errors:", results.errors);
+                return;
+            }
+
+            parsedCsvData = processCsvData(results.data);
+            renderPreviewGrid(parsedCsvData); // This function will be created in the next step
+
+            // Show the preview and bulk tools containers
+            document.getElementById('previewContainer').style.display = 'block';
+            document.getElementById('bulkToolsContainer').style.display = 'block';
+        }
+    });
+}
+
+/**
+ * Processes the raw data from the CSV file, mapping columns and values.
+ * @param {Array<Object>} data The array of objects from PapaParse.
+ * @returns {Array<Object>} The processed data.
+ */
+function processCsvData(data) {
+    const allergenIdMap = FSA_ALLERGENS.reduce((acc, allergen) => {
+        acc[`allergen_${allergen.id}`] = allergen.id;
+        return acc;
+    }, {});
+
+    const statusMap = {
+        'contains': 'contains',
+        'y': 'contains',
+        'may contain': 'may_contain',
+        'x': 'may_contain',
+        'free': 'free',
+        'n': 'free',
+        '-': 'free',
+        '': 'unknown'
+    };
+
+    return data.map(row => {
+        const processedRow = {
+            item: row.item,
+            category: row.category,
+            notes: row.notes,
+            allergens: {}
+        };
+
+        for (const key in row) {
+            const lowerKey = key.toLowerCase().trim();
+            const allergenId = allergenIdMap[lowerKey];
+            if (allergenId) {
+                const value = row[key] ? row[key].toLowerCase().trim() : '';
+                processedRow.allergens[allergenId] = statusMap[value] || 'unknown';
+            }
+        }
+
+        return processedRow;
+    });
+}
+
+/**
+ * Renders the preview grid with the processed CSV data, highlighting changes.
+ * @param {Array<Object>} data The processed data to render.
+ */
+function renderPreviewGrid(data) {
+    const gridContainer = document.getElementById('importPreviewGrid');
+    if (!gridContainer) return;
+
+    const existingItems = menuItemsCache.reduce((acc, item) => {
+        acc[item.name.toLowerCase()] = item;
+        return acc;
+    }, {});
+
+    let tableHtml = `
+        <table class="import-preview-table">
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Category</th>
+                    ${FSA_ALLERGENS.map(a => `<th>${a.name}</th>`).join('')}
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    data.forEach(newRow => {
+        const existingItem = existingItems[newRow.item.toLowerCase()];
+        tableHtml += '<tr>';
+        tableHtml += `<td>${newRow.item}</td>`;
+        tableHtml += `<td>${newRow.category}</td>`;
+
+        FSA_ALLERGENS.forEach(allergen => {
+            const newStatus = newRow.allergens[allergen.id] || 'unknown';
+            const oldStatus = existingItem ? (existingItem.allergens[allergen.id] || 'unknown') : 'new';
+
+            const isChanged = newStatus !== oldStatus;
+            const cellClass = isChanged ? 'status-changed' : '';
+            const originalValueAttr = `data-original-value="${oldStatus}"`;
+
+            tableHtml += `<td class="${cellClass}" ${originalValueAttr}>${newStatus}</td>`;
+        });
+
+        const oldNotes = existingItem ? existingItem.notes : '';
+        const notesChanged = newRow.notes !== oldNotes;
+        const notesCellClass = notesChanged ? 'status-changed' : '';
+        tableHtml += `<td class="${notesCellClass}" data-original-value="${oldNotes}">${newRow.notes}</td>`;
+
+        tableHtml += '</tr>';
+    });
+
+    tableHtml += '</tbody></table>';
+    gridContainer.innerHTML = tableHtml;
+}
+
+let copiedStatuses = null;
+
+/**
+ * Handles the "Set column for selected items" bulk tool.
+ */
+function handleBulkSet() {
+    const selectedRows = document.querySelectorAll('.import-preview-table .selected');
+    if (selectedRows.length === 0) {
+        showToast("Please select at least one row to apply the bulk change.", "error");
+        return;
+    }
+
+    const column = document.getElementById('bulkSetColumn').value;
+    const status = document.getElementById('bulkSetStatus').value;
+
+    selectedRows.forEach(row => {
+        const itemName = row.cells[0].textContent;
+        const dataRow = parsedCsvData.find(d => d.item === itemName);
+        if (dataRow) {
+            dataRow.allergens[column] = status;
+        }
+    });
+
+    renderPreviewGrid(parsedCsvData);
+}
+
+/**
+ * Handles the confirmation of the import, sending the data to the backend.
+ */
+async function handleConfirmImport() {
+    if (parsedCsvData.length === 0) {
+        showToast("No data to import.", "error");
+        return;
+    }
+
+    showToast("Importing data...", "info");
+
+    try {
+        const importAllergens = firebase.functions().httpsCallable('importAllergens');
+        const result = await importAllergens({ items: parsedCsvData });
+
+        showToast(result.data.message, "success");
+
+        // Refresh the local cache and UI
+        await fetchAndRenderMenuItems();
+
+        // Reset the import page
+        document.getElementById('previewContainer').style.display = 'none';
+        document.getElementById('bulkToolsContainer').style.display = 'none';
+        document.getElementById('csvFileInput').value = '';
+        parsedCsvData = [];
+
+    } catch (error) {
+        console.error("Error calling importAllergens function:", error);
+        showToast(`Import failed: ${error.message}`, "error");
+    }
+}
+
+/**
+ * Handles the "Copy Statuses" bulk tool.
+ */
+function handleCopyStatus() {
+    const selectedRow = document.querySelector('.import-preview-table .selected');
+    if (!selectedRow) {
+        showToast("Please select a row to copy from.", "error");
+        return;
+    }
+
+    if (document.querySelectorAll('.import-preview-table .selected').length > 1) {
+        showToast("Please select only one row to copy from.", "error");
+        return;
+    }
+
+    const itemName = selectedRow.cells[0].textContent;
+    const dataRow = parsedCsvData.find(d => d.item === itemName);
+    if (dataRow) {
+        copiedStatuses = { ...dataRow.allergens };
+        showToast("Statuses copied.", "success");
+    }
+}
+
+/**
+ * Handles the "Paste Statuses" bulk tool.
+ */
+function handlePasteStatus() {
+    const selectedRows = document.querySelectorAll('.import-preview-table .selected');
+    if (selectedRows.length === 0) {
+        showToast("Please select at least one row to paste to.", "error");
+        return;
+    }
+
+    if (!copiedStatuses) {
+        showToast("Nothing to paste. Please copy a row's statuses first.", "error");
+        return;
+    }
+
+    selectedRows.forEach(row => {
+        const itemName = row.cells[0].textContent;
+        const dataRow = parsedCsvData.find(d => d.item === itemName);
+        if (dataRow) {
+            dataRow.allergens = { ...copiedStatuses };
+        }
+    });
+
+    renderPreviewGrid(parsedCsvData);
 }

@@ -150,6 +150,60 @@ exports.addStamp = functions.https.onCall(async (data, context) => {
     });
 });
 
+exports.importAllergens = functions.https.onCall(async (data, context) => {
+    if (!context.auth || !context.auth.token.admin) {
+        throw new functions.https.HttpsError('permission-denied', 'Only admin users can import allergen data.');
+    }
+
+    const importedData = data.items;
+    if (!importedData || !Array.isArray(importedData)) {
+        throw new functions.https.HttpsError('invalid-argument', 'Invalid data format. Expected an array of items.');
+    }
+
+    const batch = db.batch();
+    const menuItemsRef = db.collection('menuItems');
+    let updatedCount = 0;
+    let createdCount = 0;
+
+    for (const item of importedData) {
+        const querySnapshot = await menuItemsRef.where('name', '==', item.item).limit(1).get();
+
+        if (!querySnapshot.empty) {
+            // Update existing item
+            const docRef = querySnapshot.docs[0].ref;
+            batch.update(docRef, {
+                allergens: item.allergens,
+                notes: item.notes,
+                category: item.category,
+                lastEditedAt: admin.firestore.FieldValue.serverTimestamp(),
+                lastEditedBy: context.auth.token.name || context.auth.token.email,
+            });
+            updatedCount++;
+        } else {
+            // Create new item
+            const newDocRef = menuItemsRef.doc();
+            batch.set(newDocRef, {
+                name: item.item,
+                category: item.category,
+                allergens: item.allergens,
+                notes: item.notes,
+                active: true,
+                lastEditedAt: admin.firestore.FieldValue.serverTimestamp(),
+                lastEditedBy: context.auth.token.name || context.auth.token.email,
+            });
+            createdCount++;
+        }
+    }
+
+    try {
+        await batch.commit();
+        return { status: 'success', message: `Import successful. Updated: ${updatedCount}, Created: ${createdCount}` };
+    } catch (error) {
+        console.error("Error committing allergen import batch:", error);
+        throw new functions.https.HttpsError('internal', 'An error occurred while importing the allergen data.');
+    }
+});
+
 /**
  * Cloud Function: redeemReward
  * Redeems a reward and handles card completion/trophy creation.
