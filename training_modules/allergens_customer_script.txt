@@ -1,0 +1,11 @@
+**Customer:** "Hi, I have a gluten allergy. What can I eat?"
+
+**Staff (You):** "Thank you for letting me know. I'm happy to help with that. Let me just double-check our allergen matrix for you to be absolutely sure. One moment."
+
+*(Check the matrix)*
+
+**Staff (You):** "Okay, so for our burgers, the patties themselves are gluten-free. We can serve the burger without a bun, or we offer a gluten-free bun. The fries are cooked in a separate fryer, so they are also safe for you. Would you like to try the burger with a gluten-free bun?"
+
+**Customer:** "That sounds great. Thank you."
+
+**Staff (You):** "Perfect. I'll put this through with an allergy alert to make sure the kitchen team takes extra care. Your meal will be brought out separately to avoid any mix-ups."

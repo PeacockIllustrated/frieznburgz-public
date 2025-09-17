@@ -20,14 +20,14 @@ import { showPage, hideAllPages, initSidebarNav, showDashboardContainer, hideDas
 
 // Import specific page rendering functions
 import {
-    renderAllergenProceduresPage,
-    renderAllergenTrainingPage,
     renderAllergenPrintPage,
     renderAllergenEditorPage,
     renderAllergenVersionsPage,
     renderAllergenImportPage
 } from './allergens.js';
 import { renderStaffAllergenMatrixPage } from './handbook.js';
+import { renderProceduresPage } from './handbook/allergens/procedures.js';
+import { renderTrainingPage } from './handbook/allergens/training.js';
 import { renderStockManagementPage, getAllUniqueStockItems } from './stock.js';
 import { renderWastageLogPage } from './wastage.js';
 import { renderDashboardOverviewPage, showQuickAdjustmentModal, openModal, closeModal } from './dashboard.js';
@@ -49,22 +49,31 @@ const changeLocationBtn = document.getElementById('changeLocationBtn');
  * Initializes the main application logic.
  */
 function initializeApp() {
-    // Initialize authentication handlers from auth.js
-    initAuth();
+    // Initialize authentication handlers from auth.js, if the container exists
+    if (document.getElementById('authContainer')) {
+        initAuth();
+    }
 
-    // Initialize location selection handlers from location.js
-    initLocationSelection();
+    // Initialize location selection handlers from location.js, if the container exists
+    if (document.getElementById('locationSelectionContainer')) {
+        initLocationSelection();
+    }
 
     // Initialize sidebar navigation from ui.js, passing the content rendering callback
-    initSidebarNav(handleNavigationClick);
+    if (document.querySelector('.dashboard-sidebar')) {
+        initSidebarNav(handleNavigationClick);
+    }
 
-    // Set up general event listeners for main dashboard controls
-    logoutBtn.addEventListener('click', handleLogout);
-    changeLocationBtn.addEventListener('click', handleChangeLocation);
+    // Set up general event listeners for main dashboard controls, if they exist
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+    if (changeLocationBtn) {
+        changeLocationBtn.addEventListener('click', handleChangeLocation);
+    }
 
     // Observe Firebase authentication state changes
     auth.onAuthStateChanged(handleAuthStateChange);
-
 }
 
 /**
@@ -214,10 +223,10 @@ async function renderPageContent(pageId) {
             await renderStaffAllergenMatrixPage();
             break;
         case 'allergen-procedures':
-            await renderAllergenProceduresPage();
+            await renderProceduresPage();
             break;
         case 'allergen-training':
-            await renderAllergenTrainingPage();
+            await renderTrainingPage();
             break;
         case 'allergen-print':
             await renderAllergenPrintPage();
@@ -255,4 +264,37 @@ window.mainApp = {
 
 
 // Initialize the app when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', initializeApp);
+document.addEventListener('DOMContentLoaded', () => {
+    initializeApp();
+    router();
+});
+
+// --- Simple Router ---
+function router() {
+    const path = window.location.pathname;
+    // When served from root, path will include /public/
+    if (path.endsWith('/handbook/allergens/procedures.html') || path.endsWith('/handbook/allergens/procedures')) {
+        renderPageContent('allergen-procedures');
+    } else if (path.endsWith('/handbook/allergens/training.html') || path.endsWith('/handbook/allergens/training')) {
+        renderPageContent('allergen-training');
+    } else if (path.includes('handbook')) { // Fallback for other handbook pages
+        renderPageContent('allergen-matrix');
+    } else if (path.endsWith('/') || path.endsWith('/index.html')) {
+        // This is the main dashboard, which is handled by the auth state change logic
+        // but we can leave a hook here if needed.
+    }
+}
+
+// --- Seeder ---
+import { seedTrainingData } from './seed-training.js';
+
+function runSeeder() {
+    const seederRun = localStorage.getItem('seederRun');
+    if (!seederRun) {
+        console.log("Running seeder...");
+        seedTrainingData();
+        localStorage.setItem('seederRun', 'true');
+    }
+}
+
+runSeeder();

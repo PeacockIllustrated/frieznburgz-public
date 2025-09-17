@@ -4,9 +4,8 @@
 import { getCurrentUser } from './user.js';
 
 // --- DOM Elements ---
-const mainDashboardContainer = document.getElementById('mainDashboardContainer');
-const sidebarNavItems = document.querySelectorAll('.nav-item'); // All sidebar navigation links
-const contentPages = document.querySelectorAll('.content-page'); // All content sections
+// Note: DOM elements are now selected inside the functions that use them
+// to avoid errors on pages where they don't exist.
 
 /**
  * Helper function to convert kebab-case string to camelCase.
@@ -24,20 +23,18 @@ function kebabToCamelCase(kebabCaseString) {
  * @param {function} onNavLinkClickCallback - A callback function from main.js to be called when a navigation link is clicked,
  *                                            responsible for rendering the content of the selected page.
  */
-export function initSidebarNav(onNavLinkClickCallback) { // Now correctly accepts the callback
+export function initSidebarNav(onNavLinkClickCallback) {
+    const sidebarNavItems = document.querySelectorAll('.nav-item');
+    if (!sidebarNavItems || sidebarNavItems.length === 0) return;
+
     sidebarNavItems.forEach(item => {
         item.addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default link behavior (e.g., jumping to #)
-            const pageId = event.currentTarget.dataset.page; // Get page ID from data-page attribute (e.g., "dashboard", "stock-management")
+            event.preventDefault();
+            const pageId = event.currentTarget.dataset.page;
 
             if (pageId) {
-                // Step 1: Manage UI visibility (hide all, show target section)
                 showPage(pageId);
-                // Step 2: Update the active state in the sidebar
                 updateSidebarActiveState(pageId);
-
-                // Step 3: Call the provided callback to render the specific content for the page.
-                // This is crucial for modules like stock.js and wastage.js to populate their divs.
                 if (onNavLinkClickCallback && typeof onNavLinkClickCallback === 'function') {
                     onNavLinkClickCallback(pageId);
                 }
@@ -54,23 +51,21 @@ export function initSidebarNav(onNavLinkClickCallback) { // Now correctly accept
  *                          to match the HTML section IDs (e.g., 'stockManagementPage').
  */
 export function showPage(pageId) {
-    // Step 1: Hide all content pages and remove 'active-page' class
+    const contentPages = document.querySelectorAll('.content-page');
+    if (!contentPages || contentPages.length === 0) return;
+
     contentPages.forEach(page => {
         page.classList.remove('active-page');
-        page.style.display = 'none'; // Ensure all are hidden via inline style
+        page.style.display = 'none';
     });
 
-    // Convert the pageId from kebab-case (from data-page) to camelCase
-    // to match the HTML element IDs (e.g., 'stockManagementPage' from 'stock-management').
     const camelCasePageId = kebabToCamelCase(pageId);
-    const targetPage = document.getElementById(`${camelCasePageId}Page`); // Corrected ID lookup
+    const targetPage = document.getElementById(`${camelCasePageId}Page`);
 
     if (targetPage) {
         targetPage.classList.add('active-page');
-        targetPage.style.display = 'block'; // Explicitly set to 'block' to show it
+        targetPage.style.display = 'block';
     } else {
-        // This warning should now only trigger if a truly unknown pageId is passed,
-        // or if there's a mismatch between kebabToCamelCase and HTML IDs.
         console.warn(`UI Error: Attempted to show unknown page with ID: ${camelCasePageId}Page`);
     }
 }
@@ -80,6 +75,8 @@ export function showPage(pageId) {
  * Used when switching to non-dashboard sections (like auth or location selection).
  */
 export function hideAllPages() {
+    const contentPages = document.querySelectorAll('.content-page');
+    if (!contentPages || contentPages.length === 0) return;
     contentPages.forEach(page => {
         page.classList.remove('active-page');
         page.style.display = 'none';
@@ -91,6 +88,8 @@ export function hideAllPages() {
  * @param {string} activePageId - The ID of the currently active page (e.g., 'dashboard', 'stock-management').
  */
 function updateSidebarActiveState(activePageId) {
+    const sidebarNavItems = document.querySelectorAll('.nav-item');
+    if (!sidebarNavItems || sidebarNavItems.length === 0) return;
     sidebarNavItems.forEach(item => {
         if (item.dataset.page === activePageId) {
             item.classList.add('active');
@@ -162,7 +161,10 @@ export function updateNavVisibility() {
 }
 
 export function showDashboardContainer() {
-    mainDashboardContainer.style.display = 'grid'; // Use grid for dashboard layout as defined in CSS
+    const mainDashboardContainer = document.getElementById('mainDashboardContainer');
+    if (mainDashboardContainer) {
+        mainDashboardContainer.style.display = 'grid';
+    }
 }
 
 /**
@@ -170,5 +172,8 @@ export function showDashboardContainer() {
  * This utility function is called by main.js when the user logs out or decides to change location.
  */
 export function hideDashboardContainer() {
-    mainDashboardContainer.style.display = 'none';
+    const mainDashboardContainer = document.getElementById('mainDashboardContainer');
+    if (mainDashboardContainer) {
+        mainDashboardContainer.style.display = 'none';
+    }
 }
