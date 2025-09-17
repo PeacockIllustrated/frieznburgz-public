@@ -20,7 +20,6 @@ import { showPage, hideAllPages, initSidebarNav, showDashboardContainer, hideDas
 
 // Import specific page rendering functions
 import {
-    renderAllergenMatrixPage,
     renderAllergenProceduresPage,
     renderAllergenTrainingPage,
     renderAllergenPrintPage,
@@ -28,6 +27,7 @@ import {
     renderAllergenVersionsPage,
     renderAllergenImportPage
 } from './allergens.js';
+import { renderStaffAllergenMatrixPage } from './handbook.js';
 import { renderStockManagementPage, getAllUniqueStockItems } from './stock.js';
 import { renderWastageLogPage } from './wastage.js';
 import { renderDashboardOverviewPage, showQuickAdjustmentModal, openModal, closeModal } from './dashboard.js';
@@ -211,7 +211,7 @@ async function renderPageContent(pageId) {
 
         // Allergen Handbook Pages
         case 'allergen-matrix':
-            await renderAllergenMatrixPage();
+            await renderStaffAllergenMatrixPage();
             break;
         case 'allergen-procedures':
             await renderAllergenProceduresPage();
