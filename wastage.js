@@ -5,7 +5,7 @@ import { db } from './firebase.js';
 import { auth } from './firebase.js'; // Needed for auth.currentUser.email for logging who made the entry
 import { getSelectedLocation } from './config.js';
 import { getCurrentStockItems } from './stock.js'; // To get item list for dropdown
-import { createWasteLogItemHtml } from './wastage-template.js'; // Template for individual waste log items
+import { createWasteLogItemHtml } from './templates/wastage-template.js'; // Template for individual waste log items
 
 // We no longer get these elements at the top, but inside the render function.
 

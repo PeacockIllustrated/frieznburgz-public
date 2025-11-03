@@ -1,7 +1,7 @@
 // --- staff.js (Final, Complete & Corrected Version) ---
 
 import { db } from './firebase.js';
-import { createStaffCardHtml } from './staff-template.js';
+import { createStaffCardHtml } from './templates/staff-template.js';
 import { getLocationDisplayName } from './config.js';
 
 // As per your instruction, the correct total number of sections is 12

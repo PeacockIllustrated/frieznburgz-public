@@ -2,10 +2,10 @@
 
 import { db, auth } from './firebase.js';
 import { getSelectedLocation, getLocationDisplayName } from './config.js';
-import { createDashboardCardHtml, createCriticalItemHtml, createRecentWasteItemHtml, createStaffSummaryCardHtml } from './dashboard-template.js';
+import { createDashboardCardHtml, createCriticalItemHtml, createRecentWasteItemHtml, createStaffSummaryCardHtml } from './templates/dashboard-template.js';
 import { getCurrentStockItems, getAllUniqueStockItems } from './stock.js';
 import { getSuppliers } from './suppliers.js';
-import { createOrderFormModalBodyHtml, getItemOptionsHtml } from './orders-template.js';
+import { createOrderFormModalBodyHtml, getItemOptionsHtml } from './templates/orders-template.js';
 
 
 // --- DOM Elements ---

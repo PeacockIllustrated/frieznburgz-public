@@ -1,5 +1,5 @@
 import { db, auth } from '../../firebase.js';
-import { createTrainingPageLayout, renderTrainingModule, renderQuiz, renderQuizResults } from './training-template.js';
+import { createTrainingPageLayout, renderTrainingModule, renderQuiz, renderQuizResults } from '../../templates/training-template.js';
 
 let currentUser;
 let quizData;

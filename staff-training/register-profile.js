@@ -7,7 +7,10 @@ import { locations } from '../config.js';
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- NEW: Gatekeeper Logic ---
-    const GATEKEEPER_PASSWORD = "FNB-STAFF!"; // The secret company password
+    // Get gatekeeper password from environment variable, fallback for backwards compatibility
+    const GATEKEEPER_PASSWORD = window.env?.VITE_GATEKEEPER_PASSWORD || 
+                                import.meta?.env?.VITE_GATEKEEPER_PASSWORD || 
+                                "FNB-STAFF!"; // Fallback - should be replaced with env var
 
     const gatekeeperForm = document.getElementById('gatekeeper-form');
     const registrationFormContainer = document.getElementById('registration-form-container');

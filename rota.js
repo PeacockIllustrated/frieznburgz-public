@@ -7,7 +7,7 @@ import {
     createShiftModalHtml,
     createAssignStaffModalHtml,
     createCalendarHtml
-} from './rota-template.js';
+} from './templates/rota-template.js';
 
 let currentWeekStartDate;
 let allStaff = [];

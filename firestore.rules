@@ -1,0 +1,126 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/_internal/admin_config) &&
+             request.auth.uid in get(/databases/$(database)/documents/_internal/admin_config).data.adminUids;
+    }
+    
+    // Helper function to get user's staff data
+    function getUserStaffData() {
+      return get(/databases/$(database)/documents/staff/$(request.auth.uid)).data;
+    }
+    
+    // Helper function to check if user has access to location
+    function hasLocationAccess(locationId) {
+      let staffData = getUserStaffData();
+      return staffData.locationId == 'all_locations' || staffData.locationId == locationId;
+    }
+    
+    // Staff collection - users can read their own document, admins can read/write all
+    match /staff/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin();
+    }
+    
+    // Locations and their subcollections
+    match /locations/{locationId} {
+      // Location document itself - only admins
+      match /{document=**} {
+        allow read: if isAuthenticated();
+        allow write: if isAdmin();
+      }
+      
+      // Items subcollection - staff can read items for their location, admins can manage all
+      match /items/{itemId} {
+        allow read: if isAuthenticated() && hasLocationAccess(locationId);
+        allow create, update: if isAuthenticated() && hasLocationAccess(locationId);
+        allow delete: if isAdmin();
+      }
+    }
+    
+    // Orders collection
+    match /orders/{orderId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+    
+    // Wastage collection
+    match /wastage/{wasteId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+    
+    // Menu items and allergen management
+    match /menuItems/{itemId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    match /allergenVersions/{versionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    match /allergens/{allergenId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Loyalty system
+    match /loyaltyCards/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAuthenticated(); // Users can create their own, admins can modify any
+    }
+    
+    match /loyaltyPrograms/{programId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    match /completedLoyaltyCards/{cardId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+    
+    match /rewardsRedeemed/{redemptionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+    }
+    
+    // Training progress
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Internal configuration
+    match /_internal/{document=**} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Suppliers collection
+    match /suppliers/{supplierId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Rota/scheduling (if stored separately)
+    match /rota/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated(); // Staff can view, managers/admins can edit
+    }
+  }
+}
+

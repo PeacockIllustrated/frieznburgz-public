@@ -4,7 +4,7 @@
 import { db } from './firebase.js';
 import { auth } from './firebase.js'; // Needed for getting current user email for waste logging
 import { getSelectedLocation, locations } from './config.js'; // Import locations for global item fetching
-import { createStockItemHtml } from './stock-template.js'; // Template for individual stock items
+import { createStockItemHtml } from './templates/stock-template.js'; // Template for individual stock items
 
 // --- DOM Elements ---
 const stockManagementContent = document.getElementById('stockManagementContent'); // Main content area for stock page
