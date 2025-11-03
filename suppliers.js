@@ -3,7 +3,7 @@
 
 import { db } from './firebase.js'; // Firebase Firestore instance
 import { getSelectedLocation } from './config.js'; // To ensure a location is selected (though suppliers might be global)
-import { createSupplierCardHtml, createSupplierDetailsModalBodyHtml } from './suppliers-template.js'; // Template for supplier cards and modal body
+import { createSupplierCardHtml, createSupplierDetailsModalBodyHtml } from './templates/suppliers-template.js'; // Template for supplier cards and modal body
 import { getAllUniqueStockItems } from './stock.js'; // NEW: To get a global list of items
 
 // --- Universal Modal Elements ---

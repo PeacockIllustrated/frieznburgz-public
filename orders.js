@@ -4,7 +4,7 @@
 import { db } from './firebase.js';
 import { auth } from './firebase.js'; // To log who created/received the order
 import { getSelectedLocation } from './config.js';
-import { createOrderCardHtml, createOrderFormModalBodyHtml, getItemOptionsHtml, createCompactSupplierCardHtml } from './orders-template.js'; // NEW: createCompactSupplierCardHtml
+import { createOrderCardHtml, createOrderFormModalBodyHtml, getItemOptionsHtml, createCompactSupplierCardHtml } from './templates/orders-template.js'; // NEW: createCompactSupplierCardHtml
 import { getAllUniqueStockItems } from './stock.js'; // To get item list for order form
 import { renderStockManagementPage } from './stock.js'; // To re-render stock page after receiving order
 import { getSuppliers } from './suppliers.js'; // To get supplier list for order form

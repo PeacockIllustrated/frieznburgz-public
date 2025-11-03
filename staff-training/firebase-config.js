@@ -1,15 +1,15 @@
 // --- staff-training/firebase-config.js ---
 // Self-contained Firebase config for the training portal.
+// Uses environment variables with fallback to hardcoded values for backwards compatibility
 
-// Your Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyA4hS3texgNpdQbjj8QIECY4n0Nl3SWwTo",
-    authDomain: "friez-burgz.firebaseapp.com",
-    projectId: "friez-burgz",
-    storageBucket: "friez-burgz.firebasestorage.app",
-    messagingSenderId: "369360939966",
-    appId: "1:369360939966:web:760d870c8c0f2a8f6667ef",
-    measurementId: "G-67WXCWCC2X"
+    apiKey: window.env?.VITE_FIREBASE_API_KEY || import.meta?.env?.VITE_FIREBASE_API_KEY || "AIzaSyA4hS3texgNpdQbjj8QIECY4n0Nl3SWwTo",
+    authDomain: window.env?.VITE_FIREBASE_AUTH_DOMAIN || import.meta?.env?.VITE_FIREBASE_AUTH_DOMAIN || "friez-burgz.firebaseapp.com",
+    projectId: window.env?.VITE_FIREBASE_PROJECT_ID || import.meta?.env?.VITE_FIREBASE_PROJECT_ID || "friez-burgz",
+    storageBucket: window.env?.VITE_FIREBASE_STORAGE_BUCKET || import.meta?.env?.VITE_FIREBASE_STORAGE_BUCKET || "friez-burgz.firebasestorage.app",
+    messagingSenderId: window.env?.VITE_FIREBASE_MESSAGING_SENDER_ID || import.meta?.env?.VITE_FIREBASE_MESSAGING_SENDER_ID || "369360939966",
+    appId: window.env?.VITE_FIREBASE_APP_ID || import.meta?.env?.VITE_FIREBASE_APP_ID || "1:369360939966:web:760d870c8c0f2a8f6667ef",
+    measurementId: window.env?.VITE_FIREBASE_MEASUREMENT_ID || import.meta?.env?.VITE_FIREBASE_MEASUREMENT_ID || "G-67WXCWCC2X"
 };
 
 if (!firebase.apps.length) {

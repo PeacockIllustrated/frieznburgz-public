@@ -1,5 +1,5 @@
 import { db } from '../../firebase.js';
-import { createProceduresPageLayout, renderProcedure } from './procedures-template.js';
+import { createProceduresPageLayout, renderProcedure } from '../../templates/procedures-template.js';
 
 export async function renderProceduresPage() {
     const pageContainer = document.getElementById('procedures-page');

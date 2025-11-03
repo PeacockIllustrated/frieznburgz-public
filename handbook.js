@@ -2,7 +2,7 @@
 // Manages the rendering and logic for the staff-facing handbook pages, starting with the allergen matrix.
 
 import { db } from './firebase.js';
-import { createMatrixPageLayout, renderMatrixTable, renderItemDrawer, renderBanner } from './handbook-template.js';
+import { createMatrixPageLayout, renderMatrixTable, renderItemDrawer, renderBanner } from './templates/handbook-template.js';
 import { FSA_ALLERGENS } from './constants.js';
 
 // --- State Management ---

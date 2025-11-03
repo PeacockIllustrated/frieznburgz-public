@@ -33,10 +33,17 @@ export async function importAdminUser() {
     }
 
     // --- Define Admin User Data ---
+    // Get defaults from environment variables, allow override via function parameter
+    const envDefaults = {
+        name: window.env?.VITE_DEFAULT_ADMIN_NAME || import.meta?.env?.VITE_DEFAULT_ADMIN_NAME || "Tom Peacock",
+        email: window.env?.VITE_DEFAULT_ADMIN_EMAIL || import.meta?.env?.VITE_DEFAULT_ADMIN_EMAIL || "peacockillustrated@gmail.com",
+        phone: window.env?.VITE_DEFAULT_ADMIN_PHONE || import.meta?.env?.VITE_DEFAULT_ADMIN_PHONE || "07494860722"
+    };
+    
     const adminStaffData = {
-      name: "Tom Peacock",
-      email: "peacockillustrated@gmail.com",
-      phone: "07494860722",
+      name: envDefaults.name,
+      email: envDefaults.email,
+      phone: envDefaults.phone,
       locationId: "all_locations", // Special identifier for admin with access to all
       startDate: "October 2023",
       role: "admin"

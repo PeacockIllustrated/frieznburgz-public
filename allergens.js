@@ -3,8 +3,8 @@
 import { db } from './firebase.js';
 import { getCurrentUser } from './user.js';
 import { showToast } from './ui.js';
-import { createPageHtml, createAllergenMatrixForStaff } from './allergens-template.js';
-import { createAllergenEditorLayout, createAllergenGrid, createNotesSection } from './allergens-editor-template.js';
+import { createPageHtml, createAllergenMatrixForStaff } from './templates/allergens-template.js';
+import { createAllergenEditorLayout, createAllergenGrid, createNotesSection } from './templates/allergens-editor-template.js';
 import { FSA_ALLERGENS, ALLERGEN_STATUS } from './constants.js';
 
 
