@@ -6,6 +6,16 @@
     --khaki: #fbae29; /* Vibrant orange-yellow */
     --salmon: #ff9686; /* Lighter red/orange tone */
     --dark-slate-grey: #050505; /* Near black, used for body background */
+    --light-grey: #f4f4f4; /* Light grey for backgrounds */
+    --success-green: #28a745; /* Success/positive actions */
+    --success-green-dark: #218838; /* Darker green for hover states */
+    --error-red: #dc3545; /* Error/destructive actions */
+    --info-blue: #2196F3; /* Info messages */
+    --border-radius: 8px; /* Standard border radius */
+    --border-radius-large: 20px; /* Large border radius for cards */
+    --transition-speed: 0.2s; /* Standard transition duration */
+    --box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); /* Standard box shadow */
+    --box-shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.2); /* Hover box shadow */
 
     /* Icon Colors */
     --color-meat: #A0522D;      /* Sienna */
@@ -60,10 +70,10 @@ body {
 .location-selection-card {
     background-color: var(--yellow); /* White background */
     border: 5px solid var(--khaki); /* Khaki border */
-    border-radius: 20px; /* Rounded corners */
+    border-radius: var(--border-radius-large); /* Rounded corners */
     padding: 40px 30px;
     text-align: center;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4); /* Subtle shadow */
+    box-shadow: var(--box-shadow-hover); /* Subtle shadow */
     max-width: 400px;
     width: 90%;
     box-sizing: border-box; /* Include padding in width calculation */
@@ -95,7 +105,7 @@ body {
     padding: 12px 10px;
     margin-bottom: 15px;
     border: 2px solid var(--red);
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     font-family: 'Futura', Arial, sans-serif; /* Futura for inputs */
     font-size: 16px;
     color: var(--dim-grey);
@@ -120,7 +130,7 @@ body {
     font-weight: 800;
     text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-speed) ease;
     width: 100%;
     display: flex; /* For aligning text and icon */
     align-items: center;
@@ -363,7 +373,7 @@ body {
     font-family: 'Montserrat', sans-serif; /* Montserrat for nav items */
     font-weight: 800;
     text-transform: uppercase;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
 }
 
 /* Icons within nav items */
@@ -455,9 +465,9 @@ body {
 .dashboard-card {
     background-color: var(--yellow);
     border: 5px solid var(--khaki);
-    border-radius: 20px;
+    border-radius: var(--border-radius-large);
     padding: 25px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--box-shadow);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -701,7 +711,7 @@ body {
 .modal-content {
     background-color: var(--yellow);
     border: 5px solid var(--khaki);
-    border-radius: 20px;
+    border-radius: var(--border-radius-large);
     padding: 30px;
     position: relative;
     width: 90%;
@@ -782,7 +792,7 @@ body {
     width: calc(100% - 20px);
     padding: 12px 10px;
     border: 2px solid var(--red);
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     font-size: 16px;
     color: var(--dim-grey);
     background-color: var(--yellow);
@@ -851,18 +861,36 @@ body {
 .item-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    /* Removed max-height: none; overflow: visible; transition: none; on desktop */
+    gap: 16px;
     padding-top: 0;
     margin-top: 0;
+    min-height: 60px; /* Ensure consistent spacing even with few items */
 }
 
 
 .stock-items-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive columns, min 280px, max 1fr */
-    gap: 20px; /* Space between category cards */
-    margin-top: 20px; /* Space from the subsection title */
+    /* Intelligent grid: 3 columns on large screens, 2 on medium, 1 on small */
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px; /* Increased gap for better breathing room */
+    margin-top: 30px; /* More space from title */
+    align-items: start; /* Align cards to top for consistent layout */
+}
+
+/* Improve grid on larger screens */
+@media screen and (min-width: 1200px) {
+    .stock-items-grid {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 1400px; /* Limit max width for better readability */
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1199px) {
+    .stock-items-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 }
 
@@ -870,11 +898,19 @@ body {
 .category-card {
     background-color: var(--yellow);
     border: 5px solid var(--khaki);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    border-radius: var(--border-radius-large);
+    padding: 28px;
+    box-shadow: var(--box-shadow);
     display: flex;
     flex-direction: column;
+    min-height: 200px; /* Ensure minimum height for consistency */
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    position: relative;
+}
+
+.category-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow-hover);
 }
 
 /* Header within category cards (Meat, Cheeses) */
@@ -882,9 +918,28 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--salmon);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--salmon);
+    position: relative;
+}
+
+/* Category item count badge */
+.category-header::after {
+    content: attr(data-item-count);
+    position: absolute;
+    right: 0;
+    bottom: -12px;
+    background-color: var(--khaki);
+    color: var(--red);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    min-width: 24px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 
@@ -897,11 +952,13 @@ body {
 .category-title {
     font-family: 'Fraunces', serif;
     font-weight: 900;
-    font-size: 24px;
+    font-size: 22px;
     color: var(--red);
     text-transform: uppercase;
     margin: 0;
     text-rendering: optimizeLegibility;
+    flex-grow: 1;
+    letter-spacing: 0.5px;
 }
 
 /* Edit icon next to category titles (future use) */
@@ -923,16 +980,37 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    padding: 10px 0;
+    gap: 12px;
+    padding: 14px 12px;
     border-bottom: 1px dashed var(--salmon);
     text-align: center;
-    transition: border-color 0.2s ease;
+    transition: all var(--transition-speed) ease;
+    border-radius: var(--border-radius);
+    background-color: transparent;
+}
+
+.stock-item:hover {
+    background-color: rgba(251, 174, 41, 0.05); /* Subtle khaki tint on hover */
+    padding-left: 14px;
+    padding-right: 14px;
 }
 
 .stock-item.has-pending-changes {
-    border: 1px dashed var(--red);
-    padding: 9px;
+    border: 2px solid var(--red);
+    border-radius: var(--border-radius);
+    padding: 12px;
+    background-color: rgba(231, 30, 38, 0.05); /* Subtle red tint for pending changes */
+    box-shadow: 0 0 0 2px rgba(231, 30, 38, 0.1);
+    animation: pending-pulse 2s ease-in-out infinite;
+}
+
+@keyframes pending-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 2px rgba(231, 30, 38, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 0 3px rgba(231, 30, 38, 0.2);
+    }
 }
 
 
@@ -949,23 +1027,27 @@ body {
 .item-name {
     flex-grow: 0;
     font-family: 'Futura', Arial, sans-serif;
-    font-size: 18px;
-    font-weight: 800;
+    font-size: 16px;
+    font-weight: 700;
     text-transform: uppercase;
     color: var(--dim-grey);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
     width: 100%;
+    line-height: 1.4;
+    letter-spacing: 0.3px;
 }
 
 /* Container for + / - / quantity input AND the circular plus button */
 .stock-controls-group {
     display: flex;
     align-items: center;
-    width: 75%;
+    width: 100%;
+    max-width: 280px;
     justify-content: center;
-    gap: 5px;
+    gap: 8px;
+    margin-top: 4px;
 }
 
 /* Container for + / - / quantity input */
@@ -979,7 +1061,14 @@ body {
     flex-shrink: 0;
     background-color: var(--khaki);
     flex-grow: 1;
-    height: 40px;
+    height: 44px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.stock-controls:focus-within {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(231, 30, 38, 0.15);
 }
 
 /* + / - buttons */
@@ -996,7 +1085,7 @@ body {
     font-weight: 800;
     font-size: 20px;
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
 }
 
 /* + / - button hover effect */
@@ -1007,18 +1096,24 @@ body {
 
 /* Stock quantity input field */
 .stock-input {
-    width: 60px;
+    width: 70px;
     text-align: center;
     border: none;
     font-family: 'Fraunces', serif;
     font-weight: 800;
-    font-size: 20px;
+    font-size: 18px;
     color: var(--red);
     background-color: var(--yellow);
     height: 100%;
-    padding: 0;
+    padding: 0 8px;
     box-sizing: border-box;
     -moz-appearance: textfield;
+    transition: background-color var(--transition-speed) ease;
+}
+
+.stock-input:focus {
+    outline: none;
+    background-color: #fffef5; /* Slightly warmer white on focus */
 }
 
 /* Remove default spinner for Chrome, Safari, Edge */
@@ -1034,52 +1129,174 @@ body {
     color: var(--yellow);
     border: none;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 25px;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all var(--transition-speed) ease;
     flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Supplier button hover effect */
 .add-stock-button:hover {
-    background-color: var(--khaki);
-    color: var(--red);
+    transform: scale(1.1);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
+
 
 /* NEW: Category Footer for Confirm Button */
 .category-footer {
-    margin-top: 20px;
-    padding-top: 15px;
+    margin-top: auto; /* Push footer to bottom of card */
+    padding-top: 20px;
     border-top: 2px dashed var(--salmon);
     text-align: center;
 }
 
 .category-footer .confirm-changes-btn {
-    width: 80%;
-    padding: 10px 20px;
-    font-size: 16px;
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 15px;
     opacity: 0.6;
     cursor: not-allowed;
     background-color: var(--red);
     color: var(--yellow);
     border-color: var(--yellow);
+    transition: all var(--transition-speed) ease;
+    font-weight: 800;
+}
+
+.category-footer .confirm-changes-btn:not(:disabled) {
+    opacity: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .category-footer .confirm-changes-btn:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background-color: var(--yellow);
     color: var(--red);
     border-color: var(--red);
 }
 
 .category-footer .confirm-changes-btn.saving {
-    background-color: #5cb85c;
+    background-color: var(--success-green);
     cursor: progress;
-    opacity: 0.8;
+    opacity: 0.9;
+    position: relative;
+}
+
+.category-footer .confirm-changes-btn.saving::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: 2px solid transparent;
+    border-top-color: var(--yellow);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- Stock Activity Log Section Styles --- */
+.stock-log-section {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 3px solid var(--salmon);
+}
+
+.stock-activity-log {
+    background-color: var(--yellow);
+    border: 5px solid var(--khaki);
+    border-radius: var(--border-radius-large);
+    padding: 25px;
+    box-shadow: var(--box-shadow);
+    margin-top: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.stock-log-group {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed var(--salmon);
+}
+
+.stock-log-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.stock-log-group > span {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--khaki);
+}
+
+.stock-log-group ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stock-log-group li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Futura', Arial, sans-serif;
+    font-size: 15px;
+    color: var(--dim-grey);
+    padding: 8px 12px;
+    background-color: rgba(251, 174, 41, 0.05);
+    border-radius: var(--border-radius);
+}
+
+.stock-log-group .log-item-name {
+    flex-grow: 1;
+    font-weight: 700;
+}
+
+.stock-log-group .log-stock-change {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 16px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    min-width: 50px;
+    text-align: center;
+}
+
+.stock-log-group .log-stock-change.increase {
+    color: var(--success-green);
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+.stock-log-group .log-stock-change.decrease {
+    color: var(--red);
+    background-color: rgba(231, 30, 38, 0.1);
+}
+
+.stock-log-group .log-stock-value {
+    font-size: 13px;
+    color: var(--dim-grey);
+    font-style: italic;
 }
 
 /* --- Wastage Log Specific Styles --- */
@@ -1088,9 +1305,9 @@ body {
 .wastage-card {
     background-color: var(--yellow);
     border: 5px solid var(--khaki);
-    border-radius: 20px;
+    border-radius: var(--border-radius-large);
     padding: 25px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--box-shadow);
     margin-bottom: 10px;
 }
 
@@ -1183,9 +1400,9 @@ body {
 .supplier-card {
     background-color: var(--yellow);
     border: 5px solid var(--khaki);
-    border-radius: 20px;
+    border-radius: var(--border-radius-large);
     padding: 25px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--box-shadow);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1435,9 +1652,9 @@ body {
 .order-card {
     background-color: var(--yellow);
     border: 5px solid var(--khaki);
-    border-radius: 20px;
+    border-radius: var(--border-radius-large);
     padding: 25px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--box-shadow);
     display: flex;
     flex-direction: column;
     transition: transform 0.2s ease;
@@ -1591,7 +1808,7 @@ body {
     width: 100%;
     padding: 12px 10px;
     border: 2px solid var(--red);
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     font-family: 'Futura', Arial, sans-serif;
     font-size: 16px;
     color: var(--dim-grey);
@@ -1949,7 +2166,8 @@ body {
     /* Stock Management Specific: Convert to Accordion on smaller screens */
     .stock-items-grid {
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 16px;
+        margin-top: 20px;
     }
 
     .category-card {
@@ -2566,9 +2784,9 @@ body {
 .settings-card {
     background-color: var(--yellow);
     border: 5px solid var(--khaki);
-    border-radius: 20px;
+    border-radius: var(--border-radius-large);
     padding: 25px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--box-shadow);
     display: flex;
     flex-direction: column;
 }
@@ -2703,9 +2921,9 @@ body {
 .loyalty-admin-card {
     background-color: var(--yellow);
     border: 5px solid var(--khaki);
-    border-radius: 20px;
+    border-radius: var(--border-radius-large);
     padding: 25px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--box-shadow);
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
@@ -3382,7 +3600,7 @@ body {
     width: 100%;
     padding: 10px;
     border: 2px solid var(--red);
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     font-family: 'Futura', Arial, sans-serif;
     font-size: 16px;
     box-sizing: border-box;
@@ -3528,15 +3746,15 @@ body {
 }
 
 .toast-notification.success {
-    background-color: #4CAF50; /* Green */
+    background-color: var(--success-green); /* Green */
 }
 
 .toast-notification.error {
-    background-color: #f44336; /* Red */
+    background-color: var(--error-red); /* Red */
 }
 
 .toast-notification.info {
-    background-color: #2196F3; /* Blue */
+    background-color: var(--info-blue); /* Blue */
 }
 
 @media screen and (max-width: 480px) {
