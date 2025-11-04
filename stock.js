@@ -111,7 +111,7 @@ export async function renderStockManagementPage() {
                 categoryCardDiv.dataset.categoryId = categoryId; // Store category ID
 
                 categoryCardDiv.innerHTML = `
-                    <div class="category-header">
+                    <div class="category-header" data-item-count="${categoryItems.length}">
                         <h3 class="category-title">${categoryName}</h3>
                         <i class="fas fa-edit edit-icon" title="Edit category items (future)"></i>
                         <i class="fas fa-chevron-down accordion-icon"></i>
