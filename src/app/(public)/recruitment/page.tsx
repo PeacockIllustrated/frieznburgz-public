@@ -1,5 +1,7 @@
-import { RecruitmentForm } from "@/components/recruitment-form"
-import { SectionHeader } from "@/components/ui/section-header"
+'use client';
+import { Suspense } from 'react';
+import { RecruitmentForm } from "@/components/recruitment-form";
+import { SectionHeader } from "@/components/ui/section-header";
 
 export default function RecruitmentPage() {
     return (
@@ -11,9 +13,11 @@ export default function RecruitmentPage() {
                     If you love great food and good vibes, fill out the form below.
                 </p>
                 <div className="rounded-xl border border-fb-surface-soft bg-fb-surface p-6 md:p-8">
-                    <RecruitmentForm />
+                    <Suspense fallback={<p>Loading form…</p>}>
+                        <RecruitmentForm />
+                    </Suspense>
                 </div>
             </div>
         </div>
-    )
+    );
 }
