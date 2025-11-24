@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Friez n Burgz
 
-## Getting Started
+A mobile-first Next.js website and admin dashboard for Friez n Burgz burger restaurant.
 
-First, run the development server:
+## Features
+
+- 🍔 **Public Website**: Homepage with weekly specials, full menu, allergen information, and recruitment
+- 🎛️ **Admin Dashboard**: Manage weekly specials with business logic enforcement
+- 📱 **Mobile-First**: Optimized for phones (375px+) with responsive breakpoints
+- 🎨 **Bold Design**: Dark theme with vibrant red/yellow accents
+- 🔒 **Supabase Backend**: PostgreSQL with Row Level Security
+
+## Tech Stack
+
+- **Framework**: Next.js 14+ (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: Supabase (PostgreSQL)
+- **Auth**: Supabase Auth
+- **Deployment**: Vercel
+
+## Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp env-template.txt .env.local
+# Edit .env.local with your Supabase credentials
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── (public)/       # Public pages
+│   ├── app/            # Admin dashboard
+│   ├── auth/           # Authentication
+│   └── actions/        # Server actions
+├── components/
+│   └── ui/             # Reusable components
+├── lib/
+│   ├── supabase/       # Database clients
+│   └── data.ts         # Static data
+└── types/              # TypeScript types
+```
 
-## Learn More
+## Database Setup
 
-To learn more about Next.js, take a look at the following resources:
+1. Create a Supabase project
+2. Run the migration from `supabase/migrations/20240523000000_init.sql`
+3. Add your Supabase credentials to `.env.local`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Required:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
 
-## Deploy on Vercel
+## Key Pages
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `/` - Homepage with specials and menu
+- `/allergens` - Allergen information matrix
+- `/customer-links` - Social media and review links
+- `/recruitment` - Job application form
+- `/app` - Admin dashboard (requires auth)
+- `/app/specials` - Manage weekly specials
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Admin Dashboard
+
+The admin dashboard allows you to:
+- View all specials grouped by type (burger, fillet, shake)
+- Set one active special per type
+- Create and edit specials with live preview
+- Manage dates and pricing
+
+## Design System
+
+**Colors:**
+- Primary (Red): `#e71e26`
+- Secondary (Yellow): `#fbae29`
+- Background: `#050505`
+- Surface: `#2f2f2f`
+
+**Typography:**
+- Headings: Fraunces-like serif
+- Body: Futura-like geometric sans
+
+## Known Issues
+
+- Build currently fails due to missing `@radix-ui/react-slot` dependency for `asChild` prop pattern
+- Auth login page is a placeholder - needs Supabase Auth UI integration
+
+## Next Steps
+
+1. Install `@radix-ui/react-slot` and update Button component
+2. Integrate Supabase Auth UI for login
+3. Add image upload functionality
+4. Implement recruitment applications view in admin
+5. Add tests
+
+## License
+
+Private project for Friez n Burgz.
