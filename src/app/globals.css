@@ -6,9 +6,10 @@
   --background: #ffffff;
   --foreground: #171717;
 
-  /* Friez n Burgz Brand Colors */
+  /* Friez n Burgz Brand Colors (2025) */
   --fb-primary: #e71e26;
   --fb-secondary: #fbae29;
+  --fb-accent: #ffde5c;
   --fb-bg: #050505;
   --fb-surface: #2f2f2f;
   --fb-surface-soft: #43464d;
@@ -34,6 +35,11 @@ body {
   font-family: var(--font-futura), Arial, Helvetica, sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-fraunces), Georgia, serif;
 }

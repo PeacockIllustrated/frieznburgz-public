@@ -7,7 +7,7 @@ function SectionHeader({ className, children, ...props }: SectionHeaderProps) {
     return (
         <h2
             className={cn(
-                "text-3xl font-bold uppercase tracking-wide font-fbHeading text-fb-primary mb-6",
+                "text-3xl md:text-4xl font-bold uppercase tracking-wide font-fbHeading text-fb-text mb-8",
                 className
             )}
             {...props}

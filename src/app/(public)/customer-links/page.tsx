@@ -38,16 +38,16 @@ export default function CustomerLinksPage() {
 
     return (
         <div className="container px-4 py-8 md:px-6 md:py-12">
-            <SectionHeader>Customer Links</SectionHeader>
+            <SectionHeader className="text-center md:text-left">Customer Links</SectionHeader>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {links.map((link) => (
-                    <Card key={link.title} className="flex flex-col">
+                    <Card key={link.title} className="flex flex-col border-2 border-fb-surface-soft hover:border-fb-primary transition-all hover:-translate-y-1 hover:shadow-xl group">
                         <CardHeader>
-                            <CardTitle className="text-xl">{link.title}</CardTitle>
-                            <CardDescription>{link.description}</CardDescription>
+                            <CardTitle className="text-xl group-hover:text-fb-primary transition-colors">{link.title}</CardTitle>
+                            <CardDescription className="text-base">{link.description}</CardDescription>
                         </CardHeader>
                         <CardContent className="mt-auto pt-4">
-                            <Button asChild variant={link.variant} className="w-full gap-2">
+                            <Button asChild variant={link.variant} className="w-full gap-2 shadow-none group-hover:shadow-md">
                                 <Link href={link.url} target="_blank" rel="noopener noreferrer">
                                     {link.cta}
                                     <ExternalLink className="h-4 w-4" />

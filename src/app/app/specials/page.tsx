@@ -38,21 +38,24 @@ export default async function SpecialsPage() {
 
                             {/* Active Special */}
                             {activeSpecial ? (
-                                <div className="mb-6">
-                                    <h4 className="text-sm font-bold uppercase text-fb-muted mb-2">Active Now</h4>
-                                    <Card className="border-fb-primary/50 bg-fb-surface-soft/20">
+                                <div className="mb-8">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <div className="h-2 w-2 rounded-full bg-fb-success animate-pulse"></div>
+                                        <h4 className="text-sm font-bold uppercase text-fb-success tracking-wider">Active Now</h4>
+                                    </div>
+                                    <Card className="border-2 border-fb-primary bg-fb-surface-soft/10 shadow-lg shadow-fb-primary/10">
                                         <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
                                             <div>
-                                                <CardTitle className="text-xl">{activeSpecial.title}</CardTitle>
-                                                <CardDescription>{activeSpecial.subtitle}</CardDescription>
+                                                <CardTitle className="text-2xl text-fb-primary">{activeSpecial.title}</CardTitle>
+                                                <CardDescription className="text-lg mt-1">{activeSpecial.subtitle}</CardDescription>
                                             </div>
-                                            <Badge variant="success">Active</Badge>
+                                            <Badge variant="success" className="px-3 py-1 text-sm font-bold tracking-wide">ACTIVE</Badge>
                                         </CardHeader>
                                         <CardContent>
-                                            <div className="flex items-center justify-between mt-4">
-                                                <span className="font-bold text-fb-primary">£{activeSpecial.price?.toFixed(2)}</span>
-                                                <div className="flex gap-2">
-                                                    <Button asChild variant="outline" size="sm">
+                                            <div className="flex items-center justify-between mt-6">
+                                                <span className="font-bold text-fb-text text-2xl font-fbHeading">£{activeSpecial.price?.toFixed(2)}</span>
+                                                <div className="flex gap-3">
+                                                    <Button asChild variant="outline" size="sm" className="border-fb-surface-soft hover:border-fb-text">
                                                         <Link href={`/app/specials/${activeSpecial.id}`}>Edit</Link>
                                                     </Button>
                                                     <SetActiveButton id={activeSpecial.id} type={activeSpecial.type} isActive={true} />
@@ -62,24 +65,24 @@ export default async function SpecialsPage() {
                                     </Card>
                                 </div>
                             ) : (
-                                <div className="p-4 rounded-xl border border-dashed border-fb-surface-soft text-center text-fb-muted mb-6">
-                                    No active special selected.
+                                <div className="p-8 rounded-2xl border-2 border-dashed border-fb-surface-soft text-center text-fb-muted mb-8 bg-fb-surface/30">
+                                    <p>No active special selected.</p>
                                 </div>
                             )}
 
                             {/* Inactive Specials */}
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                                 {inactiveSpecials.map((special) => (
-                                    <Card key={special.id} className="opacity-80 hover:opacity-100 transition-opacity">
+                                    <Card key={special.id} className="opacity-70 hover:opacity-100 transition-all hover:border-fb-secondary hover:shadow-md group">
                                         <CardHeader className="pb-2">
-                                            <CardTitle className="text-lg">{special.title}</CardTitle>
-                                            <p className="text-xs text-fb-muted truncate">{special.subtitle}</p>
+                                            <CardTitle className="text-lg group-hover:text-fb-secondary transition-colors">{special.title}</CardTitle>
+                                            <p className="text-sm text-fb-muted truncate">{special.subtitle}</p>
                                         </CardHeader>
                                         <CardContent>
                                             <div className="flex items-center justify-between mt-4">
-                                                <span className="text-sm font-mono">£{special.price?.toFixed(2)}</span>
+                                                <span className="text-base font-bold text-fb-muted group-hover:text-fb-text transition-colors">£{special.price?.toFixed(2)}</span>
                                                 <div className="flex gap-2">
-                                                    <Button asChild variant="ghost" size="sm">
+                                                    <Button asChild variant="ghost" size="sm" className="hover:bg-fb-surface-soft">
                                                         <Link href={`/app/specials/${special.id}`}>Edit</Link>
                                                     </Button>
                                                     <SetActiveButton id={special.id} type={special.type} isActive={false} />

@@ -14,6 +14,7 @@ const config: Config = {
         fb: {
           primary: "var(--fb-primary)",
           secondary: "var(--fb-secondary)",
+          accent: "var(--fb-accent)",
           bg: "var(--fb-bg)",
           surface: "var(--fb-surface)",
           surfaceSoft: "var(--fb-surface-soft)",
