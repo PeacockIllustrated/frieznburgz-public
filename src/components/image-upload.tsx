@@ -59,8 +59,8 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
     return (
         <div className="space-y-4 w-full">
             <div className={cn(
-                "border-2 border-dashed border-fb-surface-soft rounded-xl p-4 flex flex-col items-center justify-center gap-4 transition-colors hover:bg-fb-surface/50 min-h-[200px]",
-                value ? "border-solid border-fb-surface-soft p-0 overflow-hidden relative" : "bg-fb-bg"
+                "border-2 border-dashed border-fb-surface-soft rounded-xl p-4 flex flex-col items-center justify-center gap-4 transition-colors hover:bg-fb-surface/50 min-h-[200px] relative",
+                value ? "border-solid border-fb-surface-soft p-0 overflow-hidden" : "bg-fb-bg"
             )}>
                 {value ? (
                     <div className="relative w-full aspect-video">
