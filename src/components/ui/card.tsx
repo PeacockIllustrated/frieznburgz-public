@@ -1,19 +1,38 @@
+'use client'
+
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { motion, HTMLMotionProps } from "framer-motion"
 
-const Card = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-    <div
-        ref={ref}
-        className={cn(
-            "rounded-xl border border-fb-surface-soft bg-fb-surface text-fb-text shadow-sm hover:shadow-md transition-all duration-300",
-            className
-        )}
-        {...props}
-    />
-))
+interface CardProps extends HTMLMotionProps<"div"> {
+    variant?: "default" | "brand"
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+    ({ className, variant = "default", ...props }, ref) => {
+        const variantStyles = {
+            default: "bg-fb-surface text-fb-text border-fb-surface-soft",
+            brand: "bg-fb-primary text-white border-fb-primary shadow-fb-primary/25"
+        }
+
+        return (
+            <motion.div
+                ref={ref}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                whileHover={{ y: -5, scale: 1.02 }}
+                transition={{ duration: 0.3 }}
+                className={cn(
+                    "rounded-xl border shadow-sm hover:shadow-xl transition-shadow duration-300",
+                    variantStyles[variant],
+                    className
+                )}
+                {...props}
+            />
+        )
+    }
+)
 Card.displayName = "Card"
 
 const CardHeader = React.forwardRef<
@@ -49,7 +68,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <p
         ref={ref}
-        className={cn("text-sm text-fb-muted", className)}
+        className={cn("text-sm opacity-80", className)}
         {...props}
     />
 ))
