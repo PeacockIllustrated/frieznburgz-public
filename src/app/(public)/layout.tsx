@@ -9,7 +9,7 @@ export default function PublicLayout({
     return (
         <div className="flex min-h-screen flex-col bg-fb-bg text-fb-text">
             <header className="sticky top-0 z-50 w-full border-b border-fb-surface-soft bg-fb-bg/95 backdrop-blur supports-[backdrop-filter]:bg-fb-bg/60">
-                <div className="container flex h-16 items-center justify-between px-4 md:px-6">
+                <div className="container flex h-20 items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <span className="text-xl font-bold uppercase tracking-tighter text-fb-primary font-fbHeading">
                             Friez n Burgz
@@ -43,8 +43,8 @@ export default function PublicLayout({
             <main className="flex-1">
                 {children}
             </main>
-            <footer className="border-t border-fb-surface-soft bg-fb-surface py-6 md:py-0">
-                <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row px-4 md:px-6">
+            <footer className="border-t border-fb-surface-soft bg-fb-surface py-8 md:py-0">
+                <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
                     <p className="text-center text-sm leading-loose text-fb-muted md:text-left">
                         © 2024 Friez n Burgz. All rights reserved.
                     </p>

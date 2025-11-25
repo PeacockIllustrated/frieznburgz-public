@@ -30,7 +30,7 @@ export default function HomePage() {
     return (
         <div className="flex flex-col gap-16 pb-20">
             {/* Breakfast Hero */}
-            <section className="relative flex flex-col items-center justify-center gap-6 px-4 py-20 text-center bg-fb-surface border-b-4 border-fb-secondary overflow-hidden">
+            <section className="relative flex flex-col items-center justify-center gap-6 py-24 md:py-32 text-center bg-fb-surface border-b-4 border-fb-secondary overflow-hidden">
                 <div className="absolute inset-0 bg-[url('/pattern.png')] opacity-5"></div> {/* Texture placeholder */}
                 <div className="relative z-10 space-y-4 max-w-3xl">
                     <Badge variant="secondary" className="text-lg px-4 py-1 mb-4 animate-pulse">NEW!</Badge>
@@ -54,11 +54,11 @@ export default function HomePage() {
             </section>
 
             {/* Promoted Specials */}
-            <section className="container px-4 md:px-6">
+            <section className="container">
                 <SectionHeader className="text-center md:text-left border-l-8 border-fb-primary pl-4">Don't Miss These</SectionHeader>
                 <div className="grid gap-8 md:grid-cols-3">
                     {promotedSpecials.map((special, idx) => (
-                        <Card key={idx} className="group border-2 border-fb-surface-soft hover:border-fb-accent transition-all hover:-translate-y-2 overflow-hidden bg-fb-surface">
+                        <Card key={idx} className="group h-full flex flex-col border-2 border-fb-surface-soft hover:border-fb-accent transition-all hover:-translate-y-2 overflow-hidden bg-fb-surface">
                             <div className="h-48 bg-fb-surface-soft/30 flex items-center justify-center relative overflow-hidden">
                                 <span className="text-fb-muted/20 font-fbHeading text-4xl uppercase rotate-12 transform">Image</span>
                                 <div className="absolute inset-0 bg-gradient-to-t from-fb-surface to-transparent opacity-80"></div>
@@ -87,7 +87,7 @@ export default function HomePage() {
             </section>
 
             {/* Main Menu */}
-            <section id="menu" className="container px-4 md:px-6 space-y-20">
+            <section id="menu" className="container space-y-24">
 
                 {/* Beef Burgz */}
                 <div className="space-y-6">
@@ -278,7 +278,7 @@ export default function HomePage() {
             </section>
 
             {/* Locations */}
-            <section className="container px-4 md:px-6 pb-12">
+            <section className="container pb-20">
                 <SectionHeader className="text-center">Locations</SectionHeader>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                     {LOCATIONS.map((loc) => (
