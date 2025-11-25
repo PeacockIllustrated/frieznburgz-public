@@ -1,23 +1,30 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Friez n Burgz Brand Colors */
+  --color-fb-primary: #e71e26;
+  --color-fb-secondary: #fbae29;
+  --color-fb-accent: #ffde5c;
+  --color-fb-bg: #050505;
+  --color-fb-surface: #2f2f2f;
+  --color-fb-surface-soft: #43464d;
+  --color-fb-text: #ffffff;
+  --color-fb-muted: #c4c4c4;
+  --color-fb-success: #027a48;
+
+  /* Fonts */
+  --font-fbHeading: var(--font-fraunces), system-ui, serif;
+  --font-fbBody: var(--font-futura), system-ui, sans-serif;
+}
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
 
-  /* Friez n Burgz Brand Colors (2025) */
-  --fb-primary: #e71e26;
-  --fb-secondary: #fbae29;
-  --fb-accent: #ffde5c;
-  --fb-bg: #050505;
-  --fb-surface: #2f2f2f;
-  --fb-surface-soft: #43464d;
-  --fb-text: #ffffff;
-  --fb-muted: #c4c4c4;
-  --fb-success: #027a48;
-
-  /* Fonts - Fallbacks for now */
+  /* Keep these for reference or other usages, but Tailwind uses @theme now */
   --font-fraunces: 'Fraunces', system-ui, serif;
   --font-futura: 'Futura PT', system-ui, sans-serif;
 }
@@ -30,10 +37,10 @@
 }
 
 body {
-  color: var(--fb-text);
-  background: radial-gradient(circle at top center, #1a1a1a 0%, var(--fb-bg) 100%);
+  color: var(--color-fb-text);
+  background: radial-gradient(circle at top center, #1a1a1a 0%, var(--color-fb-bg) 100%);
   background-attachment: fixed;
-  font-family: var(--font-futura), Arial, Helvetica, sans-serif;
+  font-family: var(--font-fbBody);
 }
 
 h1,
@@ -42,5 +49,5 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-fraunces), Georgia, serif;
+  font-family: var(--font-fbHeading);
 }
