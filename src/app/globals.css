@@ -4,15 +4,19 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* Friez n Burgz Brand Colors */
+  /* Friez n Burgz Brand Colors - Light Theme */
   --color-fb-primary: #e71e26;
   --color-fb-secondary: #fbae29;
   --color-fb-accent: #ffde5c;
-  --color-fb-bg: #050505;
-  --color-fb-surface: #2f2f2f;
-  --color-fb-surface-soft: #43464d;
-  --color-fb-text: #ffffff;
-  --color-fb-muted: #c4c4c4;
+  --color-fb-bg: #ffffff;
+  --color-fb-surface: #f4f4f5;
+  /* Zinc-100 */
+  --color-fb-surface-soft: #e4e4e7;
+  /* Zinc-200 */
+  --color-fb-text: #09090b;
+  /* Zinc-950 */
+  --color-fb-muted: #71717a;
+  /* Zinc-500 */
   --color-fb-success: #027a48;
 
   /* Fonts */
@@ -22,7 +26,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #09090b;
 
   /* Keep these for reference or other usages, but Tailwind uses @theme now */
   --font-fraunces: 'Fraunces', system-ui, serif;
@@ -31,14 +35,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    /* Force light mode for now as requested */
+    --foreground: #09090b;
   }
 }
 
 body {
   color: var(--color-fb-text);
-  background: radial-gradient(circle at top center, #1a1a1a 0%, var(--color-fb-bg) 100%);
+  background: radial-gradient(circle at top center, #fafafa 0%, var(--color-fb-bg) 100%);
   background-attachment: fixed;
   font-family: var(--font-fbBody);
 }
