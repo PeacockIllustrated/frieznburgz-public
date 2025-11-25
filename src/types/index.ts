@@ -19,9 +19,15 @@ export interface Special {
 export type MenuCategory =
     | 'Beef Burgz'
     | 'Chix Burgz'
+    | 'Vegetarian'
     | 'Sides'
     | 'Breakfast'
-    | 'Milkshakez';
+    | 'Milkshakez'
+    | 'Cheesecakez'
+    | 'Hot Drinks'
+    | 'Add Inside Your Burger'
+    | 'Add Into Your Box'
+    | 'Extra Sauce';
 
 export interface MenuItem {
     id: string;

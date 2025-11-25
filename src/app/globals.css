@@ -31,7 +31,8 @@
 
 body {
   color: var(--fb-text);
-  background: var(--fb-bg);
+  background: radial-gradient(circle at top center, #1a1a1a 0%, var(--fb-bg) 100%);
+  background-attachment: fixed;
   font-family: var(--font-futura), Arial, Helvetica, sans-serif;
 }
 
