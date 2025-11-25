@@ -10,6 +10,7 @@ export interface Special {
     price?: number | null;
     image_url?: string | null;
     is_active: boolean;
+    allergens?: Allergen[];
     starts_at?: string | null;
     ends_at?: string | null;
     created_at: string;

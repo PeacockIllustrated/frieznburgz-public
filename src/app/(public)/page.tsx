@@ -7,6 +7,8 @@ import { SectionHeader } from "@/components/ui/section-header"
 import Link from "next/link"
 import { MENU_ITEMS, LOCATIONS } from "@/lib/data"
 import { motion } from "framer-motion"
+import { Info } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function HomePage() {
     const promotedSpecials = [
@@ -75,9 +77,28 @@ export default function HomePage() {
                             <div className="h-48 bg-black/20 flex items-center justify-center relative overflow-hidden">
                                 <span className="text-white/20 font-fbHeading text-4xl uppercase rotate-12 transform">Image</span>
                             </div>
+
+
+                            // ... inside promotedSpecials mapping ...
                             <CardHeader className="relative -mt-12 pt-0">
-                                <div className="bg-fb-secondary text-fb-text px-4 py-1 rounded-full inline-block text-sm font-bold uppercase tracking-wider mb-2 shadow-lg">
-                                    Special
+                                <div className="flex justify-between items-start mb-2">
+                                    <div className="bg-fb-secondary text-fb-text px-4 py-1 rounded-full inline-block text-sm font-bold uppercase tracking-wider shadow-lg">
+                                        Special
+                                    </div>
+                                    {/* Mock allergens for promoted specials since they are hardcoded for now */}
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="bg-white/10 p-2 rounded-full hover:bg-white/20 cursor-pointer backdrop-blur-sm transition-colors">
+                                                    <Info className="h-5 w-5 text-white" />
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p className="font-bold mb-1">Allergens:</p>
+                                                <p className="text-xs">Gluten, Milk, Mustard</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </div>
                                 <CardTitle className="text-3xl text-white group-hover:text-fb-accent transition-colors">
                                     {special.title}

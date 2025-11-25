@@ -56,6 +56,8 @@ export async function upsertSpecial(formData: FormData) {
     const is_active = formData.get('is_active') === 'on'
     const starts_at = formData.get('starts_at') as string || null
     const ends_at = formData.get('ends_at') as string || null
+    const allergensStr = formData.get('allergens') as string
+    const allergens = allergensStr ? JSON.parse(allergensStr) : []
 
     const specialData = {
         type,
@@ -66,6 +68,7 @@ export async function upsertSpecial(formData: FormData) {
         price,
         image_url,
         is_active,
+        allergens,
         starts_at,
         ends_at,
         updated_at: new Date().toISOString(),

@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Special, SpecialType } from "@/types"
+import { Special, Allergen } from "@/types"
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { ImageUpload } from "@/components/image-upload"
+import { AllergenSelector } from "@/components/allergen-selector"
 
 export function SpecialsForm({ special }: { special?: Special }) {
     const [preview, setPreview] = useState<Partial<Special>>(special || {
@@ -16,7 +18,9 @@ export function SpecialsForm({ special }: { special?: Special }) {
         title: 'New Special',
         description: 'Description will appear here...',
         price: 0,
-        is_active: false
+        is_active: false,
+        image_url: '',
+        allergens: []
     })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -27,10 +31,20 @@ export function SpecialsForm({ special }: { special?: Special }) {
         }))
     }
 
+    const handleImageChange = (url: string) => {
+        setPreview(prev => ({ ...prev, image_url: url }))
+    }
+
+    const handleAllergensChange = (allergens: Allergen[]) => {
+        setPreview(prev => ({ ...prev, allergens }))
+    }
+
     return (
         <div className="grid gap-8 lg:grid-cols-2">
             <form action={upsertSpecial} className="space-y-6">
                 <input type="hidden" name="id" value={special?.id || ''} />
+                <input type="hidden" name="image_url" value={preview.image_url || ''} />
+                <input type="hidden" name="allergens" value={JSON.stringify(preview.allergens || [])} />
 
                 <div className="space-y-2">
                     <Label htmlFor="type">Type</Label>
@@ -69,16 +83,17 @@ export function SpecialsForm({ special }: { special?: Special }) {
                     <Textarea id="description" name="description" defaultValue={special?.description} onChange={handleChange} required placeholder="Full description..." />
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                        <Label htmlFor="price">Price (£)</Label>
-                        <Input id="price" name="price" type="number" step="0.01" defaultValue={special?.price || ''} onChange={handleChange} placeholder="0.00" />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="image_url">Image URL</Label>
-                        <Input id="image_url" name="image_url" defaultValue={special?.image_url || ''} onChange={handleChange} placeholder="https://..." />
-                    </div>
+                <div className="space-y-2">
+                    <Label htmlFor="price">Price (£)</Label>
+                    <Input id="price" name="price" type="number" step="0.01" defaultValue={special?.price || ''} onChange={handleChange} placeholder="0.00" />
                 </div>
+
+                <div className="space-y-2">
+                    <Label>Image</Label>
+                    <ImageUpload value={preview.image_url || ''} onChange={handleImageChange} />
+                </div>
+
+                <AllergenSelector value={preview.allergens || []} onChange={handleAllergensChange} />
 
                 <div className="flex items-center gap-2">
                     <input
@@ -115,23 +130,32 @@ export function SpecialsForm({ special }: { special?: Special }) {
             {/* Live Preview */}
             <div className="space-y-4">
                 <h3 className="text-lg font-bold uppercase text-fb-muted">Preview</h3>
-                <Card className="overflow-hidden border-fb-primary/20">
+                <Card variant="brand" className="overflow-hidden">
                     {preview.image_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={preview.image_url} alt="Preview" className="aspect-video w-full object-cover" />
                     ) : (
-                        <div className="aspect-video w-full bg-fb-surface-soft/50 flex items-center justify-center text-fb-muted">No Image</div>
+                        <div className="aspect-video w-full bg-black/20 flex items-center justify-center text-white/50">No Image</div>
                     )}
                     <CardHeader>
                         <div className="flex items-center justify-between">
                             <Badge variant="secondary" className="uppercase">{preview.type}</Badge>
-                            {preview.price && <span className="font-bold text-fb-primary">£{Number(preview.price).toFixed(2)}</span>}
+                            {preview.price && <span className="font-bold text-fb-accent">£{Number(preview.price).toFixed(2)}</span>}
                         </div>
-                        <CardTitle className="mt-2 text-xl">{preview.title || 'Title'}</CardTitle>
-                        {preview.subtitle && <CardDescription>{preview.subtitle}</CardDescription>}
+                        <CardTitle className="mt-2 text-xl text-white">{preview.title || 'Title'}</CardTitle>
+                        {preview.subtitle && <CardDescription className="text-white/80">{preview.subtitle}</CardDescription>}
                     </CardHeader>
                     <CardContent>
-                        <p className="text-sm text-fb-muted line-clamp-3">{preview.description || 'Description...'}</p>
+                        <p className="text-sm text-white/90 line-clamp-3">{preview.description || 'Description...'}</p>
+                        {preview.allergens && preview.allergens.length > 0 && (
+                            <div className="mt-4 flex flex-wrap gap-1">
+                                {preview.allergens.map(a => (
+                                    <Badge key={a} variant="outline" className="text-[10px] py-0 px-2 border-white/30 text-white/80 uppercase">
+                                        {a}
+                                    </Badge>
+                                ))}
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>
