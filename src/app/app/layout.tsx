@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
+export const dynamic = 'force-dynamic'
+
 export default async function RootLayout({
     children,
 }: {

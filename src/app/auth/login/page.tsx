@@ -7,10 +7,12 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
+    const [origin, setOrigin] = useState('')
     const [supabase] = useState(() => createClient())
     const router = useRouter()
 
     useEffect(() => {
+        setOrigin(window.location.origin)
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
                 router.push('/app')
@@ -95,7 +97,7 @@ export default function LoginPage() {
                             },
                         }}
                         providers={[]}
-                        redirectTo={`${window.location.origin}/app`}
+                        redirectTo={`${origin}/app`}
                     />
                 </div>
             </div>

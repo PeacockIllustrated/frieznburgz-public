@@ -1,7 +1,9 @@
-'use client';
+
 import { Suspense } from 'react';
 import { RecruitmentForm } from "@/components/recruitment-form";
 import { SectionHeader } from "@/components/ui/section-header";
+
+export const dynamic = 'force-dynamic';
 
 export default function RecruitmentPage() {
     return (
