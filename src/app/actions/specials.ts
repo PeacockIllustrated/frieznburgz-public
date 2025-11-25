@@ -23,7 +23,10 @@ export async function getActiveSpecials() {
         .select('*')
         .eq('is_active', true)
 
-    if (error) throw new Error(error.message)
+    if (error) {
+        console.error('Error fetching active specials:', error)
+        return []
+    }
     return data as Special[]
 }
 
