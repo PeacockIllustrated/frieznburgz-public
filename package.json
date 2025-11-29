@@ -12,8 +12,7 @@
     "deploy": "firebase deploy",
     "deploy:hosting": "firebase deploy --only hosting",
     "deploy:functions": "firebase deploy --only functions",
-    "deploy:rules": "firebase deploy --only firestore:rules",
-    "build": "echo 'No build step required'"
+    "deploy:rules": "firebase deploy --only firestore:rules"
   },
   "keywords": [
     "restaurant",
