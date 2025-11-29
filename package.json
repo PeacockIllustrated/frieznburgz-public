@@ -6,6 +6,21 @@
   "scripts": {
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
+    "format": "prettier --write \"**/*.{js,html,css,json}\"",
+    "format:check": "prettier --check \"**/*.{js,html,css,json}\"",
+    "dev": "firebase emulators:start",
+    "deploy": "firebase deploy",
+    "deploy:hosting": "firebase deploy --only hosting",
+    "deploy:functions": "firebase deploy --only functions",
+    "deploy:rules": "firebase deploy --only firestore:rules",
+    "vercel-build": "echo 'No build step required'",
+    "build": "echo 'No build step required'"
+  },
+  "keywords": [
+    "restaurant",
+    "management",
+    "firebase",
+    "admin-dashboard"
   ],
   "author": "",
   "license": "ISC",
