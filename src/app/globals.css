@@ -6,12 +6,15 @@
 
   /* Friez n Burgz Brand Colors - Light Theme */
   --color-fb-primary: #e71e26;
-  --color-fb-secondary: #fbae29;
-  --color-fb-accent: #ffde5c;
+  --color-fb-secondary: #09090b;
+  /* Changed to Black */
+  --color-fb-accent: #e71e26;
+  /* Changed to Red to match primary */
   --color-fb-bg: #ffffff;
-  --color-fb-surface: #f4f4f5;
+  --color-fb-surface: #ffffff;
+  /* Changed to White for cleaner look */
   /* Zinc-100 */
-  --color-fb-surface-soft: #e4e4e7;
+  --color-fb-surface-soft: #f4f4f5;
   /* Zinc-200 */
   --color-fb-text: #09090b;
   /* Zinc-950 */
@@ -20,17 +23,15 @@
   --color-fb-success: #027a48;
 
   /* Fonts */
-  --font-fbHeading: var(--font-fraunces), system-ui, serif;
-  --font-fbBody: var(--font-futura), system-ui, sans-serif;
+  --font-fbHeading: var(--font-montserrat), system-ui, serif;
+  --font-fbBody: var(--font-montserrat), system-ui, sans-serif;
 }
 
 :root {
   --background: #ffffff;
   --foreground: #09090b;
 
-  /* Keep these for reference or other usages, but Tailwind uses @theme now */
-  --font-fraunces: 'Fraunces', system-ui, serif;
-  --font-futura: 'Futura PT', system-ui, sans-serif;
+  --font-montserrat: 'Montserrat', system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,7 +44,8 @@
 
 body {
   color: var(--color-fb-text);
-  background: radial-gradient(circle at top center, #fafafa 0%, var(--color-fb-bg) 100%);
+  background: #ffffff;
+  /* Removed radial gradient */
   background-attachment: fixed;
   font-family: var(--font-fbBody);
 }
@@ -55,6 +57,7 @@ h4,
 h5,
 h6 {
   font-family: var(--font-fbHeading);
+  font-weight: 900;
 }
 
 @utility container {

@@ -28,7 +28,10 @@ export type MenuCategory =
     | 'Hot Drinks'
     | 'Add Inside Your Burger'
     | 'Add Into Your Box'
-    | 'Extra Sauce';
+    | 'Extra Sauce'
+    | 'Seasonal Specials'
+    | 'Kidz Menu'
+    | 'Friez';
 
 export interface MenuItem {
     id: string;
