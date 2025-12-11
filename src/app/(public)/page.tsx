@@ -19,16 +19,25 @@ export default async function HomePage() {
                 <div className="bg-fb-surface-soft/30 rounded-[3rem] p-8 md:p-12 border-2 border-fb-surface-soft">
                     <SectionHeader className="text-center text-fb-primary mb-8">Seasonal Specialz</SectionHeader>
                     <div className="flex flex-col items-center mb-10 text-center">
-                        <span className="text-5xl md:text-6xl font-black text-fb-primary font-fbHeading mb-3">£13</span>
-                        <span className="text-lg md:text-xl font-bold text-fb-text uppercase tracking-widest max-w-2xl">
+                        <span className="text-4xl md:text-6xl font-black text-fb-primary font-fbHeading mb-3">£13</span>
+                        <span className="text-base md:text-xl font-bold text-fb-text uppercase tracking-widest max-w-2xl px-4">
                             Both served with Gravy, Brie & Bacon Jam Friez
                         </span>
                     </div>
                     <div className="grid gap-12 md:grid-cols-2 max-w-5xl mx-auto">
-                        {MENU_ITEMS.filter(i => i.category === 'Seasonal Specials').map(item => (
-                            <div key={item.id} className="flex flex-col items-center text-center space-y-3">
-                                <h3 className="text-3xl md:text-4xl font-black text-fb-text uppercase font-fbHeading leading-none">{item.name}</h3>
-                                <p className="text-lg font-medium text-fb-muted max-w-sm leading-snug">{item.description}</p>
+                        {MENU_ITEMS.filter(i => i.category === 'Seasonal Specials').map((item, idx) => (
+                            <div key={item.id} className="flex flex-col items-center text-center space-y-6 group">
+                                <div className="relative w-full max-w-sm aspect-square">
+                                    <img
+                                        src={item.id === 'seasonal-1' ? '/special-porker.png' : '/special-clucker.png'}
+                                        alt={item.name}
+                                        className={`w-full h-full object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-110 ${idx === 0 ? '-rotate-6' : 'rotate-6'}`}
+                                    />
+                                </div>
+                                <div>
+                                    <h3 className="text-3xl md:text-4xl font-black text-fb-text uppercase font-fbHeading leading-none mb-2">{item.name}</h3>
+                                    <p className="text-lg font-medium text-fb-muted max-w-sm leading-snug mx-auto">{item.description}</p>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -39,10 +48,10 @@ export default async function HomePage() {
             {activeSpecials.length > 0 && (
                 <section className="container">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 mb-6 border-b-2 border-fb-surface-soft">
-                        <h2 className="text-5xl md:text-6xl font-black font-fbHeading text-fb-secondary uppercase tracking-wide">Live Specialz</h2>
-                        <div className="animate-pulse flex items-center gap-2 bg-fb-secondary/10 px-4 py-2 rounded-full">
+                        <h2 className="text-4xl md:text-6xl font-black font-fbHeading text-fb-primary uppercase tracking-wide">Live Specialz</h2>
+                        <div className="animate-pulse flex items-center gap-2 bg-fb-primary/10 px-4 py-2 rounded-full self-start md:self-auto">
                             <div className="w-3 h-3 bg-fb-secondary rounded-full"></div>
-                            <span className="font-bold text-fb-secondary uppercase tracking-wider text-sm">Limited Time Only</span>
+                            <span className="font-bold text-fb-secondary uppercase tracking-wider text-xs md:text-sm">Limited Time Only</span>
                         </div>
                     </div>
 
@@ -76,10 +85,10 @@ export default async function HomePage() {
                 <section>
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 mb-8">
                         <div>
-                            <h2 className="text-5xl md:text-6xl font-black font-fbHeading text-fb-primary uppercase tracking-wide">Beef Burgz</h2>
+                            <h2 className="text-4xl md:text-6xl font-black font-fbHeading text-fb-primary uppercase tracking-wide">Beef Burgz</h2>
                         </div>
-                        <div className="text-3xl font-bold text-fb-primary px-6 py-3 rounded-xl transform -rotate-1 border-2 border-fb-primary">
-                            £8.50 <span className="text-lg font-normal text-fb-primary/90 block md:inline md:ml-2">(+ friez & 1 sauce)</span>
+                        <div className="text-xl md:text-3xl font-bold text-fb-primary px-4 md:px-6 py-2 md:py-3 rounded-xl transform -rotate-1 border-2 border-fb-primary self-start md:self-auto">
+                            £8.50 <span className="text-sm md:text-lg font-normal text-fb-primary/90 block md:inline md:ml-2">(+ friez & 1 sauce)</span>
                         </div>
                     </div>
                     <div className="grid gap-x-12 gap-y-6 md:grid-cols-2">
@@ -97,10 +106,10 @@ export default async function HomePage() {
                 <section>
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 mb-8">
                         <div>
-                            <h2 className="text-5xl md:text-6xl font-black font-fbHeading text-fb-secondary uppercase tracking-wide">Chix Burgz</h2>
+                            <h2 className="text-4xl md:text-6xl font-black font-fbHeading text-fb-primary uppercase tracking-wide">Chix Burgz</h2>
                         </div>
-                        <div className="text-3xl font-bold text-fb-text bg-fb-surface px-6 py-3 rounded-xl transform rotate-1">
-                            £8.50 <span className="text-lg font-normal text-fb-text/80 block md:inline md:ml-2">(+ friez & 1 sauce)</span>
+                        <div className="text-xl md:text-3xl font-bold text-fb-text bg-fb-surface px-4 md:px-6 py-2 md:py-3 rounded-xl transform rotate-1 self-start md:self-auto">
+                            £8.50 <span className="text-sm md:text-lg font-normal text-fb-text/80 block md:inline md:ml-2">(+ friez & 1 sauce)</span>
                         </div>
                     </div>
                     <div className="grid gap-x-12 gap-y-6 md:grid-cols-2">
@@ -119,7 +128,7 @@ export default async function HomePage() {
                     {/* Add Inside */}
                     <div>
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 mb-8">
-                            <h2 className="text-4xl md:text-5xl font-black font-fbHeading text-fb-text uppercase tracking-wide">Add Inside</h2>
+                            <h2 className="text-3xl md:text-5xl font-black font-fbHeading text-fb-primary uppercase tracking-wide">Add Inside</h2>
                         </div>
                         <div className="space-y-4">
                             {MENU_ITEMS.filter(i => i.category === 'Add Inside Your Burger').map(item => (
@@ -134,7 +143,7 @@ export default async function HomePage() {
                     {/* Vegetarian/Upgrade Box - Simplified */}
                     <div>
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 mb-8">
-                            <h2 className="text-4xl md:text-5xl font-black font-fbHeading text-fb-text uppercase tracking-wide">Vegetarian</h2>
+                            <h2 className="text-3xl md:text-5xl font-black font-fbHeading text-fb-primary uppercase tracking-wide">Vegetarian</h2>
                         </div>
                         <div className="bg-fb-surface-soft/50 text-fb-text rounded-3xl p-8 flex flex-col justify-center text-center border-2 border-transparent">
                             <p className="text-2xl font-bold mb-2">Swap any beef with</p>
@@ -155,7 +164,7 @@ export default async function HomePage() {
                         {/* Chix Bitez */}
                         <div className="space-y-6">
                             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 mb-2">
-                                <h3 className="text-4xl md:text-5xl font-black uppercase text-fb-secondary font-fbHeading">Chix Bitez</h3>
+                                <h3 className="text-3xl md:text-5xl font-black uppercase text-fb-primary font-fbHeading">Chix Bitez</h3>
                             </div>
                             <div className="space-y-4">
                                 {MENU_ITEMS.filter(i => i.category === 'Sides' && i.name.includes('Chix Bitez')).map(item => (
@@ -173,7 +182,7 @@ export default async function HomePage() {
                         {/* Filletz */}
                         <div className="space-y-6">
                             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 mb-2">
-                                <h3 className="text-4xl md:text-5xl font-black uppercase text-fb-secondary font-fbHeading">Filletz</h3>
+                                <h3 className="text-3xl md:text-5xl font-black uppercase text-fb-primary font-fbHeading">Filletz</h3>
                             </div>
                             <div className="space-y-4">
                                 {MENU_ITEMS.filter(i => i.category === 'Sides' && i.name.includes('Filletz')).map(item => (
@@ -190,7 +199,7 @@ export default async function HomePage() {
                         {/* Oumi Cheeze */}
                         <div className="space-y-6">
                             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 mb-2">
-                                <h3 className="text-4xl md:text-5xl font-black uppercase text-fb-secondary font-fbHeading">Oumi Cheeze</h3>
+                                <h3 className="text-3xl md:text-5xl font-black uppercase text-fb-primary font-fbHeading">Oumi Cheeze</h3>
                             </div>
                             <div className="space-y-4">
                                 {MENU_ITEMS.filter(i => i.category === 'Sides' && i.name.includes('Oumi Cheeze')).map(item => (
@@ -241,13 +250,13 @@ export default async function HomePage() {
                 <section>
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 mb-8">
                         <div>
-                            <h2 className="text-5xl md:text-6xl font-black font-fbHeading text-fb-secondary uppercase tracking-wide">Friez</h2>
+                            <h2 className="text-4xl md:text-6xl font-black font-fbHeading text-fb-primary uppercase tracking-wide">Friez</h2>
                         </div>
                     </div>
                     <div className="grid md:grid-cols-2 gap-12">
                         {/* The Friez - No Card */}
                         <div>
-                            <h3 className="text-3xl font-black uppercase mb-6 text-fb-text font-fbHeading border-b-2 border-fb-surface-soft pb-2">The Friez</h3>
+                            <h3 className="text-3xl font-black uppercase mb-6 text-fb-primary font-fbHeading border-b-2 border-fb-surface-soft pb-2">The Friez</h3>
                             <div className="space-y-4">
                                 {MENU_ITEMS.filter(i => i.category === 'Friez').map(item => (
                                     <div key={item.id} className="flex justify-between items-center border-b border-fb-surface-soft pb-3 last:border-0">
@@ -259,7 +268,7 @@ export default async function HomePage() {
                         </div>
                         {/* Add To Box - No Card */}
                         <div>
-                            <h3 className="text-3xl font-black uppercase mb-6 text-fb-text font-fbHeading border-b-2 border-fb-surface-soft pb-2">Add To Box</h3>
+                            <h3 className="text-3xl font-black uppercase mb-6 text-fb-primary font-fbHeading border-b-2 border-fb-surface-soft pb-2">Add To Box</h3>
                             <div className="space-y-4">
                                 {MENU_ITEMS.filter(i => i.category === 'Add Into Your Box').map(item => (
                                     <div key={item.id} className="flex justify-between items-center border-b border-fb-surface-soft pb-3 last:border-0">
@@ -272,31 +281,30 @@ export default async function HomePage() {
                     </div>
                 </section>
 
-                {/* Kidz Menu - Improved Content & Layout */}
-                <section className="bg-fb-surface rounded-[3rem] p-10 md:p-16 text-center relative overflow-hidden">
-                    <div className="relative z-10">
-                        <div className="flex flex-col items-center gap-4 mb-12">
-                            <h2 className="text-6xl md:text-7xl font-black font-fbHeading text-fb-text uppercase drop-shadow-sm">Kidz Menu</h2>
-                            <span className="text-6xl font-black text-white bg-fb-primary px-8 py-2 rounded-full transform -rotate-2 shadow-xl border-4 border-white">£6</span>
+                {/* Kidz Menu - Standardized Style */}
+                <section>
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 mb-12 border-b-8 border-fb-primary/20">
+                        <div>
+                            <h2 className="text-4xl md:text-6xl font-black font-fbHeading text-fb-primary uppercase tracking-wide">Kidz Menu</h2>
+                            <p className="text-lg md:text-xl font-bold text-fb-muted mt-2 uppercase tracking-widest">Includes Friez</p>
                         </div>
+                        <div className="text-4xl md:text-5xl font-black text-fb-primary font-fbHeading">
+                            £6.00
+                        </div>
+                    </div>
 
-                        <div className="max-w-4xl mx-auto">
-                            <h3 className="text-2xl font-bold uppercase mb-8 text-fb-muted">Included with Friez</h3>
-                            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {/* Hardcoded Options for better layout than dynamic mapping */}
-                                {[
-                                    { name: "Single Beef", icon: "🍔" },
-                                    { name: "Chicken Bitez", icon: "🍗" },
-                                    { name: "Filletz", icon: "🍗" },
-                                    { name: "Oumi Cheeze", icon: "🧀" }
-                                ].map((item) => (
-                                    <div key={item.name} className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl shadow-sm hover:scale-105 transition-transform">
-                                        <span className="text-4xl mb-2" role="img" aria-label={item.name}>{item.icon}</span>
-                                        <span className="text-xl font-black uppercase text-fb-secondary font-fbHeading leading-tight">{item.name}</span>
-                                    </div>
-                                ))}
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-6">
+                        {[
+                            { name: "Single Beef", icon: "🍔" },
+                            { name: "Chicken Bitez", icon: "🍗" },
+                            { name: "Filletz", icon: "🍗" },
+                            { name: "Oumi Cheeze", icon: "🧀" }
+                        ].map((item) => (
+                            <div key={item.name} className="flex justify-between items-center border-b border-fb-surface-soft pb-4">
+                                <span className="text-2xl font-black uppercase text-fb-text font-fbHeading">{item.name}</span>
+                                {/* Icon removed or kept minimal? Keeping minimal as per 'clean' request, maybe just text list or small icon */}
                             </div>
-                        </div>
+                        ))}
                     </div>
                 </section>
 
@@ -305,9 +313,9 @@ export default async function HomePage() {
                     <div className="grid gap-12 md:grid-cols-2 items-start">
                         {/* Cheesecakes - Clean List */}
                         <div>
-                            <div className="flex justify-between items-end mb-8 border-b-2 border-fb-text pb-2">
-                                <h3 className="text-4xl font-black font-fbHeading">Cheesecakez</h3>
-                                <span className="text-3xl font-bold text-fb-primary">£4.50</span>
+                            <div className="flex flex-wrap justify-between items-end mb-8 border-b-2 border-fb-text pb-2 gap-2">
+                                <h3 className="text-3xl md:text-4xl font-black font-fbHeading text-fb-primary">Cheesecakez</h3>
+                                <span className="text-2xl md:text-3xl font-bold text-fb-primary">£4.50</span>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 {MENU_ITEMS.filter(i => i.category === 'Cheesecakez').map(item => (
@@ -319,11 +327,11 @@ export default async function HomePage() {
                         </div>
                         {/* Milkshakes - Clean List */}
                         <div>
-                            <div className="flex justify-between items-end mb-8 border-b-2 border-fb-text pb-2">
-                                <h3 className="text-4xl font-black font-fbHeading">Milkshakez</h3>
+                            <div className="flex flex-wrap justify-between items-end mb-8 border-b-2 border-fb-text pb-2 gap-2">
+                                <h3 className="text-3xl md:text-4xl font-black font-fbHeading text-fb-primary">Milkshakez</h3>
                                 <div className="text-right leading-none">
-                                    <span className="block text-sm font-bold text-fb-muted mb-1">REG / LRG</span>
-                                    <span className="text-3xl font-bold text-fb-primary">3.50 / 4.50</span>
+                                    <span className="block text-xs md:text-sm font-bold text-fb-muted mb-1">REG / LRG</span>
+                                    <span className="text-2xl md:text-3xl font-bold text-fb-primary">3.50 / 4.50</span>
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -355,11 +363,11 @@ export default async function HomePage() {
                 <section id="breakfast" className="space-y-12 pt-12 border-t-8 border-fb-surface-soft">
                     <div className="text-center space-y-4">
                         <span className="inline-block bg-fb-secondary text-white font-bold px-4 py-1 rounded-full text-sm uppercase tracking-widest mb-2">Morning Special</span>
-                        <h2 className="text-6xl md:text-7xl font-black font-fbHeading text-fb-secondary uppercase tracking-tight">Breakfast Burgz!</h2>
+                        <h2 className="text-6xl md:text-7xl font-black font-fbHeading text-fb-primary uppercase tracking-tight">Breakfast Burgz!</h2>
                         <p className="text-xl md:text-2xl text-fb-text font-bold max-w-2xl mx-auto border-y-2 border-fb-surface-soft py-4">CHOOSE YOUR BASE £4 • TOPPED WITH AMERICAN SLICES</p>
                     </div>
                     <div className="bg-fb-surface-soft/30 p-10 rounded-[3rem] text-center max-w-3xl mx-auto">
-                        <h3 className="text-3xl font-bold text-fb-text mb-2">Add Extra Toppings</h3>
+                        <h3 className="text-3xl font-bold text-fb-primary mb-2">Add Extra Toppings</h3>
                         <p className="text-7xl font-black text-fb-secondary font-fbHeading mb-4">£1.50 <span className="text-3xl font-bold text-fb-muted">EACH</span></p>
                         <p className="text-fb-muted font-bold text-lg font-mono">(See in-store for full selection)</p>
                     </div>

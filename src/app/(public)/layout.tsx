@@ -11,9 +11,10 @@ export default function PublicLayout({
             <header className="sticky top-0 z-50 w-full border-b border-fb-surface-soft bg-fb-bg/95 backdrop-blur supports-[backdrop-filter]:bg-fb-bg/60">
                 <div className="container flex h-20 items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
-                        <span className="text-xl font-bold uppercase tracking-tighter text-fb-primary font-fbHeading">
+                        {/* <span className="text-xl font-bold uppercase tracking-tighter text-fb-primary font-fbHeading">
                             Friez n Burgz
-                        </span>
+                        </span> */}
+                        <img src="/logo.png" alt="Friez n Burgz" className="h-12 w-auto object-contain" />
                     </Link>
                     <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
                         <Link href="/#menu" className="transition-colors hover:text-fb-primary">
