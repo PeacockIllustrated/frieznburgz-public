@@ -17,7 +17,7 @@ export default async function HomePage() {
             {/* Condensed Seasonal Specials Hero */}
             <section className="container">
                 <div className="bg-fb-surface-soft/30 rounded-[3rem] p-8 md:p-12 border-2 border-fb-surface-soft">
-                    <SectionHeader className="text-center text-fb-primary mb-10">Seasonal Specialz</SectionHeader>
+                    <SectionHeader className="text-center text-fb-primary mb-10">Mouth-Watering Specialz</SectionHeader>
                     <div className="grid gap-12 md:grid-cols-2 max-w-5xl mx-auto">
                         {MENU_ITEMS.filter(i => i.category === 'Seasonal Specials').map((item, idx) => (
                             <div key={item.id} className="flex flex-col items-center text-center space-y-6 group">
