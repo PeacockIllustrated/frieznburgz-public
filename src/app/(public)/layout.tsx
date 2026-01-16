@@ -20,9 +20,7 @@ export default function PublicLayout({
                         <Link href="/#menu" className="transition-colors hover:text-fb-primary">
                             Menu
                         </Link>
-                        <Link href="/allergens" className="transition-colors hover:text-fb-primary">
-                            Allergens
-                        </Link>
+
                         <Link href="/customer-links" className="transition-colors hover:text-fb-primary">
                             Links
                         </Link>

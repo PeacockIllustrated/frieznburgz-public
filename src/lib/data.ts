@@ -4,16 +4,17 @@ export const MENU_ITEMS: MenuItem[] = [
     // Seasonal Specials
     {
         id: 'seasonal-1',
-        name: 'Christmas Porker',
-        description: 'Pork and Beef Patties, Brie, Stuffing Patty, Rocket, Crispy Bacon Jam, Chilli Flakes, American Cheese.',
-        price: 13.00,
+        name: 'The Surf & Turf',
+        description: 'Battered king prawns, Sweet chilli sauce, 7oz patty, Herb Cream cheese, Lettuce. Friez served with a pot of lemon pepper and dill mayo.',
+        price: 14.00,
         category: 'Seasonal Specials',
     },
     {
         id: 'seasonal-2',
-        name: 'Christmas Clucker',
-        description: 'Chicken Burger, Brie, Stuffing Patty, Rocket, Crispy Bacon Jam, Chilli Flakes.',
-        price: 13.00,
+        name: 'Birthday Cake Shake',
+        description: 'Freshly made milkshake with the classic birthday taste, with sprinkles.',
+        price: 4.50,
+        priceAlt: 5.50,
         category: 'Seasonal Specials',
     },
 
@@ -21,7 +22,7 @@ export const MENU_ITEMS: MenuItem[] = [
     {
         id: 'beef-1',
         name: 'Fussy Beef',
-        description: 'Only Beef, Cheeze.',
+        description: 'Only Beef & Cheeze',
         price: 8.50,
         category: 'Beef Burgz',
     },
@@ -50,7 +51,7 @@ export const MENU_ITEMS: MenuItem[] = [
     {
         id: 'beef-5',
         name: 'American',
-        description: 'Cheeze, Diced Onion, Dill Pickles, Ketchup, Mustard.',
+        description: 'Cheeze, Diced Onion, Dill Pickles, Ketchup & Mustard',
         price: 8.50,
         category: 'Beef Burgz',
     },
@@ -59,14 +60,14 @@ export const MENU_ITEMS: MenuItem[] = [
     {
         id: 'chix-1',
         name: 'Fussy Chix',
-        description: 'Only Chicken, Cheeze.',
+        description: 'Only Chicken & Cheeze',
         price: 8.50,
         category: 'Chix Burgz',
     },
     {
         id: 'chix-2',
         name: 'Light',
-        description: 'Cheeze, Lettuce, Creamy Garlic.',
+        description: 'Cheeze, Lettuce & Creamy Garlic',
         price: 8.50,
         category: 'Chix Burgz',
     },
@@ -81,7 +82,7 @@ export const MENU_ITEMS: MenuItem[] = [
     {
         id: 'chix-4',
         name: 'Crunchy',
-        description: 'Cheeze, Dijionese Coleslaw, House-Made Garlic Parmesan Sauce.',
+        description: 'Cheeze, Dijonaise Coleslaw & House-Made Garlic Parmesan Sauce',
         price: 8.50,
         category: 'Chix Burgz',
     },
@@ -158,15 +159,7 @@ export const MENU_ITEMS: MenuItem[] = [
     { id: 'shake-3', name: 'Chocolate', price: 3.50, category: 'Milkshakez', is_veggie: true },
     { id: 'shake-4', name: 'Banana', price: 3.50, category: 'Milkshakez', is_veggie: true },
 
-    // Special Shake
-    {
-        id: 'shake-special',
-        name: 'The Biscoff Shake',
-        description: 'Fresh Cream, Caramel Swirls, Biscoff Cream, Crushed Biscuits.',
-        price: 4.50,
-        category: 'Milkshakez',
-        is_veggie: true
-    },
+
 
     // Breakfast (Untouched as requested)
     {
@@ -197,22 +190,27 @@ export const LOCATIONS = [
     {
         name: 'South Shields',
         address: '124 Fowler St, South Shields NE33 1PZ',
-        times: 'Mon-Sat: 12-9pm | Sun: 2-9pm',
+        times: 'Mon-Thu: 12-9pm | Fri-Sat: 9am-9pm (Breakfast 9-11am) | Sun: 2-9pm',
     },
     {
         name: 'Byker, Newcastle',
         address: '247 Shields Road, NE6 1DQ',
-        times: 'Mon-Sat: 12-9pm | Sun: 2-9pm',
+        times: 'Mon-Thu: 12-9pm | Fri-Sat: 9am-9pm (Breakfast 9-11am) | Sun: 2-9pm',
     },
     {
         name: 'Forest Hall',
         address: '7 Station Road, NE12 7AR',
-        times: 'Mon-Sat: 12-9pm | Sun: 2-9pm',
+        times: 'Mon-Thu: 12-9pm | Fri-Sat: 9am-9pm (Breakfast 9-11am) | Sun: 2-9pm',
     },
     {
         name: 'Whitley Bay',
         address: '164 Whitley Road, NE26 2LX',
-        times: 'Mon-Sat: 12-9pm | Sun: 2-9pm',
+        times: 'Mon-Thu: 12-9pm | Fri-Sat: 9am-9pm (Breakfast 9-11am) | Sun: 2-9pm',
+    },
+    {
+        name: 'Percy Street, Newcastle',
+        address: '99 Percy St, Newcastle upon Tyne NE1 7RT',
+        times: 'Mon-Thu: 12-9pm | Fri-Sat: 11:30am-9pm | Sun: 11am-6pm',
     }
 ]
 

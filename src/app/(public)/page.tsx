@@ -17,26 +17,23 @@ export default async function HomePage() {
             {/* Condensed Seasonal Specials Hero */}
             <section className="container">
                 <div className="bg-fb-surface-soft/30 rounded-[3rem] p-8 md:p-12 border-2 border-fb-surface-soft">
-                    <SectionHeader className="text-center text-fb-primary mb-8">Seasonal Specialz</SectionHeader>
-                    <div className="flex flex-col items-center mb-10 text-center">
-                        <span className="text-4xl md:text-6xl font-black text-fb-primary font-fbHeading mb-3">£13</span>
-                        <span className="text-base md:text-xl font-bold text-fb-text uppercase tracking-widest max-w-2xl px-4">
-                            Both served with Gravy, Brie & Bacon Jam Friez
-                        </span>
-                    </div>
+                    <SectionHeader className="text-center text-fb-primary mb-10">Seasonal Specialz</SectionHeader>
                     <div className="grid gap-12 md:grid-cols-2 max-w-5xl mx-auto">
                         {MENU_ITEMS.filter(i => i.category === 'Seasonal Specials').map((item, idx) => (
                             <div key={item.id} className="flex flex-col items-center text-center space-y-6 group">
                                 <div className="relative w-full max-w-sm aspect-square">
                                     <img
-                                        src={item.id === 'seasonal-1' ? '/special-porker.png' : '/special-clucker.png'}
+                                        src={item.id === 'seasonal-1' ? '/Surf-&-Turf.png' : '/Birthday-Cake-Shake.png'}
                                         alt={item.name}
                                         className={`w-full h-full object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-110 ${idx === 0 ? '-rotate-6' : 'rotate-6'}`}
                                     />
                                 </div>
                                 <div>
                                     <h3 className="text-3xl md:text-4xl font-black text-fb-text uppercase font-fbHeading leading-none mb-2">{item.name}</h3>
-                                    <p className="text-lg font-medium text-fb-muted max-w-sm leading-snug mx-auto">{item.description}</p>
+                                    <p className="text-lg font-medium text-fb-muted max-w-sm leading-snug mx-auto uppercase">{item.description}</p>
+                                    <p className="text-3xl md:text-4xl font-black text-fb-primary font-fbHeading mt-4">
+                                        £{item.price?.toFixed(2)}{item.priceAlt && ` / £${item.priceAlt.toFixed(2)}`}
+                                    </p>
                                 </div>
                             </div>
                         ))}
@@ -343,20 +340,7 @@ export default async function HomePage() {
                             </div>
                         </div>
                     </div>
-                    {/* Special Shake - Simplified */}
-                    <div className="mt-12 border-t-4 border-fb-surface-soft pt-12">
-                        {MENU_ITEMS.filter(i => i.name === 'The Biscoff Shake').map(item => (
-                            <div key={item.id} className="flex flex-col md:flex-row items-center gap-10">
-                                <div className="flex-1 text-center md:text-left">
-                                    <h3 className="text-5xl font-black font-fbHeading text-fb-primary uppercase mb-3">Special: {item.name}</h3>
-                                    <p className="text-2xl font-bold text-fb-text/80 mb-6">{item.description}</p>
-                                </div>
-                                <div className="inline-block bg-fb-primary px-8 py-3 rounded-full text-white font-black text-3xl shadow-md">
-                                    £{item.price?.toFixed(2)} / £5.50
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+
                 </section>
 
                 {/* Breakfast (Original - Preserving mostly but matching clean style) */}
@@ -387,17 +371,20 @@ export default async function HomePage() {
                 {/* Locations */}
                 <section className="pb-20 pt-12 text-center">
                     <SectionHeader className="text-center mb-16">Locations</SectionHeader>
-                    <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
-                        {LOCATIONS.map((loc) => (
-                            <div key={loc.name} className="flex flex-col gap-6 group">
+                    <div className="flex flex-wrap justify-center gap-12">
+                        {LOCATIONS.map((loc, idx) => (
+                            <div
+                                key={loc.name}
+                                className={`flex flex-col gap-6 group w-full md:w-[calc(50%-1.5rem)] lg:w-[calc(33.333%-2rem)] ${idx >= 3 ? 'lg:w-[calc(33.333%-2rem)]' : ''}`}
+                            >
                                 <h3 className="text-3xl text-fb-primary font-black uppercase tracking-wide group-hover:scale-105 transition-transform">{loc.name}</h3>
                                 <div className="space-y-4 p-6 h-full transition-all">
                                     <p className="text-fb-text font-bold text-xl leading-snug">{loc.address}</p>
                                     <MapPin className="w-8 h-8 mx-auto text-fb-primary/80" />
                                     <div className="text-sm text-fb-muted space-y-2 font-bold font-mono">
-                                        <p>12–9pm | Mon–Sat</p>
-                                        <p>9–11am | Fri–Sat (Breakfast)</p>
-                                        <p>2–9pm | Sun</p>
+                                        {loc.times.split(' | ').map((time, idx) => (
+                                            <p key={idx}>{time}</p>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
