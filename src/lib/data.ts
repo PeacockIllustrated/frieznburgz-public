@@ -128,12 +128,12 @@ export const MENU_ITEMS: MenuItem[] = [
     { id: 'side-3', name: 'Chix Bitez (15 pcs)', description: '7+8 pcs x 2 flavs', price: 7.50, category: 'Sides' },
     { id: 'side-4', name: 'Filletz (2 pcs)', price: 3.50, category: 'Sides' },
     { id: 'side-5', name: 'Filletz (5 pcs)', price: 7.50, category: 'Sides' },
-    { id: 'side-6', name: 'Oumi Cheeze (4 pcs)', price: 3.00, category: 'Sides', is_veggie: true },
+    { id: 'side-6', name: 'Oumi Cheeze (5 pcs)', price: 3.00, category: 'Sides', is_veggie: true },
     { id: 'side-7', name: 'Oumi Cheeze (8 pcs)', price: 5.00, category: 'Sides', is_veggie: true },
 
     // Friez (Standalone)
     { id: 'friez-1', name: 'Plain Friez', price: 2.50, category: 'Friez' },
-    { id: 'friez-2', name: 'Cheeze Sauce Friez', price: 3.00, category: 'Friez' },
+    { id: 'friez-2', name: 'Cheeze Sauce Friez', price: 4.00, category: 'Friez' },
     { id: 'friez-3', name: 'Cheeze Sauce & Bacon Friez', price: 4.50, category: 'Friez' },
     { id: 'friez-4', name: 'Truffle Garlic Parm Friez', price: 4.50, category: 'Friez' },
 
