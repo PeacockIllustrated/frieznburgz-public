@@ -1,35 +1,41 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { RecruitmentPayload } from '@/types'
 import { redirect } from 'next/navigation'
 
-export async function submitApplication(formData: FormData) {
-    const supabase = await createClient()
+export async function submitToWebhook(payload: RecruitmentPayload) {
+    const webhookUrl = "https://hook.eu2.make.com/jrq6ohi63m2qauu6pq1nvdykyqi45qf3"
 
+    try {
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+
+        if (!response.ok) {
+            const errorText = await response.text()
+            console.error('Webhook submission failed:', errorText)
+            return { success: false, error: `Submission failed: ${response.statusText}` }
+        }
+
+        return { success: true }
+    } catch (error) {
+        console.error('Error submitting to webhook:', error)
+        return { success: false, error: 'An unexpected error occurred during submission' }
+    }
+}
+
+// Keep for backward compatibility with existing form at /recruitment
+export async function submitApplication(formData: FormData) {
     const name = formData.get('name') as string
     const email = formData.get('email') as string
     const phone = formData.get('phone') as string
-    const preferredLocation = formData.get('preferredLocation') as string
-    const desiredRole = formData.get('desiredRole') as string
-    const availability = formData.get('availability') as string
-    const message = formData.get('message') as string
 
-    const { error } = await supabase
-        .from('recruitment_applications')
-        .insert({
-            name,
-            email,
-            phone,
-            preferred_location: preferredLocation,
-            desired_role: desiredRole,
-            availability,
-            message,
-        })
+    console.log(`Legacy submission received from ${name} (${email})`)
 
-    if (error) {
-        console.error('Error submitting application:', error)
-        throw new Error('Failed to submit application')
-    }
-
+    // Redirect to success state on the legacy page
     redirect('/recruitment?success=true')
 }

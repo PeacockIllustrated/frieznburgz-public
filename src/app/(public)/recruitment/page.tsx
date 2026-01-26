@@ -1,6 +1,5 @@
-
 import { Suspense } from 'react';
-import { RecruitmentForm } from "@/components/recruitment-form";
+import { OnboardingForm } from "@/components/onboarding-form";
 import { SectionHeader } from "@/components/ui/section-header";
 
 export const dynamic = 'force-dynamic';
@@ -11,14 +10,14 @@ export default function RecruitmentPage() {
             <SectionHeader className="text-center">Join the Team</SectionHeader>
             <div className="space-y-8">
                 <div className="bg-fb-surface-soft/20 border border-fb-surface-soft rounded-xl p-6 text-center">
-                    <p className="text-fb-muted text-lg leading-relaxed">
+                    <p className="text-fb-muted text-lg leading-relaxed font-bold uppercase tracking-tight">
                         We’re always looking for passionate people to join the Friez n Burgz family.
                         If you love great food and good vibes, fill out the form below.
                     </p>
                 </div>
-                <div className="rounded-2xl border-2 border-fb-surface-soft bg-fb-surface p-6 md:p-10 shadow-xl">
-                    <Suspense fallback={<div className="flex justify-center p-8"><p className="text-fb-muted animate-pulse">Loading form...</p></div>}>
-                        <RecruitmentForm />
+                <div className="mt-8">
+                    <Suspense fallback={<div className="flex justify-center p-8"><p className="text-fb-muted animate-pulse font-black uppercase">Loading form...</p></div>}>
+                        <OnboardingForm />
                     </Suspense>
                 </div>
             </div>

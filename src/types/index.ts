@@ -38,6 +38,7 @@ export interface MenuItem {
     name: string;
     description?: string;
     price?: number;
+    priceAlt?: number;
     category: MenuCategory;
     is_vegan?: boolean;
     is_veggie?: boolean;
@@ -62,14 +63,36 @@ export interface AllergenItem {
     allergens: Allergen[];
 }
 
-export interface RecruitmentApplication {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    preferredLocation: string;
-    desiredRole: string;
-    availability: string;
-    message: string;
-    created_at: string;
+export interface RecruitmentData {
+    "Name Recruitment": string;
+    "Email Recruitment": string;
+    "Date of Birth": string;
+    "Phone Number": string;
+    "Location": string;
+    "position": string;
+    "Availability": string;
+    "South Shields": string;
+    "Byker": string;
+    "Forest Hall": string;
+    "Whitley Bay": string;
+    "Studying or Working?": string;
+    "Can Drive": string;
+    "Car": string;
+    "Public Transport": string;
+    "Walking": string;
+    "Other Transport": string;
+    "Experience": string;
+    "Describe Experience": string;
+    "Certifications": string;
+    "Additional Skills": string;
+    "Logistics": string;
+    "Start Availability": string;
+    "Why?": string;
+    "Anything Else?": string;
+}
+
+export interface RecruitmentPayload {
+    name: "Recruitment";
+    data: RecruitmentData;
+    submittedAt: string;
 }
