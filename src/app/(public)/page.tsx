@@ -23,7 +23,7 @@ export default async function HomePage() {
                             <div key={item.id} className="flex flex-col items-center text-center space-y-6 group">
                                 <div className="relative w-full max-w-sm aspect-square">
                                     <img
-                                        src={item.id === 'seasonal-1' ? '/Surf-&-Turf.png' : '/Birthday-Cake-Shake.png'}
+                                        src={item.id === 'seasonal-1' ? '/indian-special.png' : '/brownie-milkshake.png'}
                                         alt={item.name}
                                         className={`w-full h-full object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-110 ${idx === 0 ? '-rotate-6' : 'rotate-6'}`}
                                     />

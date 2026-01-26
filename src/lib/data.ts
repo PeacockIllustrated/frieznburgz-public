@@ -4,15 +4,15 @@ export const MENU_ITEMS: MenuItem[] = [
     // Seasonal Specials
     {
         id: 'seasonal-1',
-        name: 'The Surf & Turf',
-        description: 'Battered king prawns, Sweet chilli sauce, 7oz patty, Herb Cream cheese, Lettuce. Friez served with a pot of lemon pepper and dill mayo.',
+        name: 'THE INDIAN SPECIAL',
+        description: 'A homemade bun stacked with crispy chicken tikka and onion bhaji, topped with fresh chillies, rich masala sauce, and finished with a coriander and crispy onion garlic mayo.',
         price: 14.00,
         category: 'Seasonal Specials',
     },
     {
         id: 'seasonal-2',
-        name: 'Birthday Cake Shake',
-        description: 'Freshly made milkshake with the classic birthday taste, with sprinkles.',
+        name: 'THE BROWNIE SHAKE',
+        description: 'Fresh cream, Chocolate Sauce, And Brownie Chunkz',
         price: 4.50,
         priceAlt: 5.50,
         category: 'Seasonal Specials',
