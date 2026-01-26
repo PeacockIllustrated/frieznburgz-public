@@ -32,7 +32,9 @@ export default function PublicLayout({
                         <Button asChild variant="default" size="sm" className="hidden md:inline-flex">
                             <Link href="/#menu">View Menu</Link>
                         </Button>
-                        {/* Mobile Menu Toggle could go here, for now keeping it simple as per prompt "Right: simple button or icon" */}
+                        <Button asChild variant="outline" size="sm" className="md:hidden">
+                            <Link href="/recruitment">Join Us</Link>
+                        </Button>
                         <Button asChild variant="default" size="sm" className="md:hidden">
                             <Link href="/#menu">Menu</Link>
                         </Button>
@@ -47,11 +49,6 @@ export default function PublicLayout({
                     <p className="text-center text-sm leading-loose text-fb-muted md:text-left">
                         © 2026 Friez n Burgz. All rights reserved.
                     </p>
-                    <div className="flex gap-4">
-                        <Link href="/app" className="text-xs text-fb-muted hover:text-fb-text">
-                            Admin Login
-                        </Link>
-                    </div>
                 </div>
             </footer>
         </div>
