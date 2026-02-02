@@ -4,9 +4,9 @@ export const MENU_ITEMS: MenuItem[] = [
     // Seasonal Specials
     {
         id: 'seasonal-1',
-        name: 'THE INDIAN SPECIAL',
-        description: 'A homemade bun stacked with crispy chicken tikka and onion bhaji, topped with fresh chillies, rich masala sauce, and finished with a coriander and crispy onion garlic mayo.',
-        price: 14.00,
+        name: 'THE GREEK XL',
+        description: 'chicken burger, smash beef patty with feta, emmental cheese, halloumi, red onion, beef tomato, lettuce and tzatziki With Greek loaded friez.',
+        price: 15.00,
         category: 'Seasonal Specials',
     },
     {

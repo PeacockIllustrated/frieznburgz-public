@@ -23,13 +23,22 @@ export default async function HomePage() {
                             <div key={item.id} className="flex flex-col items-center text-center space-y-6 group">
                                 <div className="relative w-full max-w-sm aspect-square">
                                     <img
-                                        src={item.id === 'seasonal-1' ? '/indian-special.png' : '/brownie-milkshake.png'}
+                                        src={item.id === 'seasonal-1' ? '/Greek-XL.png' : '/brownie-milkshake.png'}
                                         alt={item.name}
                                         className={`w-full h-full object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-110 ${idx === 0 ? '-rotate-6' : 'rotate-6'}`}
                                     />
                                 </div>
                                 <div>
-                                    <h3 className="text-3xl md:text-4xl font-black text-fb-text uppercase font-fbHeading leading-none mb-2">{item.name}</h3>
+                                    <h3 className="text-3xl md:text-4xl font-black text-fb-text uppercase font-fbHeading leading-none mb-2">
+                                        {item.name.includes('XL') ? (
+                                            <>
+                                                {item.name.replace('XL', '')}
+                                                <span className="text-fb-secondary">XL</span>
+                                            </>
+                                        ) : (
+                                            item.name
+                                        )}
+                                    </h3>
                                     <p className="text-lg font-medium text-fb-muted max-w-sm leading-snug mx-auto uppercase">{item.description}</p>
                                     <p className="text-3xl md:text-4xl font-black text-fb-primary font-fbHeading mt-4">
                                         £{item.price?.toFixed(2)}{item.priceAlt && ` / £${item.priceAlt.toFixed(2)}`}
