@@ -4,17 +4,25 @@ export const MENU_ITEMS: MenuItem[] = [
     // Seasonal Specials
     {
         id: 'seasonal-1',
-        name: 'THE GREEK XL',
-        description: 'chicken burger, smash beef patty with feta, emmental cheese, halloumi, red onion, beef tomato, lettuce and tzatziki With Greek loaded friez.',
-        price: 15.00,
-        category: 'Seasonal Specials',
-    },
-    {
-        id: 'seasonal-2',
         name: 'THE BROWNIE SHAKE',
         description: 'Fresh cream, Chocolate Sauce, And Brownie Chunkz',
         price: 4.50,
         priceAlt: 5.50,
+        category: 'Seasonal Specials',
+    },
+    {
+        id: 'seasonal-2',
+        name: 'TRUFFLE PRM & PEPPER RANCH',
+        description: 'Smash beef patty, truffle parmesan, pepper ranch sauce, crispy onions, American cheese',
+        price: 12.00,
+        category: 'Seasonal Specials',
+    },
+    {
+        id: 'seasonal-3',
+        name: 'THE DUBAI SHAKE',
+        description: 'Fresh cream, Pistachio, Kataifi pastry, Chocolate sauce',
+        price: 5.50,
+        priceAlt: 6.50,
         category: 'Seasonal Specials',
     },
 

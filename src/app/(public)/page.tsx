@@ -18,34 +18,69 @@ export default async function HomePage() {
             <section className="container">
                 <div className="bg-fb-surface-soft/30 rounded-[3rem] p-8 md:p-12 border-2 border-fb-surface-soft">
                     <SectionHeader className="text-center text-fb-primary mb-10">Mouth-Watering Specialz</SectionHeader>
-                    <div className="grid gap-12 md:grid-cols-2 max-w-5xl mx-auto">
-                        {MENU_ITEMS.filter(i => i.category === 'Seasonal Specials').map((item, idx) => (
-                            <div key={item.id} className="flex flex-col items-center text-center space-y-6 group">
-                                <div className="relative w-full max-w-sm aspect-square">
+                    <div className="grid gap-8 md:gap-6 grid-cols-1 md:grid-cols-3 max-w-6xl mx-auto items-center">
+                        {/* Brownie Shake - Left */}
+                        <div className="flex flex-col items-center text-center space-y-6 group order-1 md:order-1">
+                            <div className="relative w-full max-w-xs aspect-square">
+                                <img
+                                    src="/brownie-milkshake.png"
+                                    alt="THE BROWNIE SHAKE"
+                                    className="w-full h-full object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-110 -rotate-6"
+                                />
+                            </div>
+                            <div>
+                                <h3 className="text-2xl md:text-3xl font-black text-fb-text uppercase font-fbHeading leading-none mb-2">
+                                    THE BROWNIE SHAKE
+                                </h3>
+                                <p className="text-base md:text-lg font-medium text-fb-muted max-w-sm leading-snug mx-auto uppercase">Fresh cream, Chocolate Sauce, And Brownie Chunkz</p>
+                                <p className="text-2xl md:text-3xl font-black text-fb-primary font-fbHeading mt-4">
+                                    £4.50 / £5.50
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Truffle Burger - Center with circular clipping mask */}
+                        <div className="flex flex-col items-center text-center space-y-6 group order-2 md:order-2">
+                            <div className="relative w-full max-w-sm aspect-square flex items-center justify-center">
+                                {/* Circular border container */}
+                                <div className="w-[85%] aspect-square rounded-full border-4 border-fb-primary bg-white overflow-hidden shadow-2xl">
                                     <img
-                                        src={item.id === 'seasonal-1' ? '/Greek-XL.png' : '/brownie-milkshake.png'}
-                                        alt={item.name}
-                                        className={`w-full h-full object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-110 ${idx === 0 ? '-rotate-6' : 'rotate-6'}`}
+                                        src="/Truffle-Prm-and-Pepper-Ranch-.png"
+                                        alt="TRUFFLE PRM & PEPPER RANCH"
+                                        className="w-full h-full object-cover scale-125 transition-transform duration-300 group-hover:scale-150"
                                     />
                                 </div>
-                                <div>
-                                    <h3 className="text-3xl md:text-4xl font-black text-fb-text uppercase font-fbHeading leading-none mb-2">
-                                        {item.name.includes('XL') ? (
-                                            <>
-                                                {item.name.replace('XL', '')}
-                                                <span className="text-fb-secondary">XL</span>
-                                            </>
-                                        ) : (
-                                            item.name
-                                        )}
-                                    </h3>
-                                    <p className="text-lg font-medium text-fb-muted max-w-sm leading-snug mx-auto uppercase">{item.description}</p>
-                                    <p className="text-3xl md:text-4xl font-black text-fb-primary font-fbHeading mt-4">
-                                        £{item.price?.toFixed(2)}{item.priceAlt && ` / £${item.priceAlt.toFixed(2)}`}
-                                    </p>
-                                </div>
                             </div>
-                        ))}
+                            <div>
+                                <h3 className="text-2xl md:text-3xl font-black text-fb-text uppercase font-fbHeading leading-none mb-2">
+                                    TRUFFLE PRM & PEPPER RANCH
+                                </h3>
+                                <p className="text-base md:text-lg font-medium text-fb-muted max-w-sm leading-snug mx-auto uppercase">Smash beef patty, truffle parmesan, pepper ranch sauce, crispy onions</p>
+                                <p className="text-2xl md:text-3xl font-black text-fb-primary font-fbHeading mt-4">
+                                    £12.00
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Dubai Shake - Right */}
+                        <div className="flex flex-col items-center text-center space-y-6 group order-3 md:order-3">
+                            <div className="relative w-full max-w-xs aspect-square">
+                                <img
+                                    src="/Dubai-Shake-NEW.png"
+                                    alt="THE DUBAI SHAKE"
+                                    className="w-full h-full object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-110 rotate-6"
+                                />
+                            </div>
+                            <div>
+                                <h3 className="text-2xl md:text-3xl font-black text-fb-text uppercase font-fbHeading leading-none mb-2">
+                                    THE DUBAI SHAKE
+                                </h3>
+                                <p className="text-base md:text-lg font-medium text-fb-muted max-w-sm leading-snug mx-auto uppercase">Fresh cream, Pistachio, Kataifi pastry, Chocolate sauce</p>
+                                <p className="text-2xl md:text-3xl font-black text-fb-primary font-fbHeading mt-4">
+                                    £5.50 / £6.50
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
