@@ -57,7 +57,7 @@ export default async function HomePage() {
                                 </h3>
                                 <p className="text-base md:text-lg font-medium text-fb-muted max-w-sm leading-snug mx-auto uppercase">Smash beef patty, truffle parmesan, pepper ranch sauce, crispy onions</p>
                                 <p className="text-2xl md:text-3xl font-black text-fb-primary font-fbHeading mt-4">
-                                    £12.00
+                                    £13.50
                                 </p>
                             </div>
                         </div>
@@ -77,7 +77,7 @@ export default async function HomePage() {
                                 </h3>
                                 <p className="text-base md:text-lg font-medium text-fb-muted max-w-sm leading-snug mx-auto uppercase">Fresh cream, Pistachio, Kataifi pastry, Chocolate sauce</p>
                                 <p className="text-2xl md:text-3xl font-black text-fb-primary font-fbHeading mt-4">
-                                    £5.50 / £6.50
+                                    £4.50 / £5.50
                                 </p>
                             </div>
                         </div>
