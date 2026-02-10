@@ -53,9 +53,9 @@ export default async function HomePage() {
                             </div>
                             <div>
                                 <h3 className="text-2xl md:text-3xl font-black text-fb-text uppercase font-fbHeading leading-none mb-2">
-                                    TRUFFLE PRM & PEPPER RANCH
+                                    TRUFFLE PARM & PEPPER RANCH
                                 </h3>
-                                <p className="text-base md:text-lg font-medium text-fb-muted max-w-sm leading-snug mx-auto uppercase">Smash beef patty, truffle parmesan, pepper ranch sauce, crispy onions</p>
+                                <p className="text-base md:text-lg font-medium text-fb-muted max-w-sm leading-snug mx-auto uppercase">2x Smash beef patty, truffle parmesan, pepper ranch sauce, crispy onions, Bacon</p>
                                 <p className="text-2xl md:text-3xl font-black text-fb-primary font-fbHeading mt-4">
                                     £13.50
                                 </p>
